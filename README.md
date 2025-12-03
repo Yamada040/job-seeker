@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 就活AI Copilot (MVP)
 
-## Getting Started
+大学生向けの就活アプリ（ES管理・AI添削・企業カード・XP表示）のMVP。初期はGeminiでAIを呼び出し、将来的にGPTへ差し替え可能な設計を前提にしています。
 
-First, run the development server:
+## 技術スタック
+
+- Next.js (App Router) + TypeScript + TailwindCSS (v4)
+- Supabase (Auth/DB/Storage + RLS)
+- AI: provider-agnostic wrapper（初期Gemini→将来GPT）
+- Hosting: Vercel
+
+## 画面
+
+- `/` マーケティング/要件サマリ（モダンUI）
+- `/dashboard` 機能プレビュー: タスク、ESカード、企業カード、AIキュー、XP表示（ダミーデータ）
+
+## DBスキーマ (Supabase)
+
+- `supabase/schema.sql` にテーブル定義・RLSポリシーを用意（profiles / es_entries / companies / xp_logs）。
+- Supabase SQLエディタまたは psql で適用し、RLSがONになっていることを確認してください。
+
+## 環境変数
+
+`.env.local` に設定してください。
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+# ローカル管理/マイグレーション用（サーバーのみで使用）
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+# optional: AI_PROVIDER=gemini|gpt (デフォルト gemini)
+# optional: NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# AIプロバイダーの鍵（初期はGemini、将来GPT等に差し替え）
+AI_PROVIDER_API_KEY=your_ai_key
+# optional: AI_PROVIDER=gemini|gpt (デフォルト gemini)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## セットアップ
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+# http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 今後の実装ステップ（優先度順）
 
-## Learn More
+1) Supabaseセットアップ: テーブル/ポリシー定義（ユーザー、ES、企業カード、XPログ）、RLS ON。
+2) Supabaseクライアント/サーバーコンポーネントを実装し、ES/企業カードのCRUD UIを接続。
+3) AIサービス層: provider-agnosticなラッパーを`/lib/ai/`に用意（Gemini→GPT差替え）。←実装済み
+4) UI強化: フィルタ・タグ・ステータス変更UI、モバイル最適化の仕上げ。
+5) 規約/プライポリ、エラーハンドリング、ローディング/空データ表示。
 
-To learn more about Next.js, take a look at the following resources:
+## Auth設定の要点（Magic Link）
+- Supabase Auth → URL Configuration: Site URL を `http://localhost:3000`、Redirect URLs に `http://localhost:3000/auth/callback` と `http://localhost:3000/dashboard` を追加。
+- Magic Linkのメールが叩くコールバック: `app/auth/callback/route.ts` で `exchangeCodeForSession` を必ず実行。
+- ログインフォームは `/login` のサーバーアクション経由でメールリンクを送信（`emailRedirectTo` は `/auth/callback`）。  
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 実装ガイドライン
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- YAGNI/DRY: MVPに不要な処理は後回し、共通化できるものは小コンポーネント/ユーティリティへ。
+- AIはプロバイダー非依存: 環境変数で切替可能な薄いサービス層を設計し、Gemini実装から着手。
+- セキュリティ: SupabaseのRLSを有効化し、HTTPS前提。写真アップロードは即時削除（将来のアバター生成用）。
+- ドキュメント優先: 画面/DB/AIの振る舞いを簡潔に記述し、後続の改修コストを下げる。
