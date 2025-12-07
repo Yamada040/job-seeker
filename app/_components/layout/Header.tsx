@@ -17,21 +17,18 @@ interface HeaderProps {
   breadcrumbs?: BreadcrumbItem[];
 }
 
-// Generate breadcrumbs from pathname
 function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
   const segments = pathname.split("/").filter(Boolean);
   const breadcrumbs: BreadcrumbItem[] = [];
 
-  // Always start with dashboard
   if (pathname !== "/dashboard") {
     breadcrumbs.push({ label: "ダッシュボード", href: "/dashboard" });
   }
 
-  // Map path segments to breadcrumbs
   let currentPath = "";
   segments.forEach((segment) => {
     currentPath += `/${segment}`;
-    
+
     let label = segment;
     switch (segment) {
       case "dashboard":
@@ -53,12 +50,11 @@ function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
         label = "設定";
         break;
       default:
-        // For dynamic segments (like IDs), try to make them more readable
         if (segment.length > 20) {
           label = "詳細";
         }
     }
-    
+
     breadcrumbs.push({ label, href: currentPath });
   });
 
@@ -70,29 +66,26 @@ export function Header({ title, description, actions, breadcrumbs }: HeaderProps
   const generatedBreadcrumbs = breadcrumbs || generateBreadcrumbs(pathname);
 
   return (
-    <header className="bg-white border-b border-[var(--border-light)] px-6 py-4">
+    <header className="border-b border-white/40 bg-white/70 px-6 py-4 backdrop-blur">
       <div className="flex flex-col gap-3">
-        {/* Breadcrumbs */}
         {generatedBreadcrumbs.length > 1 && (
           <nav className="flex items-center space-x-1 text-sm">
-            <HomeIcon className="h-4 w-4 text-[var(--foreground-tertiary)]" />
-            <ChevronRightIcon className="h-4 w-4 text-[var(--foreground-tertiary)]" />
-            
+            <HomeIcon className="h-4 w-4 text-slate-400" />
+            <ChevronRightIcon className="h-4 w-4 text-slate-400" />
+
             {generatedBreadcrumbs.map((item, index) => (
               <div key={item.href} className="flex items-center space-x-1">
                 {index === generatedBreadcrumbs.length - 1 ? (
-                  <span className="text-[var(--foreground)] font-medium">
-                    {item.label}
-                  </span>
+                  <span className="text-slate-800 font-medium">{item.label}</span>
                 ) : (
                   <>
                     <Link
                       href={item.href}
-                      className="text-[var(--foreground-secondary)] hover:text-[var(--foreground)] transition-colors"
+                      className="text-slate-500 hover:text-slate-800 transition-colors"
                     >
                       {item.label}
                     </Link>
-                    <ChevronRightIcon className="h-4 w-4 text-[var(--foreground-tertiary)]" />
+                    <ChevronRightIcon className="h-4 w-4 text-slate-300" />
                   </>
                 )}
               </div>
@@ -100,33 +93,23 @@ export function Header({ title, description, actions, breadcrumbs }: HeaderProps
           </nav>
         )}
 
-        {/* Title and Actions */}
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             {title && (
-              <h1 className="text-2xl font-semibold text-[var(--foreground)] truncate">
-                {title}
-              </h1>
+              <h1 className="text-2xl font-semibold text-slate-900 truncate">{title}</h1>
             )}
             {description && (
-              <p className="mt-1 text-sm text-[var(--foreground-secondary)]">
-                {description}
-              </p>
+              <p className="mt-1 text-sm text-slate-600">{description}</p>
             )}
           </div>
-          
-          {actions && (
-            <div className="flex items-center gap-2 ml-4">
-              {actions}
-            </div>
-          )}
+
+          {actions && <div className={clsx("ml-4 flex items-center gap-2")}>{actions}</div>}
         </div>
       </div>
     </header>
   );
 }
 
-// Predefined header configurations for common pages
 export const pageHeaders = {
   dashboard: {
     title: "ダッシュボード",
@@ -146,11 +129,11 @@ export const pageHeaders = {
   },
   companies: {
     title: "企業管理",
-    description: "志望企業の情報管理・分析",
+    description: "志望企業の管理・分析",
   },
   "company-detail": {
     title: "企業詳細",
-    description: "企業情報の確認・編集",
+    description: "企業情報の確認と編集",
   },
   "company-new": {
     title: "新しい企業",
@@ -158,6 +141,6 @@ export const pageHeaders = {
   },
   profile: {
     title: "プロフィール",
-    description: "個人設定の管理",
+    description: "個人設定とアバター管理",
   },
 } as const;

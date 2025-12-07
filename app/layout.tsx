@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "就活AI Copilot | MVP",
-  description: "ES管理・企業分析・AI添削をまとめる大学生向けの就活アプリ（MVP）",
+  description: "ES添削・企業管理・タスク進捗をAIで支援し、前向きに就活を進めるためのMVP版Webアプリ。",
 };
 
 export default function RootLayout({
@@ -24,9 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>

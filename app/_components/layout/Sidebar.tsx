@@ -30,19 +30,19 @@ const navigationItems: NavItem[] = [
     label: "ES管理",
     href: "/es",
     icon: DocumentTextIcon,
-    description: "エントリーシートの作成・管理",
+    description: "エントリーシートを整理",
   },
   {
     label: "企業管理",
     href: "/companies",
     icon: BuildingOfficeIcon,
-    description: "企業情報の管理・分析",
+    description: "企業情報と進捗の記録",
   },
   {
     label: "プロフィール",
     href: "/profile",
     icon: UserIcon,
-    description: "個人設定の管理",
+    description: "ユーザー設定とアバター",
   },
 ];
 
@@ -66,44 +66,39 @@ export function Sidebar() {
     <Link
       href={item.href}
       className={clsx(
-        "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group",
+        "group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
         {
-          "bg-gradient-to-r from-amber-100/80 to-orange-100/80 text-amber-700 shadow-sm": isActive,
-          "text-slate-600 hover:text-slate-800 hover:bg-white/50": !isActive,
-        }
+          "bg-white/90 text-amber-700 shadow-md shadow-amber-200/50 border border-amber-100":
+            isActive,
+          "text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent":
+            !isActive,
+        },
       )}
     >
-      <item.icon 
-        className={clsx(
-          "h-5 w-5 flex-shrink-0 transition-colors",
-          {
-            "text-amber-600": isActive,
-            "text-slate-500 group-hover:text-slate-700": !isActive,
-          }
-        )}
+      <item.icon
+        className={clsx("h-5 w-5 flex-shrink-0 transition-colors", {
+          "text-amber-600": isActive,
+          "text-slate-500 group-hover:text-slate-800": !isActive,
+        })}
       />
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="truncate">{item.label}</div>
         {item.description && (
-          <div className="text-xs text-slate-500 truncate mt-0.5">
-            {item.description}
-          </div>
+          <div className="mt-0.5 truncate text-xs text-slate-500">{item.description}</div>
         )}
       </div>
     </Link>
   );
 
   return (
-    <div className="fixed left-0 top-0 h-full w-60 bg-white/80 backdrop-blur border-r border-slate-200/70 z-50">
-      {/* Header */}
-      <div className="flex items-center gap-2 p-6 border-b border-slate-200/50">
-        <div className="w-8 h-8 bg-gradient-to-br from-amber-300 to-orange-500 rounded-xl flex items-center justify-center shadow-md shadow-amber-300/40">
-          <span className="text-slate-900 text-sm font-bold">就</span>
+    <div className="fixed left-0 top-0 z-50 h-full w-60 border-r border-white/50 bg-white/70 backdrop-blur">
+      <div className="flex items-center gap-2 border-b border-white/60 p-6">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-amber-300 to-orange-500 text-sm font-bold text-slate-900 shadow-md shadow-amber-300/40">
+          就
         </div>
         <span className="font-semibold text-slate-900">就活Copilot</span>
       </div>
 
-      {/* Main Navigation */}
       <nav className="flex-1 p-4">
         <div className="space-y-2">
           {navigationItems.map((item) => (
@@ -116,32 +111,22 @@ export function Sidebar() {
         </div>
       </nav>
 
-      {/* Bottom Navigation */}
-      <div className="border-t border-slate-200/50 p-4">
+      <div className="border-t border-white/60 p-4">
         <div className="space-y-2">
           {bottomItems.map((item) => (
-            <NavLink
-              key={item.href}
-              item={item}
-              isActive={pathname === item.href}
-            />
+            <NavLink key={item.href} item={item} isActive={pathname === item.href} />
           ))}
         </div>
       </div>
 
-      {/* User Info */}
-      <div className="border-t border-slate-200/50 p-4">
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-br from-slate-50 to-white border border-slate-200/50 shadow-sm">
-          <div className="w-10 h-10 bg-gradient-to-br from-amber-300 to-orange-500 rounded-xl flex items-center justify-center shadow-md">
-            <span className="text-slate-900 text-sm font-bold">U</span>
+      <div className="border-t border-white/60 p-4">
+        <div className="flex items-center gap-3 rounded-xl border border-white/70 bg-white/90 p-3 shadow-sm">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-amber-300 to-orange-500 text-sm font-bold text-slate-900 shadow-md">
+            U
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold text-slate-900 truncate">
-              ユーザー
-            </div>
-            <div className="text-xs text-slate-600 truncate">
-              レベル 3 | 150 XP
-            </div>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-sm font-semibold text-slate-900">ユーザー</div>
+            <div className="truncate text-xs text-slate-600">レベル 3 | 150 XP</div>
           </div>
         </div>
       </div>

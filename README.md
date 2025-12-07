@@ -1,79 +1,73 @@
 # 就活AI Copilot (MVP)
 
-大学生向けの就活アプリ（ES管理・AI添削・企業カード・XP表示）のMVP。初期はGeminiでAIを呼び出し、将来的にGPTへ差し替え可能な設計を前提にしています。
+就活のES添削・企業管理・進捗確認を、AIとゲーミフィケーションで前向きに進めるためのMVP版Webアプリです。Gemini/GPTを環境変数だけで差し替えできる薄いラッパー構成になっています。
+
+## 実装済みの主な機能
+- 認証: Supabase Auth (Magic Link / Google OAuth)。認証コールバックでセッションをCookieに保存。
+- ダッシュボード: ユーザー専用データを集約（ES/企業/XP、AIキュー、フォーカス、メトリクス）。ログイン必須。
+- ES管理: 一覧フィルタ、質問カード形式で作成/編集、AI添削パネル、タグ、ステータス、削除。ログイン必須。
+- 企業管理: 企業カードの作成/編集/削除、志望度・ステータス・メモ・お気に入り。ログイン必須。
+- プロフィール: 氏名/大学/学部/アバター（固定2種）を保存。ログイン必須。
+- ホーム（MVP紹介）: 白基調のガラス風UIで、ログイン/新規登録導線と機能紹介を表示。
+- 共通UI: 抽象グラデ背景（`public/bg-abstract.svg`）、Sidebar/Breadcrumb、MVPボタン/カードスタイル、Tailwind v4準拠（`bg-linear-to-*`）。
 
 ## 技術スタック
+- Next.js (App Router) + TypeScript + Tailwind CSS v4
+- Supabase (Auth/DB/Storage, RLS)
+- AI: provider-agnostic ラッパー（Gemini/GPTを環境変数で切替）
+- Hosting: Vercel想定
 
-- Next.js (App Router) + TypeScript + TailwindCSS (v4)
-- Supabase (Auth/DB/Storage + RLS)
-- AI: provider-agnostic wrapper（初期Gemini→将来GPT）
-- Hosting: Vercel
-
-## 画面
-
-- `/` マーケティング/要件サマリ（モダンUI）
-- `/dashboard` 機能プレビュー: タスク、ESカード、企業カード、AIキュー、XP表示（ダミーデータ）
-
-## DBスキーマ (Supabase)
-
-- `supabase/schema.sql` にテーブル定義・RLSポリシーを用意（profiles / es_entries / companies / xp_logs）。
-- Supabase SQLエディタまたは psql で適用し、RLSがONになっていることを確認してください。
-
-## 環境変数
-
-`.env.local` に設定してください。
-
+## 環境変数 (.env.local)
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-# ローカル管理/マイグレーション用（サーバーのみで使用）
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-# optional: AI_PROVIDER=gemini|gpt (デフォルト gemini)
-# optional: NEXT_PUBLIC_SITE_URL=http://localhost:3000
-
-# AIプロバイダーの鍵（初期はGemini、将来GPT等に差し替え）
-AI_PROVIDER_API_KEY=your_ai_key
-# optional: AI_PROVIDER=gemini|gpt (デフォルト gemini)
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=xxxxx
+SUPABASE_SERVICE_ROLE_KEY=xxxxx       # server-only
+# optional
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+AI_PROVIDER=gemini                    # gemini | gpt
+AI_PROVIDER_API_KEY=xxxxx
 ```
 
 ## セットアップ
-
 ```bash
 npm install
 npm run dev
 # http://localhost:3000
 ```
 
-## 今後の実装ステップ（優先度順）
+## 認証設定（Supabase）
+1. Supabase Dashboard → Authentication → URL Configuration  
+   - Site URL: `http://localhost:3000`  
+   - Redirect URLs:  
+     - `http://localhost:3000/auth/callback`  
+     - `http://localhost:3000/dashboard`
+2. Next.js route handler: `app/auth/callback/route.ts` で `exchangeCodeForSession` を実行（実装済み）。
+3. ログイン必須: ダッシュボード/ES/企業/プロフィール/新規作成/詳細は未ログイン時に `/login` へリダイレクト。
 
-1) Supabaseセットアップ: テーブル/ポリシー定義（ユーザー、ES、企業カード、XPログ）、RLS ON。
-2) Supabaseクライアント/サーバーコンポーネントを実装し、ES/企業カードのCRUD UIを接続。
-3) AIサービス層: provider-agnosticなラッパーを`/lib/ai/`に用意（Gemini→GPT差替え）。←実装済み
-4) UI強化: フィルタ・タグ・ステータス変更UI、モバイル最適化の仕上げ。
-5) 規約/プライポリ、エラーハンドリング、ローディング/空データ表示。
+## DB
+- スキーマ: `supabase/schema.sql`（profiles / es_entries / companies / xp_logs）。RLS有効。
+- `es_entries.questions` は JSONB 推奨。列が無い環境でもフォールバック挿入で動作。
 
-## Auth設定の要点（Magic Link）
-- Supabase Auth → URL Configuration: Site URL を `http://localhost:3000`、Redirect URLs に `http://localhost:3000/auth/callback` と `http://localhost:3000/dashboard` を追加。
-- Magic Linkのメールが叩くコールバック: `app/auth/callback/route.ts` で `exchangeCodeForSession` を必ず実行。
-- ログインフォームは `/login` のサーバーアクション経由でメールリンクを送信（`emailRedirectTo` は `/auth/callback`）。  
+## 実装ルール（AIも参照する想定）
+- YAGNI/DRYを徹底し、MVPに不要な複雑化を避ける。
+- 認証が必要なデータ取得は必ず `user_id` でスコープする（未ログインはリダイレクト）。
+- Supabase SSRクライアント:
+  - Server Action/Route HandlerでCookie書き込みが必要な場合のみ `createSupabaseActionClient` を使用。
+  - Server Componentでは `createSupabaseReadonlyClient` を使用し、Cookie書き込みは禁止。
+- Tailwindは推奨クラス（例: `bg-linear-to-*`）を使い、警告を避ける。
+- AI呼び出しは `lib/ai/` の薄いラッパー経由。環境変数でGemini/GPTを切替。キー未設定時は安全に失敗させる。
+- ログイン必須ページでは未ログイン時 `/login` へ即リダイレクトする。
+- フォームのサーバーアクションは `"use server"` か Route Handler で定義し、Client Componentに直接関数を渡さない。
 
-## 実装ガイドライン
+## ページ一覧
+- `/` ホーム（MVP紹介、ログイン/新規登録導線）
+- `/login` ログイン（Magic Link / Google）
+- `/auth/callback` 認証コールバック
+- `/dashboard` ダッシュボード（ログイン必須）
+- `/es` / `/es/new` / `/es/[id]` ES管理（ログイン必須）
+- `/companies` / `/companies/new` / `/companies/[id]` 企業管理（ログイン必須）
+- `/profile` プロフィール編集（ログイン必須）
 
-- YAGNI/DRY: MVPに不要な処理は後回し、共通化できるものは小コンポーネント/ユーティリティへ。
-- AIはプロバイダー非依存: 環境変数で切替可能な薄いサービス層を設計し、Gemini実装から着手。
-- セキュリティ: SupabaseのRLSを有効化し、HTTPS前提。写真アップロードは即時削除（将来のアバター生成用）。
-- ドキュメント優先: 画面/DB/AIの振る舞いを簡潔に記述し、後続の改修コストを下げる。
-
-### グラデーションユーティリティの注意点
-
-Tailwind CSS が提供する公式のグラデーションクラスは
-`bg-gradient-to-b` です。
-
-エディタ拡張機能などが内部実装に基づく
-`bg-linear-to-b`
-を提案する場合がありますが、このクラスは Tailwind には存在せず、
-置き換えるとビルドエラーが発生します。
-
-Tailwind を利用する際は、公式仕様に従い
-`bg-gradient-to-b`
-をそのまま使用してください。
+## 次に必要なキー
+- Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- AI: `AI_PROVIDER_API_KEY`（Gemini/GPTどちらか） and `AI_PROVIDER` 指定

@@ -11,18 +11,24 @@ type Props = {
   initialItems: EsRow[];
 };
 
-const STATUS_OPTIONS = ["すべて", "下書き", "提出済", "添削済"] as const;
+const STATUS_OPTIONS = [
+  { label: "すべて", value: "all" },
+  { label: "下書き", value: "draft" },
+  { label: "提出済", value: "submitted" },
+  { label: "添削済", value: "reviewed" },
+  { label: "完了", value: "done" },
+] as const;
 
 export function EsListClient({ initialItems }: Props) {
-  const [status, setStatus] = useState<(typeof STATUS_OPTIONS)[number]>("すべて");
+  const [status, setStatus] = useState<(typeof STATUS_OPTIONS)[number]["value"]>("all");
   const [query, setQuery] = useState("");
 
   const filtered = useMemo(() => {
     const items = Array.isArray(initialItems) ? initialItems : [];
     return items.filter((item) => {
-      const matchStatus = status === "すべて" || item.status === status;
+      const matchStatus = status === "all" || item.status === status;
       const q = query.toLowerCase();
-      const titleHit = item.title?.toLowerCase().includes(q);
+      const titleHit = (item.title || "").toLowerCase().includes(q);
       const tagHit = (item.tags ?? []).some((t) => t.toLowerCase().includes(q));
       return matchStatus && (!query || titleHit || tagHit);
     });
@@ -34,14 +40,14 @@ export function EsListClient({ initialItems }: Props) {
         <div className="flex flex-wrap gap-2 text-xs">
           {STATUS_OPTIONS.map((opt) => (
             <button
-              key={opt}
+              key={opt.value}
               type="button"
-              onClick={() => setStatus(opt)}
+              onClick={() => setStatus(opt.value)}
               className={`rounded-full border px-3 py-1 ${
-                status === opt ? "border-amber-300 bg-amber-50 text-amber-700" : "border-slate-200 bg-white text-slate-700"
+                status === opt.value ? "border-amber-300 bg-amber-50 text-amber-700" : "border-slate-200 bg-white text-slate-700"
               }`}
             >
-              {opt}
+              {opt.label}
             </button>
           ))}
         </div>
@@ -77,7 +83,9 @@ export function EsListClient({ initialItems }: Props) {
           </Link>
         ))}
         {filtered.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-6 text-sm text-slate-700 shadow-soft">該当するESがありません。フィルタを変更してください。</div>
+          <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-6 text-sm text-slate-700 shadow-soft">
+            該当するESがありません。フィルタやキーワードを変えてみてください。
+          </div>
         ) : null}
       </div>
     </div>

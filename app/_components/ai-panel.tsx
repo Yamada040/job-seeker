@@ -7,7 +7,6 @@ type Props = {
   defaultInput: string;
   title: string;
   hint?: string;
-  // 外部から入力を上書きしたいときに使う（例: 本文コピー）
   presetText?: string;
   presetKey?: string;
 };
@@ -26,7 +25,7 @@ export function AiPanel({ kind, defaultInput, title, hint, presetKey, presetText
   const [error, setError] = useState<string | null>(null);
   const wordCount = input.split(/\s+/).filter(Boolean).length;
 
-  // presetKey が変わるたびに外部テキストで上書き
+  // presetKey が変わったら入力を最新化
   useEffect(() => {
     if (!presetKey) return;
     setInput(presetText ?? "");
@@ -57,13 +56,13 @@ export function AiPanel({ kind, defaultInput, title, hint, presetKey, presetText
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-slate-100 shadow-lg backdrop-blur">
+    <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 text-sm text-slate-900 shadow-md">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs text-amber-200">{title}</p>
-          {hint ? <p className="text-[11px] text-slate-200/70">{hint}</p> : null}
+          <p className="text-xs font-semibold text-amber-700">{title}</p>
+          {hint ? <p className="text-[11px] text-slate-500">{hint}</p> : null}
         </div>
-        <span className="rounded-full border border-white/20 px-3 py-1 text-[11px] text-slate-200">
+        <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] text-slate-700">
           {response?.provider ?? "AI"}
         </span>
       </div>
@@ -71,10 +70,10 @@ export function AiPanel({ kind, defaultInput, title, hint, presetKey, presetText
         value={input}
         onChange={(e) => setInput(e.target.value)}
         rows={8}
-        className="mt-3 w-full rounded-xl border border-white/10 bg-slate-900/40 px-4 py-3 text-sm text-white outline-none focus:border-amber-300"
+        className="mt-3 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
       />
-      <div className="flex items-center justify-between text-[11px] text-slate-200/70">
-        <span>単語数: {wordCount}</span>
+      <div className="flex items-center justify-between text-[11px] text-slate-500">
+        <span>ワード数: {wordCount}</span>
         {hint ? <span>{hint}</span> : null}
       </div>
       <div className="mt-3 flex justify-end">
@@ -87,13 +86,13 @@ export function AiPanel({ kind, defaultInput, title, hint, presetKey, presetText
           {loading ? "実行中..." : "AIに送る"}
         </button>
       </div>
-      {error ? <p className="mt-2 text-[11px] text-rose-300">Error: {error}</p> : null}
+      {error ? <p className="mt-2 text-[11px] text-rose-500">Error: {error}</p> : null}
       {response ? (
-        <div className="mt-3 space-y-2 rounded-xl border border-white/10 bg-slate-900/40 p-3">
-          <p className="text-xs text-amber-200">要約</p>
-          <p className="text-sm text-slate-100/90">{response.summary ?? "結果がありません"}</p>
+        <div className="mt-3 space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <p className="text-xs font-semibold text-amber-700">要約</p>
+          <p className="text-sm text-slate-800">{response.summary ?? "要約なし"}</p>
           {response.bulletPoints?.length ? (
-            <ul className="list-disc space-y-1 pl-4 text-sm text-slate-100/85">
+            <ul className="list-disc space-y-1 pl-4 text-sm text-slate-800">
               {response.bulletPoints.map((b) => (
                 <li key={b}>{b}</li>
               ))}

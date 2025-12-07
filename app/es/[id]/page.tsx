@@ -1,192 +1,131 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon, TrashIcon } from "@heroicons/react/24/outline";
 
-import { updateEs, deleteEs } from "../actions";
-import { EsAiPanel } from "../_components/ai-es-panel";
-import { QuestionsEditor } from "../_components/questions-editor";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/server-readonly";
-
-type Props = { params: { id: string } };
+import { AppLayout } from "@/app/_components/layout";
+import { QuestionsEditor } from "../_components/questions-editor";
+import { EsAiPanel } from "../_components/ai-es-panel";
+import { deleteEs, updateEs } from "../actions";
 
 type Question = { id: string; prompt: string; answer_md: string };
 
-const STATUS_OPTIONS = ["下書き", "提出済", "添削済"];
+function parseQuestions(questions: unknown): Question[] {
+  if (!questions) return [];
+  if (Array.isArray(questions)) {
+    return questions.map((q) => ({
+      id: typeof q.id === "string" ? q.id : crypto.randomUUID(),
+      prompt: typeof q.prompt === "string" ? q.prompt : "",
+      answer_md: typeof q.answer_md === "string" ? q.answer_md : "",
+    }));
+  }
+  return [];
+}
 
-export default async function EsDetailPage({ params }: Props) {
-  const resolvedParams = await Promise.resolve(params);
-
+export default async function EsDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const supabase = await createSupabaseReadonlyClient();
-  const { data: userData } = supabase ? await supabase.auth.getUser() : { data: null };
+  const { data: userData } = await supabase?.auth.getUser();
+  const userId = userData?.user?.id ?? null;
 
-  const { data, error } =
-    supabase && userData?.user
-      ? await supabase
-          .from("es_entries")
-          .select("*")
-          .eq("id", resolvedParams.id)
-          .eq("user_id", userData.user.id)
-          .maybeSingle()
-      : { data: null, error: null };
+  if (!userId) return redirect("/login");
 
-  const fallback = {
-    id: resolvedParams.id,
-    user_id: userData?.user?.id ?? "guest",
-    title: "サンプルES",
-    content_md: "ここにES本文を入力してください。",
-    status: "下書き",
-    tags: ["サンプル"],
-    score: null,
-    questions: [],
-    created_at: null,
-    updated_at: null,
-  } as const;
+  const { data, error } = await supabase.from("es_entries").select("*").eq("id", id).eq("user_id", userId).maybeSingle();
 
-  const es = data ?? fallback;
-  const loadError = Boolean(error || !data);
-  const canEdit = Boolean(userData?.user);
+  if (error || !data) {
+    return redirect("/es");
+  }
 
-  const rawQuestions = (es as { questions?: unknown }).questions;
-  const questions: Question[] = Array.isArray(rawQuestions)
-    ? rawQuestions.map((q) => {
-        const item = q as Partial<Question>;
-        return {
-          id: typeof item.id === "string" ? item.id : crypto.randomUUID(),
-          prompt: typeof item.prompt === "string" ? item.prompt : "",
-          answer_md: typeof item.answer_md === "string" ? item.answer_md : "",
-        };
-      })
-    : [];
-
+  const questions = parseQuestions(data.questions);
   const combinedContent =
     questions.length > 0
       ? questions
-          .map((q) => `${q.prompt}\n${q.answer_md}`.trim())
+          .map((q) => [q.prompt?.trim(), q.answer_md?.trim()].filter(Boolean).join("\n"))
           .filter(Boolean)
           .join("\n\n")
-      : es.content_md ?? "";
+      : data.content_md ?? "";
 
-  const handleUpdate = async (formData: FormData) => {
-    "use server";
-    await updateEs(resolvedParams.id, formData);
-  };
-
-  const headerActions = (
-    <div className="flex gap-3">
-      <Link href="/es" className="mvp-button mvp-button-secondary">
-        <ArrowLeftIcon className="h-4 w-4" />
-        一覧へ戻る
-      </Link>
-      {canEdit && (
-        <form action={deleteEs.bind(null, resolvedParams.id)} className="inline">
-          <button
-            type="submit"
-            className="mvp-button mvp-button-secondary text-red-600 hover:bg-red-50"
-            onClick={(e) => {
-              if (!confirm("本当に削除しますか？")) {
-                e.preventDefault();
-              }
-            }}
-          >
-            <TrashIcon className="h-4 w-4" />
-            削除
-          </button>
-        </form>
-      )}
-    </div>
-  );
+  const handleUpdate = updateEs.bind(null, id);
+  const handleDelete = deleteEs.bind(null, id);
 
   return (
-    <AppLayout 
-      headerTitle={es.title}
-      headerDescription={`ESの編集・AI添削 ${loadError ? "(サンプル表示中)" : ""}`}
-      headerActions={headerActions}
+    <AppLayout
+      headerTitle="ES詳細"
+      headerDescription="質問カードを編集してAI添削へ"
+      headerActions={
+        <div className="flex flex-wrap gap-3">
+          <Link href="/" className="mvp-button mvp-button-secondary">
+            <HomeIcon className="h-4 w-4" />
+            MVPホーム
+          </Link>
+          <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+            <ArrowUturnLeftIcon className="h-4 w-4" />
+            ダッシュボード
+          </Link>
+          <Link href="/es" className="mvp-button mvp-button-secondary">
+            <ArrowLeftIcon className="h-4 w-4" />
+            一覧へ戻る
+          </Link>
+        </div>
+      }
       className="flex flex-col gap-8"
     >
-
-      {/* Main Form */}
-      <form action={handleUpdate} className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur">
-        <div className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700">タイトル</span>
+      <div className="grid gap-4 lg:grid-cols-[1.4fr,0.9fr]">
+        <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur">
+          <form action={handleUpdate} className="space-y-4">
+            <div className="space-y-2">
+              <label className="block text-xs text-slate-600">タイトル*</label>
               <input
                 name="title"
-                defaultValue={es.title}
+                defaultValue={data.title ?? ""}
                 required
-                disabled={!canEdit}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 disabled:opacity-60"
+                className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
               />
-            </label>
+            </div>
 
-            <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700">ステータス</span>
-              <select
-                name="status"
-                defaultValue={es.status ?? "下書き"}
-                disabled={!canEdit}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 disabled:opacity-60"
-              >
-                {STATUS_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block space-y-1 text-xs text-slate-600">
+                ステータス
+                <select
+                  name="status"
+                  defaultValue={data.status ?? "draft"}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                >
+                  <option value="draft">下書き</option>
+                  <option value="submitted">提出済</option>
+                  <option value="reviewed">添削済</option>
+                  <option value="done">完了</option>
+                </select>
+              </label>
+              <label className="block space-y-1 text-xs text-slate-600">
+                タグ（カンマ区切り）
+                <input
+                  name="tags"
+                  defaultValue={(data.tags ?? []).join(", ")}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                  placeholder="SaaS, プロダクト, 夏インターン"
+                />
+              </label>
+            </div>
 
-          <label className="block space-y-2">
-            <span className="text-sm font-medium text-slate-700">タグ（カンマ区切り）</span>
-            <input
-              name="tags"
-              defaultValue={(es.tags ?? []).join(", ")}
-              disabled={!canEdit}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 disabled:opacity-60"
-              placeholder="SaaS, インターン, 志望度高"
-            />
-          </label>
+            <QuestionsEditor initialQuestions={questions.length ? questions : [{ id: crypto.randomUUID(), prompt: "自己PR", answer_md: data.content_md ?? "" }]} />
 
-          <div className="space-y-3">
-            <QuestionsEditor initialQuestions={questions} />
-          </div>
-
-          <label className="block space-y-2">
-            <span className="text-sm font-medium text-slate-700">全体メモ（任意、AI送信時にも使われます）</span>
-            <textarea
-              name="content_md"
-              rows={4}
-              defaultValue={es.content_md ?? ""}
-              disabled={!canEdit}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 disabled:opacity-60"
-            />
-          </label>
-
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
-            <Link href="/es" className="mvp-button mvp-button-secondary">
-              キャンセル
-            </Link>
-            <button
-              type="submit"
-              disabled={!canEdit}
-              className="mvp-button mvp-button-primary disabled:opacity-60"
-            >
-              <PencilSquareIcon className="h-4 w-4" />
-              保存
-            </button>
-          </div>
+            <div className="flex justify-between gap-3">
+              <button type="submit" className="mvp-button mvp-button-primary">
+                保存する
+              </button>
+              <button formAction={handleDelete} className="mvp-button mvp-button-secondary text-red-600">
+                <TrashIcon className="h-4 w-4" />
+                削除
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
 
-      {/* AI Panel */}
-      <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-md backdrop-blur">
-        <EsAiPanel content={combinedContent} />
+        <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur">
+          <EsAiPanel content={combinedContent} />
+        </div>
       </div>
-
-      {/* Status Notice */}
-      {!canEdit && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 shadow-soft">
-          デモ表示中です。ログインすると保存・削除が有効になります。
-        </div>
-      )}
     </AppLayout>
   );
 }

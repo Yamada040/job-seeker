@@ -1,12 +1,27 @@
 import Link from "next/link";
-import { ArrowLeftIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { redirect } from "next/navigation";
+import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
 
 import { createCompany } from "../actions";
 import { AppLayout } from "@/app/_components/layout";
+import { createSupabaseReadonlyClient } from "@/lib/supabase/server-readonly";
 
-export default function NewCompanyPage() {
+export default async function NewCompanyPage() {
+  const supabase = await createSupabaseReadonlyClient();
+  if (!supabase) return redirect("/login");
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData?.user) return redirect("/login");
+
   const headerActions = (
-    <div className="flex gap-3">
+    <div className="flex flex-wrap gap-3">
+      <Link href="/" className="mvp-button mvp-button-secondary">
+        <HomeIcon className="h-4 w-4" />
+        MVPホーム
+      </Link>
+      <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+        <ArrowUturnLeftIcon className="h-4 w-4" />
+        ダッシュボード
+      </Link>
       <Link href="/companies" className="mvp-button mvp-button-secondary">
         <ArrowLeftIcon className="h-4 w-4" />
         一覧へ戻る
@@ -15,21 +30,21 @@ export default function NewCompanyPage() {
   );
 
   return (
-    <AppLayout 
+    <AppLayout
       headerTitle="企業を追加"
-      headerDescription="企業カードを作成してステータス・メモ・お気に入りを管理"
+      headerDescription="志望企業のカードを作成して進捗を管理"
       headerActions={headerActions}
       className="flex flex-col gap-8"
     >
       <form action={createCompany} className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur">
         <div className="space-y-6">
           <label className="block space-y-2">
-            <span className="text-sm font-medium text-slate-700">企業名 *</span>
+            <span className="text-sm font-medium text-slate-700">企業名*</span>
             <input
               name="name"
               required
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
-              placeholder="例：Alpha SaaS"
+              placeholder="例: Alpha SaaS"
             />
           </label>
 
@@ -42,62 +57,50 @@ export default function NewCompanyPage() {
             />
           </label>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700">ステータス</span>
-              <select 
-                name="stage" 
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300" 
-                defaultValue="未エントリー"
-              >
-                <option value="未エントリー">未エントリー</option>
-                <option value="書類提出">書類提出</option>
-                <option value="面接中">面接中</option>
-                <option value="内定">内定</option>
-                <option value="辞退">辞退</option>
-              </select>
-            </label>
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-slate-700">ステータス</span>
+            <input
+              name="stage"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              placeholder="Screening / Document passed など"
+            />
+          </label>
 
-            <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700">志望度（1-5）</span>
-              <input
-                name="preference"
-                type="number"
-                min={1}
-                max={5}
-                defaultValue={3}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
-              />
-            </label>
-          </div>
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-slate-700">志望度（1-5）</span>
+            <input
+              name="preference"
+              type="number"
+              min="1"
+              max="5"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              placeholder="3"
+            />
+          </label>
 
           <label className="block space-y-2">
             <span className="text-sm font-medium text-slate-700">メモ</span>
             <textarea
               name="memo"
-              rows={4}
+              rows={3}
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
-              placeholder="企業メモを記入"
+              placeholder="興味を持った理由、選考ポイントなど"
             />
           </label>
 
-          <label className="flex items-center gap-2 text-sm text-slate-700">
-            <input type="checkbox" name="favorite" className="h-4 w-4 rounded border-slate-300 bg-slate-50" />
-            お気に入りにする
+          <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+            <input type="checkbox" name="favorite" className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400" />
+            お気に入りに追加
           </label>
+        </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
-            <Link href="/companies" className="mvp-button mvp-button-secondary">
-              キャンセル
-            </Link>
-            <button
-              type="submit"
-              className="mvp-button mvp-button-primary"
-            >
-              <PlusIcon className="h-4 w-4" />
-              追加する
-            </button>
-          </div>
+        <div className="mt-6 flex justify-end gap-3">
+          <Link href="/companies" className="mvp-button mvp-button-secondary">
+            キャンセル
+          </Link>
+          <button type="submit" className="mvp-button mvp-button-primary">
+            追加する
+          </button>
         </div>
       </form>
     </AppLayout>

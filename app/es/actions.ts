@@ -44,7 +44,7 @@ export async function createEs(formData: FormData) {
   if (!userData?.user) throw new Error("Not authenticated");
 
   const title = (formData.get("title") as string | null)?.trim();
-  const status = (formData.get("status") as string | null) ?? "下書き";
+  const status = (formData.get("status") as string | null) ?? "draft";
   const content_md = (formData.get("content_md") as string | null) ?? "";
   const tagsRaw = (formData.get("tags") as string | null) ?? "";
   const questions = parseQuestions(formData.get("questions_json") as string | null);
@@ -54,7 +54,7 @@ export async function createEs(formData: FormData) {
     .map((t) => t.trim())
     .filter(Boolean);
 
-  if (!title) throw new Error("タイトルは必須です");
+  if (!title) throw new Error("タイトルを入力してください");
 
   const combinedContent = combineContent(questions, content_md);
 
@@ -74,7 +74,7 @@ export async function createEs(formData: FormData) {
     error = err as Error;
   }
 
-  // DBにquestionsカラムが無い場合のフォールバック（スキーマ未反映時）
+  // DBにquestionsカラムが未作成の場合のバックアップ挿入
   if (error && typeof (error as { message?: string }).message === "string" && (error as { message?: string }).message?.includes("questions")) {
     const { error: retryError } = await supabase.from("es_entries").insert({
       user_id: userData.user.id,
@@ -99,7 +99,7 @@ export async function updateEs(id: string, formData: FormData) {
   if (!userData?.user) throw new Error("Not authenticated");
 
   const title = (formData.get("title") as string | null)?.trim();
-  const status = (formData.get("status") as string | null) ?? "下書き";
+  const status = (formData.get("status") as string | null) ?? "draft";
   const content_md = (formData.get("content_md") as string | null) ?? "";
   const tagsRaw = (formData.get("tags") as string | null) ?? "";
   const questions = parseQuestions(formData.get("questions_json") as string | null);
@@ -109,7 +109,7 @@ export async function updateEs(id: string, formData: FormData) {
     .map((t) => t.trim())
     .filter(Boolean);
 
-  if (!title) throw new Error("タイトルは必須です");
+  if (!title) throw new Error("タイトルを入力してください");
 
   const combinedContent = combineContent(questions, content_md);
 

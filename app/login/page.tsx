@@ -12,7 +12,6 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<"signin" | "signup">("signin");
 
-  // 既にログイン済みならダッシュボードへ
   useEffect(() => {
     const checkSession = async () => {
       const supabase = createSupabaseBrowserClient();
@@ -41,7 +40,7 @@ export default function LoginPage() {
       });
       if (signInError) throw signInError;
       if (data) {
-        setMessage(mode === "signup" ? "登録用のメールを送信しました。受信トレイを確認してください。" : "ログイン用のメールを送信しました。受信トレイを確認してください。");
+        setMessage(mode === "signup" ? "登録用のメールを送信しました。受信ボックスをご確認ください。" : "ログイン用のメールを送信しました。受信ボックスをご確認ください。");
       }
     } catch (err) {
       setError((err as Error)?.message ?? "メール送信に失敗しました");
@@ -72,39 +71,47 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50">
-      <div className="pointer-events-none absolute inset-0 -z-10 opacity-70">
-        <div className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,196,38,0.14),transparent_60%)] blur-2xl" />
-        <div className="absolute right-0 top-10 h-96 w-96 rounded-full bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.12),transparent_60%)] blur-2xl" />
-        <div className="absolute inset-0 bg-[linear-gradient(130deg,rgba(255,255,255,0.04)_0%,rgba(255,255,255,0.01)_40%,rgba(255,255,255,0.04)_100%)]" />
-      </div>
+    <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_25%_20%,rgba(255,196,38,0.12),transparent_40%),radial-gradient(circle_at_80%_10%,rgba(56,189,248,0.1),transparent_45%),linear-gradient(135deg,#ffedd5_0%,#e0f2fe_45%,#e9d5ff_100%)] text-slate-900">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[url('/bg-abstract.svg')] bg-cover bg-center opacity-80" />
 
-      <main className="mx-auto flex max-w-lg flex-col gap-8 px-6 py-16">
-        <div className="space-y-3 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-200">Sign in</p>
-          <h1 className="text-3xl font-semibold">メールまたはGoogleでログイン</h1>
-          <p className="text-sm text-slate-100/80">Magic Link か Google アカウントでログインできます。登録済みならそのままログイン、新規ならメールで本登録を完了してください。</p>
+      <main className="mx-auto flex max-w-xl flex-col gap-6 px-6 py-12 sm:py-16">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-lg font-semibold">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-amber-300 to-orange-500 text-sm font-bold text-slate-900 shadow-md shadow-amber-300/40">
+              就
+            </span>
+            就活Copilot
+          </div>
+          <Link href="/" className="text-sm text-amber-700 hover:underline">
+            ホームへ戻る
+          </Link>
+        </div>
+
+        <div className="space-y-2 rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-700">Sign in</p>
+          <h1 className="text-2xl font-semibold">メールまたはGoogleでログイン</h1>
+          <p className="text-sm text-slate-700">Magic Link方式で、メールに届くリンクを押すだけでログインできます。登録済みか未登録かはメールで自動判定します。</p>
         </div>
 
         <div className="flex gap-2 text-xs">
           <button
             type="button"
             onClick={() => setMode("signin")}
-            className={`flex-1 rounded-full border px-3 py-2 ${mode === "signin" ? "border-amber-300 bg-amber-300/20 text-amber-50" : "border-white/20 text-white"}`}
+            className={`flex-1 rounded-full border px-3 py-2 ${mode === "signin" ? "border-amber-300 bg-amber-50 text-amber-700" : "border-slate-200 bg-white text-slate-700"}`}
           >
             ログイン
           </button>
           <button
             type="button"
             onClick={() => setMode("signup")}
-            className={`flex-1 rounded-full border px-3 py-2 ${mode === "signup" ? "border-emerald-300 bg-emerald-300/20 text-emerald-50" : "border-white/20 text-white"}`}
+            className={`flex-1 rounded-full border px-3 py-2 ${mode === "signup" ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-700"}`}
           >
             新規登録
           </button>
         </div>
 
-        <form onSubmit={handleSignIn} className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg backdrop-blur">
-          <label className="block text-sm text-slate-100/90">
+        <form onSubmit={handleSignIn} className="space-y-4 rounded-2xl border border-slate-200 bg-white/80 p-6 shadow-md backdrop-blur">
+          <label className="block text-sm text-slate-700">
             メールアドレス
             <input
               type="email"
@@ -112,7 +119,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900/40 px-4 py-3 text-sm text-white outline-none ring-0 placeholder:text-slate-500 focus:border-amber-300"
+              className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none ring-0 placeholder:text-slate-500 focus:border-amber-300"
             />
           </label>
           <button
@@ -122,33 +129,33 @@ export default function LoginPage() {
           >
             {loading ? "送信中..." : "Magic Link を送る"}
           </button>
-          {message ? <p className="text-xs text-emerald-200">{message}</p> : null}
-          {error ? <p className="text-xs text-rose-300">{error}</p> : null}
+          {message ? <p className="text-xs text-emerald-600">{message}</p> : null}
+          {error ? <p className="text-xs text-rose-600">{error}</p> : null}
         </form>
 
-        <div className="flex items-center gap-3 text-xs text-slate-300/70">
-          <span className="h-px flex-1 bg-white/10" />
+        <div className="flex items-center gap-3 text-xs text-slate-500">
+          <span className="h-px flex-1 bg-slate-200" />
           <span>または</span>
-          <span className="h-px flex-1 bg-white/10" />
+          <span className="h-px flex-1 bg-slate-200" />
         </div>
 
         <button
           type="button"
           onClick={handleGoogle}
           disabled={loading}
-          className="w-full rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-full border border-slate-200 bg-white/80 px-5 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Googleで続ける
+          Googleでログイン
         </button>
 
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-slate-100 shadow-lg">
+        <div className="rounded-2xl border border-white/70 bg-white/80 p-5 text-sm text-slate-900 shadow-md">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-amber-200">ログイン後のヒント</p>
-              <p className="text-sm">メールを開いてMagic Linkを踏むと、そのままダッシュボードに遷移します。ログイン済みならこのページからダッシュボードへ移動できます。</p>
+              <p className="text-xs text-amber-700">すぐに試したい場合</p>
+              <p className="text-sm text-slate-700">メール送信が面倒なら、ダッシュボードでデモデータを確認してからログインすることもできます。</p>
             </div>
-            <Link href="/dashboard" className="rounded-full border border-white/20 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10">
-              ダッシュボードへ
+            <Link href="/dashboard" className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-800 transition hover:bg-white">
+              デモを見る
             </Link>
           </div>
         </div>

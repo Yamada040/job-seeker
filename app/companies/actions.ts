@@ -12,12 +12,13 @@ export async function createCompany(formData: FormData) {
   if (!userData?.user) throw new Error("Not authenticated");
 
   const name = (formData.get("name") as string | null)?.trim();
-  if (!name) throw new Error("企業名は必須です");
+  if (!name) throw new Error("企業名を入力してください");
 
   const url = (formData.get("url") as string | null)?.trim() || null;
-  const stage = (formData.get("stage") as string | null) ?? "未エントリー";
+  const stage = (formData.get("stage") as string | null) ?? "Screening";
   const preference = Number(formData.get("preference")) || 3;
   const memo = (formData.get("memo") as string | null) || null;
+  const favorite = formData.get("favorite") === "on";
 
   const { error } = await supabase.from("companies").insert({
     user_id: userData.user.id,
@@ -26,6 +27,7 @@ export async function createCompany(formData: FormData) {
     stage,
     preference,
     memo,
+    favorite,
   });
   if (error) throw error;
   revalidatePath("/companies");
@@ -39,12 +41,12 @@ export async function updateCompany(id: string, formData: FormData) {
 
   const name = (formData.get("name") as string | null)?.trim();
   const url = (formData.get("url") as string | null)?.trim() || null;
-  const stage = (formData.get("stage") as string | null) ?? "未エントリー";
+  const stage = (formData.get("stage") as string | null) ?? "Screening";
   const preference = Number(formData.get("preference")) || 3;
   const memo = (formData.get("memo") as string | null) || null;
   const favorite = formData.get("favorite") === "on";
 
-  if (!name) throw new Error("企業名は必須です");
+  if (!name) throw new Error("企業名を入力してください");
 
   const { error } = await supabase
     .from("companies")
