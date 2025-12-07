@@ -30,6 +30,7 @@ export interface Database {
           user_id: string | null;
           title: string;
           content_md: string | null;
+          questions: Json | null;
           status: string | null;
           tags: string[] | null;
           score: number | null;
@@ -41,6 +42,7 @@ export interface Database {
           user_id?: string | null;
           title: string;
           content_md?: string | null;
+          questions?: Json | null;
           status?: string | null;
           tags?: string[] | null;
           score?: number | null;

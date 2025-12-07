@@ -1,61 +1,73 @@
 import Link from "next/link";
+import { PlusIcon, StarIcon } from "@heroicons/react/24/outline";
+
 import { Database } from "@/lib/database.types";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/server-readonly";
-import { CompanyListClient } from "./_components/company-list-client";
+import { AppLayout } from "@/app/_components/layout";
 
 type CompanyRow = Database["public"]["Tables"]["companies"]["Row"];
 
-export default async function CompanyListPage() {
+export default async function CompaniesPage() {
   let companies: CompanyRow[] = [];
   try {
     const supabase = await createSupabaseReadonlyClient();
     if (supabase) {
-      const { data } = await supabase.from("companies").select("*").order("updated_at", { ascending: false }).limit(12);
+      const { data } = await supabase.from("companies").select("*").order("updated_at", { ascending: false }).limit(20);
       companies = data ?? [];
     }
   } catch {
     // fallback below
   }
+
   if (companies.length === 0) {
     companies = [
-      { id: "1", user_id: null, name: "Alpha SaaS", stage: "書類提出", url: "alphasaas.jp", memo: null, preference: 3, favorite: true, ai_summary: null, created_at: null, updated_at: null },
-      { id: "2", user_id: null, name: "Sky Finance", stage: "面接中", url: "skyfin.co.jp", memo: null, preference: 3, favorite: false, ai_summary: null, created_at: null, updated_at: null },
+      { id: "c1", user_id: null, name: "Alpha SaaS", url: "alphasaas.jp", memo: "SaaSプロダクトが強い", stage: "未エントリー", preference: 3, favorite: true, ai_summary: null, created_at: null, updated_at: null },
+      { id: "c2", user_id: null, name: "Sky Finance", url: "skyfin.co.jp", memo: "フィンテック系", stage: "書類提出", preference: 3, favorite: false, ai_summary: null, created_at: null, updated_at: null },
     ];
   }
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-50">
-      <div className="pointer-events-none absolute inset-0 -z-10 opacity-70">
-        <div className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,196,38,0.14),transparent_60%)] blur-2xl" />
-        <div className="absolute right-0 top-10 h-96 w-96 rounded-full bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.12),transparent_60%)] blur-2xl" />
-      </div>
-      <main className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-14 sm:px-10 sm:py-16">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-200">Companies</p>
-            <h1 className="text-3xl font-semibold">企業カード一覧</h1>
-            <p className="text-sm text-slate-200/80">企業の詳細管理はこのページで行い、ダッシュボードには概要を表示します。</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/dashboard"
-              className="rounded-full border border-white/20 px-4 py-2 text-xs text-white hover:bg-white/10"
-            >
-              戻る
-            </Link>
-            <Link
-              href="/companies/new"
-              className="rounded-full bg-linear-to-r from-emerald-300 via-cyan-300 to-sky-300 px-4 py-2 text-xs font-semibold text-slate-950 shadow-lg shadow-emerald-400/30"
-            >
-              企業を追加
-            </Link>
-          </div>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <CompanyListClient items={companies} />
-        </div>
-      </main>
+  const headerActions = (
+    <div className="flex gap-3">
+      <Link href="/companies/new" className="mvp-button mvp-button-primary">
+        <PlusIcon className="h-4 w-4" />
+        企業を追加
+      </Link>
     </div>
+  );
+
+  return (
+    <AppLayout 
+      headerTitle="企業管理"
+      headerDescription="志望企業の情報管理・分析・お気に入り管理"
+      headerActions={headerActions}
+      className="flex flex-col gap-8"
+    >
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {companies.map((c) => (
+          <Link
+            key={c.id}
+            href={`/companies/${c.id}`}
+            className="block"
+          >
+            <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-md transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-semibold text-slate-900">{c.name}</h3>
+                    {c.favorite && <StarIcon className="h-4 w-4 text-amber-500" />}
+                  </div>
+                  <p className="text-sm text-slate-600">{c.url}</p>
+                  <p className="text-sm text-slate-700">{c.memo ?? "メモなし"}</p>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-2">
+                <span className="mvp-badge mvp-badge-slate">{c.stage ?? "未設定"}</span>
+                <span className="mvp-badge mvp-badge-amber">志望度: {c.preference ?? "-"}</span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </section>
+    </AppLayout>
   );
 }

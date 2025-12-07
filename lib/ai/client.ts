@@ -54,12 +54,12 @@ async function callGemini(prompt: string): Promise<AiResponse> {
   }
 
   type GeminiPart = { text?: string };
-  type GeminiContent = { parts?: GeminiPart[]; output_text?: string };
+  type GeminiContent = { parts?: GeminiPart[] };
   type GeminiResponse = { candidates?: { content?: GeminiContent }[] };
   const data = (await res.json()) as GeminiResponse;
   const parts = data?.candidates?.[0]?.content?.parts ?? [];
   const text: string | undefined =
-    parts.map((p) => p.text ?? "").filter(Boolean).join("\n") || data?.candidates?.[0]?.output_text;
+    parts.map((p) => p.text ?? "").filter(Boolean).join("\n") || undefined;
 
   if (!text) {
     return { summary: "Geminiからテキストを取得できませんでした。" };

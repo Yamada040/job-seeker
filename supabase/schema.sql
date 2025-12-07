@@ -18,6 +18,7 @@ create table if not exists public.es_entries (
   content_md text default '',
   status text default '下書き',
   tags text[] default array[]::text[],
+  questions jsonb default '[]'::jsonb, -- [{id, prompt, answer_md}]
   score int,
   created_at timestamptz default now(),
   updated_at timestamptz default now()

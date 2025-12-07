@@ -1,8 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
+import { ArrowLeftIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 
 import { createSupabaseReadonlyClient } from "@/lib/supabase/server-readonly";
 import { updateProfile } from "./actions";
+import { AppLayout } from "@/app/_components/layout";
 
 const avatarOptions = [
   { id: "sunrise", label: "Sunrise", src: "/avatars/sunrise.svg" },
@@ -26,73 +28,76 @@ export default async function ProfilePage() {
     avatar_id: "",
   };
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-50">
-      <div className="pointer-events-none absolute inset-0 -z-10 opacity-70">
-        <div className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,196,38,0.14),transparent_60%)] blur-2xl" />
-        <div className="absolute right-0 top-10 h-96 w-96 rounded-full bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.12),transparent_60%)] blur-2xl" />
-      </div>
-      <main className="mx-auto flex max-w-3xl flex-col gap-6 px-6 py-14 sm:px-10 sm:py-16">
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-200">Profile</p>
-            <h1 className="text-3xl font-semibold">プロフィール編集</h1>
-            <p className="text-sm text-slate-200/80">名前 / 大学 / 学部 / アバターIDを変更できます。</p>
-          </div>
-          <Link href="/dashboard" className="rounded-full border border-white/20 px-4 py-2 text-xs text-white hover:bg-white/10">
-            戻る
-          </Link>
-        </div>
+  const headerActions = (
+    <div className="flex gap-3">
+      <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+        <ArrowLeftIcon className="h-4 w-4" />
+        ダッシュボードに戻る
+      </Link>
+    </div>
+  );
 
-        <form
-          action={updateProfile}
-          className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-slate-100 shadow-lg backdrop-blur"
-        >
-          <div className="grid gap-4 sm:grid-cols-2">
+  return (
+    <AppLayout 
+      headerTitle="プロフィール編集"
+      headerDescription="名前・大学・学部・アバターを変更できます"
+      headerActions={headerActions}
+      className="flex flex-col gap-8"
+    >
+      <form action={updateProfile} className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur">
+        <div className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
             <label className="block space-y-2">
-              <span className="text-xs text-slate-200/80">フルネーム</span>
+              <span className="text-sm font-medium text-slate-700">フルネーム</span>
               <input
                 name="full_name"
                 defaultValue={profile.full_name ?? ""}
                 disabled={!canEdit}
-                className="w-full rounded-xl border border-white/10 bg-slate-900/40 px-4 py-3 text-sm text-white outline-none focus:border-amber-300 disabled:opacity-60"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 disabled:opacity-60"
+                placeholder="山田 太郎"
               />
             </label>
             <label className="block space-y-2">
-              <span className="text-xs text-slate-200/80">メール</span>
+              <span className="text-sm font-medium text-slate-700">メール</span>
               <input
                 value={userData?.user?.email ?? "未ログイン"}
                 disabled
-                className="w-full rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 outline-none"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 outline-none"
               />
             </label>
           </div>
-          <label className="block space-y-2">
-            <span className="text-xs text-slate-200/80">大学</span>
-            <input
-              name="university"
-              defaultValue={profile.university ?? ""}
-              disabled={!canEdit}
-              className="w-full rounded-xl border border-white/10 bg-slate-900/40 px-4 py-3 text-sm text-white outline-none focus:border-amber-300 disabled:opacity-60"
-            />
-          </label>
-          <label className="block space-y-2">
-            <span className="text-xs text-slate-200/80">学部</span>
-            <input
-              name="faculty"
-              defaultValue={profile.faculty ?? ""}
-              disabled={!canEdit}
-              className="w-full rounded-xl border border-white/10 bg-slate-900/40 px-4 py-3 text-sm text-white outline-none focus:border-amber-300 disabled:opacity-60"
-            />
-          </label>
-          <label className="block space-y-2">
-            <span className="text-xs text-slate-200/80">アバターID（固定画像から選択）</span>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-700">大学</span>
+              <input
+                name="university"
+                defaultValue={profile.university ?? ""}
+                disabled={!canEdit}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 disabled:opacity-60"
+                placeholder="○○大学"
+              />
+            </label>
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-700">学部</span>
+              <input
+                name="faculty"
+                defaultValue={profile.faculty ?? ""}
+                disabled={!canEdit}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 disabled:opacity-60"
+                placeholder="○○学部"
+              />
+            </label>
+          </div>
+
+          <div className="space-y-3">
+            <span className="text-sm font-medium text-slate-700">アバター（固定画像から選択）</span>
             <div className="grid gap-3 sm:grid-cols-2">
               {avatarOptions.map((opt) => (
                 <label
                   key={opt.id}
-                  className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-3 ${
-                    profile.avatar_id === opt.id ? "border-amber-300 bg-amber-300/10" : "border-white/10 bg-slate-900/40"
+                  className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-4 transition-colors ${
+                    profile.avatar_id === opt.id ? "border-amber-300 bg-amber-50" : "border-slate-200 bg-white hover:bg-slate-50"
                   }`}
                 >
                   <input
@@ -103,37 +108,41 @@ export default async function ProfilePage() {
                     disabled={!canEdit}
                     className="h-4 w-4 accent-amber-300"
                   />
-                  <Image src={opt.src} alt={opt.label} width={48} height={48} className="h-12 w-12 rounded-xl border border-white/10 bg-slate-900/60 object-cover" />
-                  <span className="text-sm text-white">{opt.label}</span>
+                  <Image src={opt.src} alt={opt.label} width={48} height={48} className="h-12 w-12 rounded-xl border border-slate-200 bg-slate-50 object-cover" />
+                  <span className="text-sm text-slate-900">{opt.label}</span>
                 </label>
               ))}
               <label
-                className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-3 ${
-                  !profile.avatar_id ? "border-amber-300 bg-amber-300/10" : "border-white/10 bg-slate-900/40"
+                className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-4 transition-colors ${
+                  !profile.avatar_id ? "border-amber-300 bg-amber-50" : "border-slate-200 bg-white hover:bg-slate-50"
                 }`}
               >
                 <input type="radio" name="avatar_id" value="" defaultChecked={!profile.avatar_id} disabled={!canEdit} className="h-4 w-4 accent-amber-300" />
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-slate-900/60 text-xs text-slate-200">なし</div>
-                <span className="text-sm text-white">未設定にする</span>
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-600">なし</div>
+                <span className="text-sm text-slate-900">未設定にする</span>
               </label>
             </div>
-          </label>
-
-          <button
-            type="submit"
-            disabled={!canEdit}
-            className="w-full rounded-full bg-linear-to-r from-amber-400 via-orange-400 to-rose-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-amber-500/30 transition hover:translate-y-0.5 hover:shadow-amber-500/50 disabled:opacity-60"
-          >
-            保存
-          </button>
-        </form>
-
-        {!canEdit ? (
-          <div className="rounded-2xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm text-amber-100">
-            デモ表示中です。ログインするとプロフィールを更新できます。
           </div>
-        ) : null}
-      </main>
-    </div>
+
+          <div className="flex justify-end pt-4 border-t border-slate-200">
+            <button
+              type="submit"
+              disabled={!canEdit}
+              className="mvp-button mvp-button-primary disabled:opacity-60"
+            >
+              <UserCircleIcon className="h-4 w-4" />
+              保存
+            </button>
+          </div>
+        </div>
+      </form>
+
+      {/* Status Notice */}
+      {!canEdit && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 shadow-soft">
+          デモ表示中です。ログインするとプロフィールを更新できます。
+        </div>
+      )}
+    </AppLayout>
   );
 }
