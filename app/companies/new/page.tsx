@@ -36,7 +36,7 @@ export default async function NewCompanyPage() {
       headerActions={headerActions}
       className="flex flex-col gap-8"
     >
-      <form action={createCompany} className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur">
+      <form action={createCompany} className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
         <div className="space-y-6">
           <label className="block space-y-2">
             <span className="text-sm font-medium text-slate-700">企業名*</span>

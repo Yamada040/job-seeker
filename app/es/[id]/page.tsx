@@ -71,7 +71,7 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
       className="flex flex-col gap-8"
     >
       <div className="grid gap-4 lg:grid-cols-[1.4fr,0.9fr]">
-        <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur">
+        <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
           <form action={handleUpdate} className="space-y-4">
             <div className="space-y-2">
               <label className="block text-xs text-slate-600">タイトル*</label>
@@ -122,7 +122,7 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
           </form>
         </div>
 
-        <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur">
+        <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
           <EsAiPanel content={combinedContent} />
         </div>
       </div>

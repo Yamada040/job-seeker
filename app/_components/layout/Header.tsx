@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { clsx } from "clsx";
+import { ThemeToggle } from "../theme-toggle";
 
 interface BreadcrumbItem {
   label: string;
@@ -66,26 +67,26 @@ export function Header({ title, description, actions, breadcrumbs }: HeaderProps
   const generatedBreadcrumbs = breadcrumbs || generateBreadcrumbs(pathname);
 
   return (
-    <header className="border-b border-white/40 bg-white/70 px-6 py-4 backdrop-blur">
+    <header className="border-b border-white/40 bg-white/70 px-6 py-4 backdrop-blur dark:border-gray-800 dark:bg-black">
       <div className="flex flex-col gap-3">
         {generatedBreadcrumbs.length > 1 && (
           <nav className="flex items-center space-x-1 text-sm">
-            <HomeIcon className="h-4 w-4 text-slate-400" />
-            <ChevronRightIcon className="h-4 w-4 text-slate-400" />
+            <HomeIcon className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+            <ChevronRightIcon className="h-4 w-4 text-slate-400 dark:text-slate-500" />
 
             {generatedBreadcrumbs.map((item, index) => (
               <div key={item.href} className="flex items-center space-x-1">
                 {index === generatedBreadcrumbs.length - 1 ? (
-                  <span className="text-slate-800 font-medium">{item.label}</span>
+                  <span className="font-medium text-slate-800 dark:text-slate-100">{item.label}</span>
                 ) : (
                   <>
                     <Link
                       href={item.href}
-                      className="text-slate-500 hover:text-slate-800 transition-colors"
+                      className="text-slate-500 transition-colors hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100"
                     >
                       {item.label}
                     </Link>
-                    <ChevronRightIcon className="h-4 w-4 text-slate-300" />
+                    <ChevronRightIcon className="h-4 w-4 text-slate-300 dark:text-slate-600" />
                   </>
                 )}
               </div>
@@ -93,17 +94,20 @@ export function Header({ title, description, actions, breadcrumbs }: HeaderProps
           </nav>
         )}
 
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             {title && (
-              <h1 className="text-2xl font-semibold text-slate-900 truncate">{title}</h1>
+              <h1 className="truncate text-2xl font-semibold text-slate-900 dark:text-slate-100">{title}</h1>
             )}
             {description && (
-              <p className="mt-1 text-sm text-slate-600">{description}</p>
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{description}</p>
             )}
           </div>
 
-          {actions && <div className={clsx("ml-4 flex items-center gap-2")}>{actions}</div>}
+          <div className={clsx("ml-4 flex items-center gap-2")}>
+            <ThemeToggle />
+            {actions}
+          </div>
         </div>
       </div>
     </header>

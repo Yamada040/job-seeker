@@ -122,7 +122,7 @@ export default async function DashboardPage() {
 
   return (
     <AppLayout headerActions={headerActions} className="flex flex-col gap-10">
-      <section className="rounded-3xl border border-white/70 bg-white/80 p-8 shadow-xl backdrop-blur">
+      <section className="rounded-3xl border border-white/70 bg-white/80 p-8 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-4">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-600">Dashboard</p>
@@ -158,7 +158,7 @@ export default async function DashboardPage() {
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((item) => (
-          <div key={item.title} className="rounded-2xl border border-white/70 bg-white/80 p-4 shadow-md backdrop-blur">
+          <div key={item.title} className="rounded-2xl border border-white/70 bg-white/80 p-4 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
             <div className="flex items-center justify-between text-sm font-semibold text-slate-900">
               <span>{item.title}</span>
               <span className="text-base">{item.icon}</span>
@@ -169,7 +169,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
-        <article className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-md backdrop-blur">
+        <article className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-slate-900">今日のフォーカス</h2>
             <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs text-amber-700 shadow">{todayTasks.length} 件</span>
@@ -184,7 +184,7 @@ export default async function DashboardPage() {
           </ul>
         </article>
 
-        <article className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-md backdrop-blur lg:col-span-2">
+        <article className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-md backdrop-blur lg:col-span-2 dark:border-slate-700/70 dark:bg-slate-900/80">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-slate-900">ESの最新状況</h2>
             <Link href="/es" className="rounded-full border border-slate-300 px-3 py-1 text-xs text-slate-800 hover:bg-white">
@@ -218,7 +218,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
-        <article className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-md backdrop-blur lg:col-span-2">
+        <article className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-md backdrop-blur lg:col-span-2 dark:border-slate-700/70 dark:bg-slate-900/80">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-slate-900">最新の企業カード</h2>
             <Link href="/companies" className="rounded-full border border-slate-300 px-3 py-1 text-xs text-slate-800 hover:bg-white">
@@ -243,7 +243,7 @@ export default async function DashboardPage() {
           </div>
         </article>
 
-        <article className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-md backdrop-blur">
+        <article className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-slate-900">AIキュー</h2>
             <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs text-emerald-700">Gemini / GPT</span>

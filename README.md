@@ -9,7 +9,7 @@
 - 企業管理: 企業カードの作成/編集/削除、志望度・ステータス・メモ・お気に入り。ログイン必須。
 - プロフィール: 氏名/大学/学部/アバター（固定2種）を保存。ログイン必須。
 - ホーム（MVP紹介）: 白基調のガラス風UIで、ログイン/新規登録導線と機能紹介を表示。
-- 共通UI: 抽象グラデ背景（`public/bg-abstract.svg`）、Sidebar/Breadcrumb、MVPボタン/カードスタイル、Tailwind v4準拠（`bg-linear-to-*`）。
+- 共通UI: 抽象グラデ背景（`public/bg-abstract.svg`）、Sidebar/Breadcrumb、MVPボタン/カードスタイル、Tailwind v4準拠（`bg-linear-to-*`）、ライト/ダーク切替（自前Providerでローカル保存）。
 
 ## 技術スタック
 - Next.js (App Router) + TypeScript + Tailwind CSS v4
@@ -17,16 +17,6 @@
 - AI: provider-agnostic ラッパー（Gemini/GPTを環境変数で切替）
 - Hosting: Vercel想定
 
-## 環境変数 (.env.local)
-```bash
-NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=xxxxx
-SUPABASE_SERVICE_ROLE_KEY=xxxxx       # server-only
-# optional
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-AI_PROVIDER=gemini                    # gemini | gpt
-AI_PROVIDER_API_KEY=xxxxx
-```
 
 ## セットアップ
 ```bash

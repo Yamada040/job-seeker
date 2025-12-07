@@ -43,7 +43,7 @@ export default async function ProfilePage() {
       headerActions={headerActions}
       className="flex flex-col gap-8"
     >
-      <form action={updateProfile} className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur">
+      <form action={updateProfile} className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
         <div className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
             <label className="block space-y-2">

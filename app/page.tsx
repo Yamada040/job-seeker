@@ -1,5 +1,10 @@
+ "use client";
+
 import Link from "next/link";
+import { useEffect } from "react";
 import { ArrowRightIcon, SparklesIcon, ShieldCheckIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
+
+import { useAppTheme } from "@/app/theme-provider";
 
 const heroBadges = [
   { label: "MVPプラン", detail: "すぐ着手可能" },
@@ -41,14 +46,18 @@ const stats = [
 ];
 
 export default function Home() {
+  const { setTheme } = useAppTheme();
+  useEffect(() => {
+    setTheme("light");
+  }, [setTheme]);
   return (
-    <div className="relative min-h-screen overflow-hidden text-slate-900">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_25%_20%,rgba(255,196,38,0.12),transparent_40%),radial-gradient(circle_at_80%_10%,rgba(56,189,248,0.1),transparent_45%),linear-gradient(135deg,#ffedd5_0%,#e0f2fe_45%,#e9d5ff_100%)]" />
-      <div className="pointer-events-none absolute inset-0 -z-20 bg-[url('/bg-abstract.svg')] bg-cover bg-center opacity-80" />
+    <div className="relative min-h-screen overflow-hidden text-slate-900 dark:text-slate-100 dark:bg-black">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_25%_20%,rgba(255,196,38,0.12),transparent_40%),radial-gradient(circle_at_80%_10%,rgba(56,189,248,0.1),transparent_45%),linear-gradient(135deg,#ffedd5_0%,#e0f2fe_45%,#e9d5ff_100%)] dark:bg-none" />
+      <div className="pointer-events-none absolute inset-0 -z-20 bg-[url('/bg-abstract.svg')] bg-cover bg-center opacity-80 dark:opacity-10" />
 
       <main className="mx-auto flex max-w-6xl flex-col gap-10 px-6 py-10 sm:px-10 sm:py-14">
         {/* ヘッダー */}
-        <header className="flex items-center justify-between">
+        <header className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-lg font-semibold">
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-amber-300 to-orange-500 text-sm font-bold text-slate-900 shadow-md shadow-amber-300/40">
               就
@@ -72,7 +81,7 @@ export default function Home() {
         </header>
 
         {/* ヒーロー */}
-        <section className="relative overflow-hidden rounded-3xl border border-white/70 bg-white/80 p-8 shadow-2xl backdrop-blur">
+        <section className="relative overflow-hidden rounded-3xl border border-white/70 bg-white/80 p-8 shadow-2xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
           <div className="absolute -right-32 -top-24 h-64 w-64 rotate-6 rounded-3xl bg-linear-to-br from-amber-300/50 via-orange-500/40 to-rose-500/40 blur-3xl" />
           <div className="absolute -left-28 bottom-[-90px] h-64 w-64 rounded-3xl bg-linear-to-br from-cyan-300/40 via-emerald-300/30 to-white/0 blur-3xl" />
 
@@ -146,7 +155,7 @@ export default function Home() {
 
         {/* KPI / タスク */}
         <section className="grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
-          <div className="rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur">
+          <div className="rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-slate-900">Today's Focus</h2>
               <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs text-amber-700 shadow">{focusItems.length} 件</span>
@@ -161,7 +170,7 @@ export default function Home() {
             </ul>
           </div>
 
-          <div className="rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur">
+          <div className="rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-slate-900">Priorities & Metrics</h2>
               <ClipboardDocumentListIcon className="h-5 w-5 text-slate-500" />
@@ -178,7 +187,7 @@ export default function Home() {
         </section>
 
         {/* モジュール紹介 */}
-        <section id="modules" className="rounded-3xl border border-white/70 bg-white/80 p-8 shadow-xl backdrop-blur">
+        <section id="modules" className="rounded-3xl border border-white/70 bg-white/80 p-8 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
           <div className="flex flex-col gap-2">
             <p className="text-sm font-semibold text-amber-700">MVP機能</p>
             <h2 className="text-2xl font-semibold text-slate-900">就活を進めるためのコア体験</h2>
@@ -202,7 +211,7 @@ export default function Home() {
 
         {/* セキュリティ / 導線 */}
         <section className="grid gap-4 lg:grid-cols-[1fr,0.8fr]">
-          <div className="rounded-3xl border border-white/70 bg-white/80 p-8 shadow-xl backdrop-blur">
+          <div className="rounded-3xl border border-white/70 bg-white/80 p-8 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
             <div className="flex items-center gap-2 text-amber-700">
               <ShieldCheckIcon className="h-5 w-5" />
               <p className="text-sm font-semibold">安全な運用を想定</p>

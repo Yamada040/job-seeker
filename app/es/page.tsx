@@ -38,7 +38,7 @@ export default async function EsListPage() {
 
   return (
     <AppLayout headerTitle="ES管理" headerDescription="エントリーシートを整理し、AI添削に送る" headerActions={headerActions}>
-      <div className="rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur">
+      <div className="rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
         <div className="flex flex-col gap-2">
           <p className="text-sm font-semibold text-amber-700">ES一覧</p>
           <p className="text-sm text-slate-700">ステータスやタグで絞り込み、気になるESをすぐ開けます。</p>

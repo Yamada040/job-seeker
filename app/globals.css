@@ -1,8 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f7fb;
-  --foreground: #0f172a;
+  --background-light: #f5f7fb;
+  --foreground-light: #0f172a;
+  --background-dark: #060b18;
+  --foreground-dark: #e2e8f0;
+  --background: var(--background-light);
+  --foreground: var(--foreground-light);
+}
+
+:root.dark {
+  --background: var(--background-dark);
+  --foreground: var(--foreground-dark);
 }
 
 @theme inline {
@@ -10,13 +19,6 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
@@ -32,6 +34,11 @@ body {
   min-height: 100vh;
 }
 
+.dark body {
+  background: #000000;
+  color: #f1f5f9;
+}
+
 .shadow-soft {
   box-shadow: 0 20px 55px rgba(15, 23, 42, 0.09);
 }
@@ -40,6 +47,12 @@ body {
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(226, 232, 240, 0.7);
   backdrop-filter: blur(14px);
+}
+
+.dark .glass {
+  background: rgba(17, 17, 17, 0.95);
+  border: 1px solid rgba(64, 64, 64, 0.4);
+  color: #f1f5f9;
 }
 
 /* MVP Style Button */
@@ -99,6 +112,29 @@ body {
   border-radius: 0.75rem;
 }
 
+.dark .mvp-card {
+  background: #111111;
+  border: 1px solid #333333;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  color: #f1f5f9;
+}
+
+.dark .mvp-button-primary {
+  color: #0f172a;
+}
+
+.dark .mvp-button-secondary {
+  background: #1a1a1a;
+  color: #f1f5f9;
+  border: 1px solid #404040;
+}
+
+.dark .mvp-button-secondary:hover {
+  background: #262626;
+  color: #ffffff;
+  border: 1px solid #525252;
+}
+
 /* MVP Background Decorations */
 .mvp-bg {
   position: relative;
@@ -119,6 +155,13 @@ body {
     linear-gradient(120deg, rgba(15, 23, 42, 0.04) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(15, 23, 42, 0.04) 100%);
   pointer-events: none;
   z-index: -1;
+}
+
+.dark .mvp-bg::before {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 196, 38, 0.12), transparent 35%),
+    radial-gradient(circle at 80% 10%, rgba(56, 189, 248, 0.12), transparent 40%),
+    linear-gradient(120deg, rgba(148, 163, 184, 0.1) 0%, rgba(15, 23, 42, 0.6) 50%, rgba(148, 163, 184, 0.1) 100%);
 }
 
 /* Layout utilities */
@@ -157,6 +200,165 @@ body {
   color: #64748b;
   font-size: 0.75rem;
   line-height: 1.4;
+}
+
+.dark .mvp-heading-lg,
+.dark .mvp-heading-md {
+  color: #e2e8f0;
+}
+.dark .mvp-text,
+.dark .mvp-text-small {
+  color: #cbd5e1;
+}
+
+/* Form Elements Dark Mode */
+.dark input,
+.dark textarea,
+.dark select {
+  background: #1a1a1a !important;
+  color: #f1f5f9 !important;
+  border-color: #404040 !important;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  background: #262626 !important;
+  border-color: #fbbf24 !important;
+  color: #ffffff !important;
+}
+
+.dark input:disabled,
+.dark textarea:disabled,
+.dark select:disabled {
+  background: #0a0a0a !important;
+  color: #64748b !important;
+  opacity: 0.7;
+}
+
+/* Dark mode specific overrides for glassmorphism */
+.dark .bg-white\/80 {
+  background: rgba(17, 17, 17, 0.95) !important;
+}
+
+.dark .bg-white\/70 {
+  background: rgba(17, 17, 17, 0.9) !important;
+}
+
+.dark .bg-white\/90 {
+  background: rgba(17, 17, 17, 0.98) !important;
+}
+
+.dark .bg-white\/60 {
+  background: rgba(17, 17, 17, 0.85) !important;
+}
+
+.dark .border-white\/70 {
+  border-color: rgba(64, 64, 64, 0.5) !important;
+}
+
+.dark .border-white\/60 {
+  border-color: rgba(64, 64, 64, 0.4) !important;
+}
+
+.dark .border-white\/50 {
+  border-color: rgba(64, 64, 64, 0.3) !important;
+}
+
+.dark .border-white\/40 {
+  border-color: rgba(64, 64, 64, 0.25) !important;
+}
+
+.dark .border-slate-200 {
+  border-color: #404040 !important;
+}
+
+.dark .border-slate-200\/70 {
+  border-color: rgba(64, 64, 64, 0.7) !important;
+}
+
+.dark .border-slate-300 {
+  border-color: #333333 !important;
+}
+
+.dark .bg-slate-50 {
+  background: #1a1a1a !important;
+}
+
+.dark .bg-slate-100 {
+  background: #262626 !important;
+}
+
+.dark .bg-white {
+  background: #111111 !important;
+}
+
+.dark .bg-amber-50 {
+  background: #261a00 !important;
+}
+
+.dark .bg-amber-100 {
+  background: #331f00 !important;
+}
+
+.dark .text-slate-900 {
+  color: #f1f5f9 !important;
+}
+
+.dark .text-slate-800 {
+  color: #e2e8f0 !important;
+}
+
+.dark .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+.dark .text-slate-500 {
+  color: #64748b !important;
+}
+
+.dark .text-amber-700 {
+  color: #fbbf24 !important;
+}
+
+.dark .text-amber-600 {
+  color: #fcd34d !important;
+}
+
+.dark .shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.6) !important;
+}
+
+.dark .shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7) !important;
+}
+
+.dark .shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8) !important;
+}
+
+.dark .shadow-soft {
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark .hover\:bg-white:hover {
+  background: #1a1a1a !important;
+}
+
+.dark .bg-linear-to-br {
+  background: linear-gradient(135deg, #fbbf24, #f97316) !important;
+}
+
+.dark .bg-linear-to-r {
+  background: linear-gradient(to right, #fbbf24, #f97316) !important;
 }
 
 /* Status badges */
