@@ -43,7 +43,7 @@ export default async function NewEsPage() {
       headerActions={headerActions}
       className="flex flex-col gap-8"
     >
-      <div className="space-y-4 rounded-2xl border border-slate-200/70 bg-white/80 p-6 text-sm text-slate-900 shadow-md backdrop-blur">
+      <div className="space-y-4 rounded-2xl border border-slate-200/70 bg-white/80 p-6 text-sm text-slate-900 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80 dark:text-slate-100">
         <div className="space-y-2">
           <h2 className="text-lg font-semibold">ESを作成</h2>
           <p className="text-sm text-slate-700">質問カードを自由に追加して、企業ごとに異なる設問にも対応できます。</p>

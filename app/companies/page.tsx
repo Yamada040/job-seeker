@@ -37,7 +37,7 @@ export default async function CompaniesPage() {
 
   return (
     <AppLayout headerTitle="企業管理" headerDescription="志望企業の情報と進捗を整理" headerActions={headerActions}>
-      <div className="rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur">
+      <div className="rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
         <div className="flex flex-col gap-2">
           <p className="text-sm font-semibold text-amber-700">企業カード</p>
           <p className="text-sm text-slate-700">ステータス・志望度・メモをまとめ、すぐに編集できます。</p>

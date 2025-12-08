@@ -40,7 +40,7 @@ export default async function CompanyDetailPage({ params }: { params: { id: stri
       }
       className="flex flex-col gap-8"
     >
-      <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur">
+      <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
         <form action={handleUpdate} className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block space-y-2">

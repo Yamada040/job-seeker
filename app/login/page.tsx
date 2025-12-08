@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ThemeToggle } from "@/app/_components/theme-toggle";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -71,11 +72,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_25%_20%,rgba(255,196,38,0.12),transparent_40%),radial-gradient(circle_at_80%_10%,rgba(56,189,248,0.1),transparent_45%),linear-gradient(135deg,#ffedd5_0%,#e0f2fe_45%,#e9d5ff_100%)] text-slate-900">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[url('/bg-abstract.svg')] bg-cover bg-center opacity-80" />
+    <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_25%_20%,rgba(255,196,38,0.12),transparent_40%),radial-gradient(circle_at_80%_10%,rgba(56,189,248,0.1),transparent_45%),linear-gradient(135deg,#ffedd5_0%,#e0f2fe_45%,#e9d5ff_100%)] text-slate-900 dark:bg-black dark:text-slate-100">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[url('/bg-abstract.svg')] bg-cover bg-center opacity-80 dark:opacity-10" />
 
       <main className="mx-auto flex max-w-xl flex-col gap-6 px-6 py-12 sm:py-16">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-lg font-semibold">
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-amber-300 to-orange-500 text-sm font-bold text-slate-900 shadow-md shadow-amber-300/40">
               就
@@ -87,7 +88,7 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <div className="space-y-2 rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur">
+        <div className="space-y-2 rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-700">Sign in</p>
           <h1 className="text-2xl font-semibold">メールまたはGoogleでログイン</h1>
           <p className="text-sm text-slate-700">Magic Link方式で、メールに届くリンクを押すだけでログインできます。登録済みか未登録かはメールで自動判定します。</p>
@@ -110,7 +111,7 @@ export default function LoginPage() {
           </button>
         </div>
 
-        <form onSubmit={handleSignIn} className="space-y-4 rounded-2xl border border-slate-200 bg-white/80 p-6 shadow-md backdrop-blur">
+        <form onSubmit={handleSignIn} className="space-y-4 rounded-2xl border border-slate-200 bg-white/80 p-6 shadow-md backdrop-blur dark:border-slate-700 dark:bg-slate-900/80">
           <label className="block text-sm text-slate-700">
             メールアドレス
             <input
@@ -149,7 +150,7 @@ export default function LoginPage() {
         </button>
 
         <div className="rounded-2xl border border-white/70 bg-white/80 p-5 text-sm text-slate-900 shadow-md">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-xs text-amber-700">すぐに試したい場合</p>
               <p className="text-sm text-slate-700">メール送信が面倒なら、ダッシュボードでデモデータを確認してからログインすることもできます。</p>
