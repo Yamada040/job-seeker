@@ -93,8 +93,8 @@ export function AiPanel({ kind, defaultInput, title, hint, presetKey, presetText
           <p className="text-sm text-slate-800">{response.summary ?? "要約なし"}</p>
           {response.bulletPoints?.length ? (
             <ul className="list-disc space-y-1 pl-4 text-sm text-slate-800">
-              {response.bulletPoints.map((b) => (
-                <li key={b}>{b}</li>
+              {response.bulletPoints.map((b, idx) => (
+                <li key={`${idx}-${b}`}>{b}</li>
               ))}
             </ul>
           ) : null}

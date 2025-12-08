@@ -8,11 +8,14 @@ const AI_MODEL = process.env.AI_MODEL; // 任意でモデルを上書き
 const templates: Record<AiPromptKind, (input: string) => string> = {
   es_review: (input) =>
     [
-      "You are an ATS-aware career coach for Japanese job hunting essays.",
-      "Assess structure, clarity, and impact. List 3-5 concrete improvements.",
-      "Return a concise rewritten draft in Japanese.",
+      "あなたは日本の新卒採用を担当する人事・面接官およびATS対策の専門家です。",
+      "以下のESを「構成・明瞭性・インパクト」の3観点で評価し、すべて日本語で回答してください。",
+      "出力フォーマット:",
+      "1) 評価: 3〜5行で、現状の良い点と弱い点をATS視点でまとめる",
+      "2) 改善点: 箇条書きで3〜5個、具体的な修正指示（数字・行動・成果を含める）",
+      "3) 書き直し案: 100点を目指す日本語ドラフト（400〜600字目安）。事実と合わない仮定は追加しない。",
       "",
-      "Essay:",
+      "対象のES:",
       input,
     ].join("\n"),
   company_analysis: (input) =>
@@ -35,8 +38,11 @@ function missingKeyResponse(): AiResponse {
 
 async function callGemini(prompt: string): Promise<AiResponse> {
   if (!AI_KEY) return missingKeyResponse();
-  const model = AI_MODEL || "gemini-1.5-flash-latest";
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${AI_KEY}`;
+  // AI Studioで ListModels に載る正式名称を使う
+  const model = AI_MODEL;
+  // v1beta の方が広く通るためデフォルトは v1beta
+  const apiVersion = process.env.AI_API_VERSION || "v1beta";
+  const endpoint = `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${AI_KEY}`;
 
   const res = await fetch(endpoint, {
     method: "POST",
@@ -50,7 +56,8 @@ async function callGemini(prompt: string): Promise<AiResponse> {
   });
 
   if (!res.ok) {
-    return { summary: `Gemini呼び出しに失敗しました (${res.status})` };
+    const bodyText = await res.text().catch(() => "");
+    return { summary: `Gemini呼び出しに失敗しました (${res.status})`, bulletPoints: bodyText ? [bodyText] : undefined };
   }
 
   type GeminiPart = { text?: string };
