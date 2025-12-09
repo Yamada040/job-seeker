@@ -192,8 +192,15 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
       </div>
 
       <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-slate-500">
-        {["日", "月", "火", "水", "木", "金", "土"].map((d) => (
-          <div key={d} className="rounded-lg bg-white/60 py-2 shadow-sm backdrop-blur dark:bg-slate-900/70">
+        {["日", "月", "火", "水", "木", "金", "土"].map((d, idx) => (
+          <div
+            key={d}
+            className={clsx(
+              "rounded-lg bg-white/60 py-2 shadow-sm backdrop-blur dark:bg-slate-900/70",
+              idx === 0 && "text-rose-500",
+              idx === 6 && "text-sky-500"
+            )}
+          >
             {d}
           </div>
         ))}
@@ -201,7 +208,9 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
 
       <div className="grid grid-cols-7 gap-2">
         {monthDays.map(({ date, inCurrentMonth }) => {
-          const day = new Date(date).getDate();
+          const jsDate = new Date(date);
+          const day = jsDate.getDate();
+          const weekday = jsDate.getDay();
           const dayEvents = eventsByDate[date] || [];
           return (
             <button
@@ -218,8 +227,21 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
               )}
             >
               <div className="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-300">
-                <span className={inCurrentMonth ? "" : "opacity-60"}>{day}</span>
-                <span className="text-[10px] rounded-full border border-slate-200 px-2 py-0.5 text-amber-700 dark:border-slate-700 dark:text-amber-200">
+                <span
+                  className={clsx(
+                    inCurrentMonth ? "" : "opacity-60",
+                    weekday === 0 && "text-rose-500",
+                    weekday === 6 && "text-sky-500"
+                  )}
+                >
+                  {day}
+                </span>
+                <span
+                  className={clsx(
+                    "text-[10px] rounded-full border px-2 py-0.5",
+                    "border-slate-200 text-amber-700 dark:border-slate-700 dark:text-amber-200"
+                  )}
+                >
                   ＋
                 </span>
               </div>
