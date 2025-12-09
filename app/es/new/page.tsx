@@ -94,6 +94,14 @@ export default async function NewEsPage() {
                 placeholder="選考メモや補足など"
               />
             </label>
+            <label className="block space-y-1 text-xs text-slate-600">
+              応募締切（日付）
+              <input
+                type="date"
+                name="deadline"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+              />
+            </label>
           </div>
 
           <QuestionsEditor initialQuestions={initialQuestions} />

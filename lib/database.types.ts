@@ -39,6 +39,7 @@ export interface Database {
           company_url: string | null;
           selection_status: string | null;
           memo: string | null;
+          deadline: string | null;
           created_at: string | null;
           updated_at: string | null;
         };
@@ -56,10 +57,34 @@ export interface Database {
           company_url?: string | null;
           selection_status?: string | null;
           memo?: string | null;
+          deadline?: string | null;
           created_at?: string | null;
           updated_at?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["es_entries"]["Insert"]>;
+      };
+      calendar_events: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          title: string;
+          company: string | null;
+          type: string | null;
+          date: string | null;
+          time: string | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          title: string;
+          company?: string | null;
+          type?: string | null;
+          date: string;
+          time?: string | null;
+          created_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["calendar_events"]["Insert"]>;
       };
       companies: {
         Row: {
