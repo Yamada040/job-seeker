@@ -43,6 +43,10 @@ export async function createEs(formData: FormData) {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) throw new Error("Not authenticated");
 
+  const company_name = (formData.get("company_name") as string | null)?.trim() || null;
+  const selection_status = (formData.get("selection_status") as string | null)?.trim() || null;
+  const company_url = (formData.get("company_url") as string | null)?.trim() || null;
+  const memo = (formData.get("memo") as string | null)?.trim() || null;
   const title = (formData.get("title") as string | null)?.trim();
   const status = (formData.get("status") as string | null) ?? "draft";
   const content_md = (formData.get("content_md") as string | null) ?? "";
@@ -54,12 +58,16 @@ export async function createEs(formData: FormData) {
     .map((t) => t.trim())
     .filter(Boolean);
 
-  if (!title) throw new Error("タイトルを入力してください");
+  if (!title) throw new Error("タイトルは必須です");
 
   const combinedContent = combineContent(questions, content_md);
 
   const payload = {
     user_id: userData.user.id,
+    company_name,
+    selection_status,
+    company_url,
+    memo,
     title,
     status,
     content_md: combinedContent,
@@ -74,10 +82,14 @@ export async function createEs(formData: FormData) {
     error = err as Error;
   }
 
-  // DBにquestionsカラムが未作成の場合のバックアップ挿入
+  // DBで questions が無い環境向けのフォールバック
   if (error && typeof (error as { message?: string }).message === "string" && (error as { message?: string }).message?.includes("questions")) {
     const { error: retryError } = await supabase.from("es_entries").insert({
       user_id: userData.user.id,
+      company_name,
+      selection_status,
+      company_url,
+      memo,
       title,
       status,
       content_md: combinedContent,
@@ -98,6 +110,10 @@ export async function updateEs(id: string, formData: FormData) {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) throw new Error("Not authenticated");
 
+  const company_name = (formData.get("company_name") as string | null)?.trim() || null;
+  const selection_status = (formData.get("selection_status") as string | null)?.trim() || null;
+  const company_url = (formData.get("company_url") as string | null)?.trim() || null;
+  const memo = (formData.get("memo") as string | null)?.trim() || null;
   const title = (formData.get("title") as string | null)?.trim();
   const status = (formData.get("status") as string | null) ?? "draft";
   const content_md = (formData.get("content_md") as string | null) ?? "";
@@ -109,7 +125,7 @@ export async function updateEs(id: string, formData: FormData) {
     .map((t) => t.trim())
     .filter(Boolean);
 
-  if (!title) throw new Error("タイトルを入力してください");
+  if (!title) throw new Error("タイトルは必須です");
 
   const combinedContent = combineContent(questions, content_md);
 
@@ -117,7 +133,17 @@ export async function updateEs(id: string, formData: FormData) {
   try {
     ({ error } = await supabase
       .from("es_entries")
-      .update({ title, status, content_md: combinedContent, tags: tags.length ? tags : null, questions })
+      .update({
+        company_name,
+        selection_status,
+        company_url,
+        memo,
+        title,
+        status,
+        content_md: combinedContent,
+        tags: tags.length ? tags : null,
+        questions,
+      })
       .eq("id", id)
       .eq("user_id", userData.user.id));
   } catch (err) {
@@ -127,7 +153,16 @@ export async function updateEs(id: string, formData: FormData) {
   if (error && typeof (error as { message?: string }).message === "string" && (error as { message?: string }).message?.includes("questions")) {
     const { error: retryError } = await supabase
       .from("es_entries")
-      .update({ title, status, content_md: combinedContent, tags: tags.length ? tags : null })
+      .update({
+        company_name,
+        selection_status,
+        company_url,
+        memo,
+        title,
+        status,
+        content_md: combinedContent,
+        tags: tags.length ? tags : null,
+      })
       .eq("id", id)
       .eq("user_id", userData.user.id);
     if (retryError) throw retryError;

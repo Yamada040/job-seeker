@@ -34,6 +34,11 @@ export interface Database {
           status: string | null;
           tags: string[] | null;
           score: number | null;
+          ai_summary: Json | null;
+          company_name: string | null;
+          company_url: string | null;
+          selection_status: string | null;
+          memo: string | null;
           created_at: string | null;
           updated_at: string | null;
         };
@@ -46,6 +51,11 @@ export interface Database {
           status?: string | null;
           tags?: string[] | null;
           score?: number | null;
+          ai_summary?: Json | null;
+          company_name?: string | null;
+          company_url?: string | null;
+          selection_status?: string | null;
+          memo?: string | null;
           created_at?: string | null;
           updated_at?: string | null;
         };

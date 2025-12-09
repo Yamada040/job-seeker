@@ -6,6 +6,7 @@ export interface AiResponse {
   summary: string;
   bulletPoints?: string[];
   raw?: unknown;
+  provider?: string;
 }
 
 export interface AiClient {
