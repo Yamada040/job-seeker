@@ -192,8 +192,15 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
       </div>
 
       <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-slate-500">
-        {["日", "月", "火", "水", "木", "金", "土"].map((d) => (
-          <div key={d} className="rounded-lg bg-white/60 py-2 shadow-sm backdrop-blur dark:bg-slate-900/70">
+        {["日", "月", "火", "水", "木", "金", "土"].map((d, idx) => (
+          <div
+            key={d}
+            className={clsx(
+              "rounded-lg bg-white/60 py-2 shadow-sm backdrop-blur dark:bg-slate-900/70",
+              idx === 0 && "text-rose-500",
+              idx === 6 && "text-sky-500"
+            )}
+          >
             {d}
           </div>
         ))}
@@ -201,7 +208,9 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
 
       <div className="grid grid-cols-7 gap-2">
         {monthDays.map(({ date, inCurrentMonth }) => {
-          const day = new Date(date).getDate();
+          const jsDate = new Date(date);
+          const day = jsDate.getDate();
+          const weekday = jsDate.getDay();
           const dayEvents = eventsByDate[date] || [];
           return (
             <button
@@ -214,12 +223,25 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                 "dark:bg-slate-900/80 dark:hover:bg-slate-900",
                 inCurrentMonth
                   ? "border-slate-200 dark:border-slate-700"
-                  : "border-dashed border-slate-200/70 text-slate-400 dark:border-slate-700/70"
+                  : "border-dashed border-slate-200/70 text-slate-400 dark:border-slate-700/70 opacity-60"
               )}
             >
               <div className="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-300">
-                <span>{day}</span>
-                <span className="text-[10px] rounded-full border border-slate-200 px-2 py-0.5 text-amber-700 dark:border-slate-700 dark:text-amber-200">
+                <span
+                  className={clsx(
+                    inCurrentMonth ? "" : "opacity-60",
+                    weekday === 0 && "text-rose-500",
+                    weekday === 6 && "text-sky-500"
+                  )}
+                >
+                  {day}
+                </span>
+                <span
+                  className={clsx(
+                    "text-[10px] rounded-full border px-2 py-0.5",
+                    "border-slate-200 text-amber-700 dark:border-slate-700 dark:text-amber-200"
+                  )}
+                >
                   ＋
                 </span>
               </div>
@@ -242,9 +264,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                     </p>
                   </div>
                 ))}
-                {dayEvents.length > 2 && (
-                  <p className="text-[10px] text-slate-500">+{dayEvents.length - 2}件</p>
-                )}
+                {dayEvents.length > 2 && <p className="text-[10px] text-slate-500">+{dayEvents.length - 2}件</p>}
               </div>
             </button>
           );
@@ -284,47 +304,45 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
 
             <div className="mt-4 space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-800">
               {eventsByDate[selectedDate]?.length ? (
-                <>
-                  {eventsByDate[selectedDate].map((evt) => (
-                    <div
-                      key={evt.id}
-                      className={clsx(
-                        "rounded-lg px-3 py-2",
-                        evt.type === "es" && "bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-100",
-                        evt.type === "interview" &&
-                          "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-100",
-                        evt.type === "intern" &&
-                          "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-100",
-                        evt.type === "other" && "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                eventsByDate[selectedDate].map((evt) => (
+                  <div
+                    key={evt.id}
+                    className={clsx(
+                      "rounded-lg px-3 py-2",
+                      evt.type === "es" && "bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-100",
+                      evt.type === "interview" &&
+                        "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-100",
+                      evt.type === "intern" &&
+                        "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-100",
+                      evt.type === "other" && "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                    )}
+                  >
+                    <p className="text-xs font-semibold">{TYPE_LABEL[evt.type]}</p>
+                    <p className="text-sm font-semibold">{evt.company || evt.title}</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-300">
+                      {evt.title} {evt.time ? `· ${evt.time}` : ""}
+                    </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
+                      {evt.id.startsWith("es-") ? (
+                        <a
+                          href={`/es/${evt.id.replace("es-", "")}`}
+                          className="rounded-full border border-slate-300 px-3 py-1 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+                        >
+                          ES詳細へ
+                        </a>
+                      ) : null}
+                      {!evt.id.startsWith("es-") && (
+                        <button
+                          type="button"
+                          onClick={() => handleEditPrefill(evt)}
+                          className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-amber-800 hover:bg-amber-100 dark:border-amber-500/40 dark:bg-amber-900/20 dark:text-amber-100"
+                        >
+                          予定を編集
+                        </button>
                       )}
-                    >
-                      <p className="text-xs font-semibold">{TYPE_LABEL[evt.type]}</p>
-                      <p className="text-sm font-semibold">{evt.company || evt.title}</p>
-                      <p className="text-xs text-slate-600 dark:text-slate-300">
-                        {evt.title} {evt.time ? `· ${evt.time}` : ""}
-                      </p>
-                      <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
-                        {evt.id.startsWith("es-") ? (
-                          <a
-                            href={`/es/${evt.id.replace("es-", "")}`}
-                            className="rounded-full border border-slate-300 px-3 py-1 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
-                          >
-                            ES詳細へ
-                          </a>
-                        ) : null}
-                        {!evt.id.startsWith("es-") && (
-                          <button
-                            type="button"
-                            onClick={() => handleEditPrefill(evt)}
-                            className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-amber-800 hover:bg-amber-100 dark:border-amber-500/40 dark:bg-amber-900/20 dark:text-amber-100"
-                          >
-                            予定を編集
-                          </button>
-                        )}
-                      </div>
                     </div>
-                  ))}
-                </>
+                  </div>
+                ))
               ) : (
                 <p className="text-xs text-slate-500">この日に登録された予定はありません。</p>
               )}
