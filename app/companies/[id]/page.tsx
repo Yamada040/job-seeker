@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon, TrashIcon } from "@heroicons/react/24/outline";
 
-import { createSupabaseReadonlyClient } from "@/lib/supabase/server-readonly";
+import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { AppLayout } from "@/app/_components/layout";
 import { updateCompany, deleteCompany } from "../actions";
 import { CompanyAiPanel } from "../_components/company-ai-panel";

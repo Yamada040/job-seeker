@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
 
 export async function updateProfile(formData: FormData) {
   const supabase = await createSupabaseServerClient();

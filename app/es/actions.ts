@@ -4,7 +4,7 @@ import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { createSupabaseActionClient } from "@/lib/supabase/server-action";
+import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
 
 type Question = { id: string; prompt: string; answer_md: string };
 

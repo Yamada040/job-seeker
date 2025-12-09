@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { PlusIcon, ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 
 import { Database } from "@/lib/database.types";
-import { createSupabaseReadonlyClient } from "@/lib/supabase/server-readonly";
+import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { AppLayout } from "@/app/_components/layout";
 import { EsListClient } from "./_components/es-list-client";
 

@@ -4,7 +4,7 @@ import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon } from "@heroicons/react/24
 
 import { createCompany } from "../actions";
 import { AppLayout } from "@/app/_components/layout";
-import { createSupabaseReadonlyClient } from "@/lib/supabase/server-readonly";
+import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 
 export default async function NewCompanyPage() {
   const supabase = await createSupabaseReadonlyClient();

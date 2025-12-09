@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { PlusIcon, BoltIcon } from "@heroicons/react/24/outline";
 
 import { Database } from "@/lib/database.types";
-import { createSupabaseReadonlyClient } from "@/lib/supabase/server-readonly";
+import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { AppLayout } from "@/app/_components/layout";
 import SignOutButton from "./_components/sign-out-button";
 

@@ -5,7 +5,7 @@ import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon } from "@heroicons/react/24
 import { createEs } from "../actions";
 import { QuestionsEditor } from "../_components/questions-editor";
 import { AppLayout } from "@/app/_components/layout";
-import { createSupabaseReadonlyClient } from "@/lib/supabase/server-readonly";
+import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 
 export default async function NewEsPage() {
   const supabase = await createSupabaseReadonlyClient();
