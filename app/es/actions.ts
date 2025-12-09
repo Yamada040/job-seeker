@@ -47,6 +47,7 @@ export async function createEs(formData: FormData) {
   const selection_status = (formData.get("selection_status") as string | null)?.trim() || null;
   const company_url = (formData.get("company_url") as string | null)?.trim() || null;
   const memo = (formData.get("memo") as string | null)?.trim() || null;
+  const deadline = (formData.get("deadline") as string | null)?.trim() || null;
   const title = (formData.get("title") as string | null)?.trim();
   const status = (formData.get("status") as string | null) ?? "draft";
   const content_md = (formData.get("content_md") as string | null) ?? "";
@@ -68,6 +69,7 @@ export async function createEs(formData: FormData) {
     selection_status,
     company_url,
     memo,
+    deadline,
     title,
     status,
     content_md: combinedContent,
@@ -75,29 +77,28 @@ export async function createEs(formData: FormData) {
     tags: tags.length ? tags : null,
   };
 
-  let error = null;
   try {
-    ({ error } = await supabase.from("es_entries").insert(payload));
+    const { error } = await supabase.from("es_entries").insert(payload);
+    if (error) throw error;
   } catch (err) {
-    error = err as Error;
-  }
-
-  // DBで questions が無い環境向けのフォールバック
-  if (error && typeof (error as { message?: string }).message === "string" && (error as { message?: string }).message?.includes("questions")) {
-    const { error: retryError } = await supabase.from("es_entries").insert({
-      user_id: userData.user.id,
-      company_name,
-      selection_status,
-      company_url,
-      memo,
-      title,
-      status,
-      content_md: combinedContent,
-      tags: tags.length ? tags : null,
-    });
-    if (retryError) throw retryError;
-  } else if (error) {
-    throw error;
+    const msg = (err as { message?: string }).message ?? "";
+    if (msg.includes("questions") || msg.includes("deadline")) {
+      const { error: retryError } = await supabase.from("es_entries").insert({
+        user_id: userData.user.id,
+        company_name,
+        selection_status,
+        company_url,
+        memo,
+        deadline,
+        title,
+        status,
+        content_md: combinedContent,
+        tags: tags.length ? tags : null,
+      });
+      if (retryError) throw retryError;
+    } else {
+      throw err;
+    }
   }
 
   revalidatePath("/es");
@@ -114,6 +115,7 @@ export async function updateEs(id: string, formData: FormData) {
   const selection_status = (formData.get("selection_status") as string | null)?.trim() || null;
   const company_url = (formData.get("company_url") as string | null)?.trim() || null;
   const memo = (formData.get("memo") as string | null)?.trim() || null;
+  const deadline = (formData.get("deadline") as string | null)?.trim() || null;
   const title = (formData.get("title") as string | null)?.trim();
   const status = (formData.get("status") as string | null) ?? "draft";
   const content_md = (formData.get("content_md") as string | null) ?? "";
@@ -129,15 +131,15 @@ export async function updateEs(id: string, formData: FormData) {
 
   const combinedContent = combineContent(questions, content_md);
 
-  let error = null;
   try {
-    ({ error } = await supabase
+    const { error } = await supabase
       .from("es_entries")
       .update({
         company_name,
         selection_status,
         company_url,
         memo,
+        deadline,
         title,
         status,
         content_md: combinedContent,
@@ -145,29 +147,30 @@ export async function updateEs(id: string, formData: FormData) {
         questions,
       })
       .eq("id", id)
-      .eq("user_id", userData.user.id));
-  } catch (err) {
-    error = err as Error;
-  }
-
-  if (error && typeof (error as { message?: string }).message === "string" && (error as { message?: string }).message?.includes("questions")) {
-    const { error: retryError } = await supabase
-      .from("es_entries")
-      .update({
-        company_name,
-        selection_status,
-        company_url,
-        memo,
-        title,
-        status,
-        content_md: combinedContent,
-        tags: tags.length ? tags : null,
-      })
-      .eq("id", id)
       .eq("user_id", userData.user.id);
-    if (retryError) throw retryError;
-  } else if (error) {
-    throw error;
+    if (error) throw error;
+  } catch (err) {
+    const msg = (err as { message?: string }).message ?? "";
+    if (msg.includes("questions") || msg.includes("deadline")) {
+      const { error: retryError } = await supabase
+        .from("es_entries")
+        .update({
+          company_name,
+          selection_status,
+          company_url,
+          memo,
+          deadline,
+          title,
+          status,
+          content_md: combinedContent,
+          tags: tags.length ? tags : null,
+        })
+        .eq("id", id)
+        .eq("user_id", userData.user.id);
+      if (retryError) throw retryError;
+    } else {
+      throw err;
+    }
   }
 
   revalidatePath("/es");

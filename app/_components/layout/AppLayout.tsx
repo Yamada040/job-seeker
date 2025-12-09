@@ -50,7 +50,7 @@ export function AppLayout({
         )}
 
         <main
-          className={clsx("mx-auto max-w-6xl px-6 py-8 sm:px-10 sm:py-12", className)}
+          className={clsx("mx-auto max-w-7xl px-6 py-8 sm:px-10 sm:py-12", className)}
         >
           {children}
         </main>
