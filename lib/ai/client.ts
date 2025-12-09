@@ -2,53 +2,54 @@ import { AiClient, AiProvider, AiPromptKind, AiResponse } from "./types";
 
 const AI_PROVIDER = (process.env.AI_PROVIDER ?? "gemini") as AiProvider;
 const AI_KEY = process.env.AI_PROVIDER_API_KEY;
-const AI_MODEL = process.env.AI_MODEL; // 任意でモデルを上書き
+const AI_MODEL = process.env.AI_MODEL;
+const AI_API_VERSION = process.env.AI_API_VERSION || "v1beta";
 
-// プロンプトテンプレート（ASCIIで安全に）
 const templates: Record<AiPromptKind, (input: string) => string> = {
   es_review: (input) =>
     [
-      "あなたは日本の新卒採用を担当する人事・面接官およびATS対策の専門家です。",
-      "以下のESを「構成・明瞭性・インパクト」の3観点で評価し、すべて日本語で回答してください。",
+      "あなたは日本の人事・面接官です。ATSを意識し、読みやすく、評価しやすい回答に整えます。必ず日本語で回答してください。",
+      "会社名・選考ステータス・URLなどが含まれていれば踏まえてください。情報が不足している場合は推測せず「情報不足」と明記します。",
       "出力フォーマット:",
-      "1) 評価: 3〜5行で、現状の良い点と弱い点をATS視点でまとめる",
-      "2) 改善点: 箇条書きで3〜5個、具体的な修正指示（数字・行動・成果を含める）",
-      "3) 書き直し案: 100点を目指す日本語ドラフト（400〜600字目安）。事実と合わない仮定は追加しない。",
+      "1) 構成評価（箇条書き3-5点）",
+      "2) 明瞭性（箇条書き）",
+      "3) 改善提案（100〜200文字で要約）",
+      "4) 修正版ドラフト（面接官に刺さる表現でリライト）",
       "",
-      "対象のES:",
+      "入力ES:",
       input,
     ].join("\n"),
   company_analysis: (input) =>
     [
-      "You are an analyst creating a concise company brief for job hunters.",
-      "Summarize: overview, main businesses, strengths, weaknesses, culture, and a 50-word JP-ready pitch.",
-      "Input can include name/URL/free text. Output should be in Japanese.",
+      "あなたは日本の人事担当者です。候補者向けに会社を説明し、求める人物像を端的に伝えます。日本語で回答してください。",
+      "会社名が不明・存在しない場合は「情報不足」と明記し、推測で書かないでください。URL があれば参考にします。",
+      "出力フォーマット（箇条書き中心、推測なし）:",
+      "1) 概要・事業",
+      "2) 強み / 弱み",
+      "3) 文化・働き方",
+      "4) 人事が伝えたいポイント（3-5項目）",
+      "5) 求める人物像（3-5項目）",
       "",
-      "Source:",
+      "入力情報:",
       input,
     ].join("\n"),
 };
 
 function missingKeyResponse(): AiResponse {
   return {
-    summary: "AI_PROVIDER_API_KEY が未設定です。.env.local に追加してください。",
+    summary: "AI_PROVIDER_API_KEY を .env.local に設定してください。",
     bulletPoints: ["AI_PROVIDER_API_KEY を設定", "AI_PROVIDER は gemini または gpt"],
   };
 }
 
 async function callGemini(prompt: string): Promise<AiResponse> {
   if (!AI_KEY) return missingKeyResponse();
-  // AI Studioで ListModels に載る正式名称を使う
-  const model = AI_MODEL;
-  // v1beta の方が広く通るためデフォルトは v1beta
-  const apiVersion = process.env.AI_API_VERSION || "v1beta";
-  const endpoint = `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${AI_KEY}`;
+  const model = AI_MODEL || "gemini-1.5-flash-latest";
+  const endpoint = `https://generativelanguage.googleapis.com/${AI_API_VERSION}/models/${model}:generateContent?key=${AI_KEY}`;
 
   const res = await fetch(endpoint, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       generationConfig: { temperature: 0.7 },
@@ -57,7 +58,10 @@ async function callGemini(prompt: string): Promise<AiResponse> {
 
   if (!res.ok) {
     const bodyText = await res.text().catch(() => "");
-    return { summary: `Gemini呼び出しに失敗しました (${res.status})`, bulletPoints: bodyText ? [bodyText] : undefined };
+    return {
+      summary: `Gemini呼び出しに失敗しました (${res.status})`,
+      bulletPoints: bodyText ? [bodyText] : undefined,
+    };
   }
 
   type GeminiPart = { text?: string };
@@ -65,11 +69,10 @@ async function callGemini(prompt: string): Promise<AiResponse> {
   type GeminiResponse = { candidates?: { content?: GeminiContent }[] };
   const data = (await res.json()) as GeminiResponse;
   const parts = data?.candidates?.[0]?.content?.parts ?? [];
-  const text: string | undefined =
-    parts.map((p) => p.text ?? "").filter(Boolean).join("\n") || undefined;
+  const text: string | undefined = parts.map((p) => p.text ?? "").filter(Boolean).join("\n") || undefined;
 
   if (!text) {
-    return { summary: "Geminiからテキストを取得できませんでした。" };
+    return { summary: "Geminiからテキストが取得できませんでした。" };
   }
 
   const bulletPoints = text
@@ -78,7 +81,7 @@ async function callGemini(prompt: string): Promise<AiResponse> {
     .filter((line) => line.startsWith("-") || line.startsWith("・"))
     .map((line) => line.replace(/^[-・]\s?/, ""));
 
-  return { summary: text, bulletPoints: bulletPoints.length ? bulletPoints : undefined };
+  return { summary: text, bulletPoints: bulletPoints.length ? bulletPoints : undefined, provider: "gemini" };
 }
 
 async function callGpt(prompt: string): Promise<AiResponse> {
@@ -112,7 +115,7 @@ async function callGpt(prompt: string): Promise<AiResponse> {
   const text: string | undefined = data?.choices?.[0]?.message?.content;
 
   if (!text) {
-    return { summary: "GPTからテキストを取得できませんでした。" };
+    return { summary: "GPTからテキストが取得できませんでした。" };
   }
 
   const bulletPoints = text
@@ -121,7 +124,7 @@ async function callGpt(prompt: string): Promise<AiResponse> {
     .filter((line: string) => line.startsWith("-") || line.startsWith("・"))
     .map((line: string) => line.replace(/^[-・]\s?/, ""));
 
-  return { summary: text, bulletPoints: bulletPoints.length ? bulletPoints : undefined };
+  return { summary: text, bulletPoints: bulletPoints.length ? bulletPoints : undefined, provider: "gpt" };
 }
 
 export function createAiClient(): AiClient {

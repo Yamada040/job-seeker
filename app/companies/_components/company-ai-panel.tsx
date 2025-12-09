@@ -1,45 +1,45 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-
 import { AiPanel } from "@/app/_components/ai-panel";
 
 type Props = {
-  content: string;
+  name?: string | null;
+  url?: string | null;
+  stage?: string | null;
+  preference?: number | null;
+  memo?: string | null;
   cacheKey?: string;
   initialSummary?: any;
   saveUrl?: string;
   saveId?: string;
-  defaultCompanyName?: string | null;
-  defaultStatus?: string | null;
-  defaultCompanyUrl?: string | null;
-  defaultTitle?: string | null;
 };
 
-export function EsAiPanel({
-  content,
+export function CompanyAiPanel({
+  name,
+  url,
+  stage,
+  preference,
+  memo,
   cacheKey,
   initialSummary,
   saveUrl,
   saveId,
-  defaultCompanyName,
-  defaultStatus,
-  defaultCompanyUrl,
-  defaultTitle,
 }: Props) {
   const [presetKey, setPresetKey] = useState<string | undefined>(undefined);
   const [presetText, setPresetText] = useState<string>("");
   const [saved, setSaved] = useState(false);
 
   const aiInput = useMemo(() => {
-    const meta = [
-      defaultCompanyName ? `企業名: ${defaultCompanyName}` : null,
-      defaultTitle ? `ESタイトル: ${defaultTitle}` : null,
-      defaultStatus ? `選考ステータス: ${defaultStatus}` : null,
-      defaultCompanyUrl ? `URL: ${defaultCompanyUrl}` : null,
+    const lines = [
+      name ? `企業名: ${name}` : "企業名: 情報不足",
+      stage ? `選考ステータス: ${stage}` : null,
+      url ? `URL: ${url}` : null,
+      preference ? `志望度: ${preference}` : null,
+      memo ? `メモ: ${memo}` : null,
     ].filter(Boolean);
-    return [...meta, content].filter(Boolean).join("\n\n");
-  }, [content, defaultCompanyName, defaultStatus, defaultCompanyUrl, defaultTitle]);
+    return lines.join("\n");
+  }, [name, url, stage, preference, memo]);
 
   useEffect(() => {
     setPresetText(aiInput);
@@ -57,19 +57,19 @@ export function EsAiPanel({
         <button
           type="button"
           onClick={() => {
-            if (saved && saveUrl) return;
+            if (saved && saveUrl) return; // 保存後は転記しない
             setPresetText(aiInput);
             setPresetKey(`${Date.now()}`);
           }}
           disabled={saved && !!saveUrl}
-          className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-800 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-800"
+          className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-800 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-800"
         >
-          {saved && saveUrl ? "保存済み（再実行できません）" : "AIに送る内容を更新"}
+          {saved && saveUrl ? "保存済み（再実行できません）" : "企業情報をAIフォームに転記"}
         </button>
       </div>
 
       <AiPanel
-        kind="es_review"
+        kind="company_analysis"
         defaultInput={aiInput}
         presetText={presetText}
         presetKey={presetKey}
@@ -77,8 +77,8 @@ export function EsAiPanel({
         initialSummary={initialSummary}
         saveUrl={saveUrl}
         saveId={saveId}
-        title="AI添削パネル"
-        hint="ボタンでES情報を転記してから送信してください。"
+        title="AI企業要約パネル"
+        hint="企業名は必須。URLやステータスを入れると精度向上。情報不足の場合は推測せず「情報不足」と表示します。"
         onSaved={() => setSaved(true)}
       />
     </div>

@@ -25,12 +25,18 @@ function parseQuestions(questions: unknown): Question[] {
 export default async function EsDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createSupabaseReadonlyClient();
-  const { data: userData } = await supabase?.auth.getUser();
+  if (!supabase) throw new Error("Supabase client unavailable");
+  const { data: userData } = await supabase.auth.getUser();
   const userId = userData?.user?.id ?? null;
 
   if (!userId) return redirect("/login");
 
-  const { data, error } = await supabase.from("es_entries").select("*").eq("id", id).eq("user_id", userId).maybeSingle();
+  const { data, error } = await supabase
+    .from("es_entries")
+    .select("*, ai_summary")
+    .eq("id", id)
+    .eq("user_id", userId)
+    .maybeSingle();
 
   if (error || !data) {
     return redirect("/es");
@@ -51,12 +57,12 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
   return (
     <AppLayout
       headerTitle="ES詳細"
-      headerDescription="質問カードを編集してAI添削へ"
+      headerDescription="ESを編集して保存し、AI添削パネルで確認できます。"
       headerActions={
         <div className="flex flex-wrap gap-3">
           <Link href="/" className="mvp-button mvp-button-secondary">
             <HomeIcon className="h-4 w-4" />
-            MVPホーム
+            MVPへ
           </Link>
           <Link href="/dashboard" className="mvp-button mvp-button-secondary">
             <ArrowUturnLeftIcon className="h-4 w-4" />
@@ -74,7 +80,17 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
         <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
           <form action={handleUpdate} className="space-y-4">
             <div className="space-y-2">
-              <label className="block text-xs text-slate-600">タイトル*</label>
+              <label className="block text-xs text-slate-600">企業名</label>
+              <input
+                name="company_name"
+                defaultValue={data.company_name ?? ""}
+                className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                placeholder="例: Alpha SaaS"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-xs text-slate-600">ESタイトル*</label>
               <input
                 name="title"
                 defaultValue={data.title ?? ""}
@@ -92,8 +108,8 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
                 >
                   <option value="draft">下書き</option>
-                  <option value="submitted">提出済</option>
-                  <option value="reviewed">添削済</option>
+                  <option value="submitted">提出済み</option>
+                  <option value="reviewed">添削済み</option>
                   <option value="done">完了</option>
                 </select>
               </label>
@@ -103,7 +119,37 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
                   name="tags"
                   defaultValue={(data.tags ?? []).join(", ")}
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
-                  placeholder="SaaS, プロダクト, 夏インターン"
+                  placeholder="SaaS, Webサービス, 本選考"
+                />
+              </label>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              <label className="block space-y-1 text-xs text-slate-600">
+                選考ステータス
+                <input
+                  name="selection_status"
+                  defaultValue={data.selection_status ?? ""}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                  placeholder="書類提出 / 面接 / 最終面接"
+                />
+              </label>
+              <label className="block space-y-1 text-xs text-slate-600">
+                企業ホームページURL
+                <input
+                  name="company_url"
+                  defaultValue={data.company_url ?? ""}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                  placeholder="https://example.com"
+                />
+              </label>
+              <label className="block space-y-1 text-xs text-slate-600">
+                メモ
+                <input
+                  name="memo"
+                  defaultValue={data.memo ?? ""}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                  placeholder="選考メモや補足など"
                 />
               </label>
             </div>
@@ -123,7 +169,17 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
         </div>
 
         <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-          <EsAiPanel content={combinedContent} />
+          <EsAiPanel
+            content={combinedContent}
+            cacheKey={data.id}
+            initialSummary={data.ai_summary}
+            saveUrl="/api/es-ai-save"
+            saveId={data.id}
+            defaultCompanyName={data.company_name ?? ""}
+            defaultStatus={data.selection_status ?? data.status ?? ""}
+            defaultCompanyUrl={data.company_url ?? data.tags?.find((t: string) => t.startsWith("http")) ?? ""}
+            defaultTitle={data.title ?? ""}
+          />
         </div>
       </div>
     </AppLayout>
