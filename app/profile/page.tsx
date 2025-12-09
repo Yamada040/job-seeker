@@ -3,7 +3,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { ArrowLeftIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 
-import { createSupabaseReadonlyClient } from "@/lib/supabase/server-readonly";
+import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { updateProfile } from "./actions";
 import { AppLayout } from "@/app/_components/layout";
 

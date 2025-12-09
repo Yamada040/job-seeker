@@ -3,7 +3,7 @@ import { PlusIcon, StarIcon, HomeIcon, ArrowUturnLeftIcon } from "@heroicons/rea
 import { redirect } from "next/navigation";
 
 import { Database } from "@/lib/database.types";
-import { createSupabaseReadonlyClient } from "@/lib/supabase/server-readonly";
+import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { AppLayout } from "@/app/_components/layout";
 
 type CompanyRow = Database["public"]["Tables"]["companies"]["Row"];
