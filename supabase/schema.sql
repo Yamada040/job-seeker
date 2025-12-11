@@ -64,11 +64,29 @@ create table if not exists public.xp_logs (
   created_at timestamptz default now()
 );
 
+create table if not exists public.aptitude_results (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
+  answers jsonb not null,
+  ai_summary text,
+  created_at timestamptz default now()
+);
+
+create table if not exists public.self_analysis_results (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
+  answers jsonb not null,
+  ai_summary text,
+  created_at timestamptz default now()
+);
+
 alter table public.profiles enable row level security;
 alter table public.es_entries enable row level security;
 alter table public.calendar_events enable row level security;
 alter table public.companies enable row level security;
 alter table public.xp_logs enable row level security;
+alter table public.aptitude_results enable row level security;
+alter table public.self_analysis_results enable row level security;
 
 do $$
 begin
@@ -170,5 +188,49 @@ begin
     select 1 from pg_policies where schemaname='public' and tablename='xp_logs' and policyname='Enable delete own xp'
   ) then
     create policy "Enable delete own xp" on public.xp_logs for delete using (auth.uid() = user_id);
+  end if;
+
+  -- aptitude_results
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='aptitude_results' and policyname='Enable read own aptitude'
+  ) then
+    create policy "Enable read own aptitude" on public.aptitude_results for select using (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='aptitude_results' and policyname='Enable insert own aptitude'
+  ) then
+    create policy "Enable insert own aptitude" on public.aptitude_results for insert with check (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='aptitude_results' and policyname='Enable update own aptitude'
+  ) then
+    create policy "Enable update own aptitude" on public.aptitude_results for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='aptitude_results' and policyname='Enable delete own aptitude'
+  ) then
+    create policy "Enable delete own aptitude" on public.aptitude_results for delete using (auth.uid() = user_id);
+  end if;
+
+  -- self_analysis_results
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='self_analysis_results' and policyname='Enable read own self analysis'
+  ) then
+    create policy "Enable read own self analysis" on public.self_analysis_results for select using (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='self_analysis_results' and policyname='Enable insert own self analysis'
+  ) then
+    create policy "Enable insert own self analysis" on public.self_analysis_results for insert with check (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='self_analysis_results' and policyname='Enable update own self analysis'
+  ) then
+    create policy "Enable update own self analysis" on public.self_analysis_results for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='self_analysis_results' and policyname='Enable delete own self analysis'
+  ) then
+    create policy "Enable delete own self analysis" on public.self_analysis_results for delete using (auth.uid() = user_id);
   end if;
 end$$;

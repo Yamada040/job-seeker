@@ -5,17 +5,18 @@ import { CheckIcon, ClipboardDocumentIcon, CloudArrowUpIcon } from "@heroicons/r
 import { BlockingOverlay } from "./blocking-overlay";
 
 type Props = {
-  kind: "es_review" | "company_analysis";
+  kind: "es_review" | "company_analysis" | "aptitude_analysis" | "self_analysis";
   defaultInput: string;
   title: string;
   hint?: string;
   presetText?: string;
   presetKey?: string;
   cacheKey?: string;
-  initialSummary?: any;
+  initialSummary?: unknown;
   saveUrl?: string;
   saveId?: string;
   onSaved?: () => void;
+  showOneShotNotice?: boolean;
 };
 
 type AiResponse = {
@@ -25,13 +26,12 @@ type AiResponse = {
   error?: string;
 };
 
-function sanitizeMarkdown(text: string): string {
-  return text
+const sanitizeMarkdown = (text: string): string =>
+  text
     .replace(/^#{1,6}\s*/gm, "")
     .replace(/^\s*[-*・]\s?/gm, "・")
     .replace(/\*\*(.*?)\*\*/g, "$1")
     .trim();
-}
 
 export function AiPanel({
   kind,
@@ -45,14 +45,15 @@ export function AiPanel({
   saveUrl,
   saveId,
   onSaved,
+  showOneShotNotice = true,
 }: Props) {
   const [input, setInput] = useState(defaultInput);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [response, setResponse] = useState<AiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [saving, setSaving] = useState(false);
 
   const wordCount = useMemo(() => input.split(/\s+/).filter(Boolean).length, [input]);
 
@@ -71,13 +72,12 @@ export function AiPanel({
     sessionStorage.setItem(`ai-cache-${key}`, JSON.stringify(data));
   };
 
-  // 初期値: 保存済み summary または sessionStorage キャッシュを読み込み
   useEffect(() => {
     if (initialSummary) {
       try {
         const savedData = typeof initialSummary === "string" ? JSON.parse(initialSummary) : initialSummary;
-        if (savedData && (savedData.summary || savedData.bulletPoints)) {
-          setResponse({ ...savedData, provider: savedData.provider || "saved" });
+        if (savedData && (savedData as AiResponse).summary) {
+          setResponse({ ...(savedData as AiResponse), provider: (savedData as AiResponse).provider || "saved" });
           setSaved(true);
           onSaved?.();
           setError(null);
@@ -86,7 +86,7 @@ export function AiPanel({
         }
       } catch (err) {
         console.error("Failed to parse initialSummary:", err);
-        setError("保存済みのAI結果を読み込めませんでした。");
+        setError("保存済みのAI回答を読み込めませんでした。");
       }
     }
 
@@ -100,7 +100,6 @@ export function AiPanel({
     }
   }, [cacheKey, initialSummary, onSaved]);
 
-  // presetKey が変わったらテキストエリアを更新（保存済みならブロック）
   useEffect(() => {
     if (!presetKey) return;
     if (saved && saveUrl) return;
@@ -110,7 +109,6 @@ export function AiPanel({
     setError(null);
   }, [presetKey, presetText, saved, saveUrl]);
 
-  // 処理中はリロード・離脱警告を表示
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
       if (loading || saving) {
@@ -123,8 +121,7 @@ export function AiPanel({
   }, [loading, saving]);
 
   const handleRun = async () => {
-    if (saved && saveUrl) return; // 保存済みは再実行禁止
-
+    if (saved && saveUrl) return;
     setLoading(true);
     setError(null);
     setResponse(null);
@@ -163,7 +160,7 @@ export function AiPanel({
       onSaved?.();
     } catch (err) {
       console.error("Save failed:", err);
-      setError("保存に失敗しました。");
+      setError("保存に失敗しました。再度お試しください。");
     } finally {
       setSaving(false);
     }
@@ -173,8 +170,7 @@ export function AiPanel({
     if (!response) return;
     const summary = response.summary ? sanitizeMarkdown(response.summary) : "";
     const bullets =
-      response.bulletPoints?.length &&
-      response.bulletPoints.map((b) => `・${sanitizeMarkdown(b)}`).join("\n");
+      response.bulletPoints?.length && response.bulletPoints.map((b) => `・${sanitizeMarkdown(b)}`).join("\n");
     const text = [summary, bullets].filter(Boolean).join("\n\n");
     try {
       await navigator.clipboard.writeText(text);
@@ -189,14 +185,21 @@ export function AiPanel({
 
   return (
     <>
-      {overlay ? <BlockingOverlay message="AI処理中です… 画面を閉じたりリロードしないでください。" /> : null}
+      {overlay ? <BlockingOverlay message="AI処理中です。画面を閉じずにお待ちください。" /> : null}
       <div className="relative rounded-2xl border border-slate-200 bg-white/90 p-5 text-sm text-slate-900 shadow-md dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100">
+        {showOneShotNotice ? (
+          <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] font-semibold text-amber-800">
+            ※ 保存済みのAI回答は再実行できません。再度利用したい場合は運営にお問い合わせください。
+          </div>
+        ) : null}
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold text-amber-700">{title}</p>
             {hint ? <p className="text-[11px] text-slate-500 dark:text-slate-300">{hint}</p> : null}
             {cacheKey ? (
-              <p className="text-[11px] text-slate-400 dark:text-slate-500">※ 1度実行すると同じページでは再実行できません。</p>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                ※ 1回保存すると再実行はできません。入力を確認してから送信してください。
+              </p>
             ) : null}
           </div>
           <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100">
@@ -211,7 +214,7 @@ export function AiPanel({
           className="mt-3 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
         />
         <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-300">
-          <span>ワード数: {wordCount}</span>
+          <span>単語数: {wordCount}</span>
           {hint ? <span>{hint}</span> : null}
         </div>
 
@@ -222,7 +225,7 @@ export function AiPanel({
             disabled={loading || (saved && !!saveUrl)}
             className="rounded-full bg-linear-to-r from-emerald-300 via-cyan-300 to-sky-300 px-4 py-2 text-xs font-semibold text-slate-950 shadow-lg shadow-emerald-400/30 transition hover:translate-y-0.5 hover:shadow-emerald-400/50 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? "実行中..." : saved && !!saveUrl ? "保存済み" : "AIに送信"}
+            {loading ? "送信中..." : saved && !!saveUrl ? "保存済み" : "AIに送る"}
           </button>
         </div>
 
@@ -232,7 +235,7 @@ export function AiPanel({
           <div className="mt-3 space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold text-amber-700">
-                AI出力 {response?.provider === "saved" ? "（保存済み）" : ""}
+                AI回答 {response?.provider === "saved" ? "（保存済み）" : ""}
               </p>
               <div className="flex gap-2">
                 {saveUrl && saveId && !saved && (
@@ -258,12 +261,12 @@ export function AiPanel({
                   className="flex items-center gap-1 rounded-full border border-slate-300 px-3 py-1 text-[11px] font-semibold text-slate-700 transition hover:bg-white dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-700"
                 >
                   {copied ? <CheckIcon className="h-4 w-4" /> : <ClipboardDocumentIcon className="h-4 w-4" />}
-                  <span>{copied ? "コピー完了" : "コピー"}</span>
+                  <span>{copied ? "コピー済み" : "コピー"}</span>
                 </button>
               </div>
             </div>
             <div className="whitespace-pre-line text-sm leading-6 text-slate-800 dark:text-slate-100">
-              {response.summary ? sanitizeMarkdown(response.summary) : "結果なし"}
+              {response.summary ? sanitizeMarkdown(response.summary) : "回答がまだありません。"}
             </div>
             {response.bulletPoints?.length ? (
               <ul className="list-disc space-y-1 pl-4 text-sm text-slate-800 dark:text-slate-100">

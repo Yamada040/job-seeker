@@ -6,7 +6,7 @@ type BlockingOverlayProps = {
   message?: string;
 };
 
-export function BlockingOverlay({ message = "処理中です..." }: BlockingOverlayProps) {
+export function BlockingOverlay({ message = "AI処理中です。画面を閉じずにお待ちください。" }: BlockingOverlayProps) {
   if (typeof document === "undefined") return null;
 
   return createPortal(
