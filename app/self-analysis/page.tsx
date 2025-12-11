@@ -36,7 +36,7 @@ export default async function SelfAnalysisPage() {
   return (
     <AppLayout
       headerTitle="自己分析"
-      headerDescription="強み・価値観・モチベーションをAIで整理"
+      headerDescription="強み・価値観・モチベーションをAIで整理し、キャリアの軸を言語化します"
       headerActions={headerActions}
       className="space-y-6"
     >

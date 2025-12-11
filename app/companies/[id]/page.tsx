@@ -50,11 +50,8 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
       headerActions={headerActions}
       className="flex flex-col gap-8"
     >
-      <form
-        action={updateCompanyAction}
-        className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80"
-      >
-        <div className="space-y-6">
+      <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+        <form action={updateCompanyAction} className="space-y-6">
           <label className="block space-y-2">
             <span className="text-sm font-medium text-slate-700">企業名</span>
             <input
@@ -141,26 +138,19 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
             />
             お気に入りに追加
           </label>
-        </div>
 
-        <div className="mt-6 flex flex-wrap justify-end gap-3">
-          <Link href="/companies" className="mvp-button mvp-button-secondary">
-            キャンセル
-          </Link>
-          <button type="submit" className="mvp-button mvp-button-primary">
-            保存する
-          </button>
-        </div>
-      </form>
-
-      <form action={deleteCompanyAction} className="mt-4 flex justify-end">
-        <button type="submit" className="mvp-button mvp-button-secondary text-red-600">
-          削除する
-        </button>
-      </form>
+            <div className="flex flex-wrap gap-3">
+              <button type="submit" className="mvp-button mvp-button-primary">
+                保存する
+              </button>
+              <Link href="/es" className="mvp-button mvp-button-secondary">
+                キャンセル
+              </Link>
+            </div>
+        </form>
+      </div>
 
       <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-        <h2 className="mb-3 text-base font-semibold text-slate-900 dark:text-slate-100">AI企業分析</h2>
         <CompanyAiPanel
           name={data.name}
           url={data.url}

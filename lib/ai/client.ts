@@ -8,12 +8,12 @@ const AI_API_VERSION = process.env.AI_API_VERSION || "v1beta";
 const templates: Record<AiPromptKind, (input: string) => string> = {
   es_review: (input) =>
     [
-      "あなたは日本の人事・面接官です。ETSを意識し、読みやすく、評価しやすい回答に整えます。必ず日本語で回答してください。",
+      "あなたは日本の人事/面接官です。ATSを意識し、読みやすく評価しやすい回答に整えます。必ず日本語で回答してください。",
       "会社名・選考ステータス・URLなどが含まれていれば踏まえてください。情報が不足している場合は推測せず「情報不足」と明記します。",
       "出力フォーマット",
-      "1) 構成評価（5点満点、箇条書き）",
-      "2) 明瞭性（5点満点、短いコメント）",
-      "3) 改善案（100〜200字で要約）",
+      "1) 構成評価（10点満点、短いコメント）",
+      "2) 明瞭性（10点満点、短いコメント）",
+      "3) 改善点（100〜200字で要約）",
       "4) 修正版ドラフト（面接官に刺さる表現でリライト）",
       "",
       "入力ES:",
@@ -23,7 +23,7 @@ const templates: Record<AiPromptKind, (input: string) => string> = {
     [
       "あなたは日本の人事担当です。候補者向けに会社を説明し、求める人物像を端的に伝えます。日本語で回答してください。",
       "会社名が不明・存在しない場合は「情報不足」と明記し、推測で書かないでください。URL があれば参照します。",
-      "出力フォーマット（箇条書き中心、推測なし）",
+      "出力フォーマット（箇条書き中心・推測なし）",
       "1) 概要・事業",
       "2) 強み / 弱み",
       "3) 文化・働き方",
@@ -35,21 +35,21 @@ const templates: Record<AiPromptKind, (input: string) => string> = {
     ].join("\n"),
   aptitude_analysis: (input) =>
     [
-      "あなたは日本のキャリアアドバイザー兼リクルーターです。質問への回答から、向いていそうな業界・職種をできるだけ細かい粒度で診断してください。日本語で回答。",
+      "あなたは日本のキャリアアドバイザー兼リクルーターです。回答から、向いている/避けたほうがよい業界・職種をできるだけ細かい粒度で診断してください。日本語で回答します。",
       "推測で書かず、情報不足のときは「情報不足」と明記してください。",
       "出力フォーマット（簡潔な箇条書き中心）",
       "1) 業界トップ3（できるだけ細かい粒度で例示）",
       "2) 職種トップ3（できるだけ細かい粒度で例示）",
       "3) 強みが活きるポイント（3-5行）",
-      "4) リスク・ミスマッチの注意点（3-5行）",
-      "5) 次の一歩（企業リサーチ/スキル強化/ES・面接で押す軸を3-5項目）",
+      "4) リスク・ミスマッチ/注意点（3-5行）",
+      "5) 次の一歩（企業リサーチ、スキル強化、ES・面接で押す軸を3-5行）",
       "",
       "質問回答:",
       input,
     ].join("\n"),
   self_analysis: (input) =>
     [
-      "あなたは日本のキャリアコーチです。回答から本人の強み・価値観・モチベーション源泉を整理し、自己PR素材に落とし込んでください。日本語で回答。",
+      "あなたは日本のキャリアコーチです。回答から本人の強み・価値観・モチベーション源泉を整理し、自己PR素材に落とし込んでください。日本語で回答します。",
       "出力フォーマット（簡潔な箇条書き中心）",
       "1) 強み3-5個（エピソードを一言で添える）",
       "2) 価値観/仕事観3-5個",
@@ -65,7 +65,7 @@ const templates: Record<AiPromptKind, (input: string) => string> = {
 function missingKeyResponse(): AiResponse {
   return {
     summary: "AI_PROVIDER_API_KEY を .env.local に設定してください。",
-    bulletPoints: ["AI_PROVIDER_API_KEY を設定", "AI_PROVIDER は gemini か gpt を指定"],
+    bulletPoints: ["AI_PROVIDER_API_KEY を設定する", "AI_PROVIDER は gemini か gpt を指定する"],
   };
 }
 
@@ -133,7 +133,8 @@ async function callGpt(prompt: string): Promise<AiResponse> {
   });
 
   if (!res.ok) {
-    return { summary: `GPT呼び出しに失敗しました (${res.status})` };
+    const bodyText = await res.text().catch(() => "");
+    return { summary: `GPT呼び出しに失敗しました (${res.status})`, bulletPoints: bodyText ? [bodyText] : undefined };
   }
 
   type OpenAIChoice = { message?: { content?: string } };

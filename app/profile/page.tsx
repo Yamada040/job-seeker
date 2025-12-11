@@ -119,7 +119,7 @@ export default async function ProfilePage() {
             </div>
           </div>
 
-          <div className="flex justify-end pt-4 border-t border-slate-200">
+          <div className="flex flex-wrap gap-3">
             <button type="submit" className="mvp-button mvp-button-primary">
               <UserCircleIcon className="h-4 w-4" />
               保存する

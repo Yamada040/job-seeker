@@ -23,17 +23,16 @@ const defaultAnswers: Answers = {
   future: "",
 };
 
-function buildPrompt(a: Answers) {
-  return [
+const buildPrompt = (a: Answers) =>
+  [
     `強み: ${a.strengths || "未記入"}`,
     `価値観: ${a.values || "未記入"}`,
     `モチベーション源泉: ${a.motivation || "未記入"}`,
     `成功体験: ${a.successes || "未記入"}`,
-    `失敗体験/学び: ${a.failures || "未記入"}`,
+    `失敗体験・学び: ${a.failures || "未記入"}`,
     `働き方の好み: ${a.workStyle || "未記入"}`,
-    `将来像: ${a.future || "未記入"}`,
+    `将来像（3-5年）: ${a.future || "未記入"}`,
   ].join("\n");
-}
 
 export default function SelfAnalysisForm({
   initialAnswers,
@@ -70,7 +69,7 @@ export default function SelfAnalysisForm({
       setPresetText(prompt);
       setPresetKey(`${Date.now()}`);
     } catch (err) {
-      alert("保存に失敗しました。再度お試しください。");
+      alert("保存に失敗しました。もう一度お試しください。");
       console.error(err);
     } finally {
       setSaving(false);
@@ -85,19 +84,39 @@ export default function SelfAnalysisForm({
     <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr]">
       <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">自己分析 質問</h2>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">自己分析 質問リスト</h2>
         </div>
         <div className="mt-4 space-y-3">
           <TextArea label="強み・得意なこと" value={answers.strengths} onChange={(v) => handleChange("strengths", v)} />
-          <TextArea label="価値観（仕事選びで譲れないこと）" value={answers.values} onChange={(v) => handleChange("values", v)} />
-          <TextArea label="モチベーション源泉（燃える瞬間/冷める瞬間）" value={answers.motivation} onChange={(v) => handleChange("motivation", v)} />
-          <TextArea label="成功体験（役割・結果・工夫）" value={answers.successes} onChange={(v) => handleChange("successes", v)} />
-          <TextArea label="失敗体験/学び" value={answers.failures} onChange={(v) => handleChange("failures", v)} />
-          <TextArea label="働き方の好み（リモート/出社、チーム/個人、裁量など）" value={answers.workStyle} onChange={(v) => handleChange("workStyle", v)} />
-          <TextArea label="将来像（3-5年の仮のゴール）" value={answers.future} onChange={(v) => handleChange("future", v)} />
-          <div className="flex justify-end pt-2">
+          <TextArea
+            label="価値観（仕事選びで譲れないこと）"
+            value={answers.values}
+            onChange={(v) => handleChange("values", v)}
+          />
+          <TextArea
+            label="モチベーション源泉（燃える瞬間 / 冷める瞬間）"
+            value={answers.motivation}
+            onChange={(v) => handleChange("motivation", v)}
+          />
+          <TextArea
+            label="成功体験（役割・結果・工夫）"
+            value={answers.successes}
+            onChange={(v) => handleChange("successes", v)}
+          />
+          <TextArea label="失敗体験・学び" value={answers.failures} onChange={(v) => handleChange("failures", v)} />
+          <TextArea
+            label="働き方の好み（リモート/出社、チーム/個人、裁量など）"
+            value={answers.workStyle}
+            onChange={(v) => handleChange("workStyle", v)}
+          />
+          <TextArea
+            label="将来像（3-5年の仮のゴール）"
+            value={answers.future}
+            onChange={(v) => handleChange("future", v)}
+          />
+          <div className="flex flex-wrap gap-3">
             <button onClick={handleRun} disabled={saving} className="mvp-button mvp-button-primary">
-              {saving ? "保存中..." : "保存してAIに送る"}
+              {saving ? "保存中..." : "保存する"}
             </button>
           </div>
         </div>
@@ -113,7 +132,7 @@ export default function SelfAnalysisForm({
           initialSummary={initialSummary ?? undefined}
           saveUrl="/api/ai/self-analysis"
           saveId={resultId ?? undefined}
-          title="AI自己分析"
+          title="AI自己分析サマリー"
           hint="入力をもとに強み・価値観・モチベーションを整理します。保存すると再実行できません。"
         />
       </div>
