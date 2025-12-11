@@ -57,14 +57,14 @@ export function CompanyAiPanel({
         <button
           type="button"
           onClick={() => {
-            if (saved && saveUrl) return; // 保存後は転記しない
+            if (saved && saveUrl) return;
             setPresetText(aiInput);
             setPresetKey(`${Date.now()}`);
           }}
           disabled={saved && !!saveUrl}
           className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-800 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-800"
         >
-          {saved && saveUrl ? "保存済み（再実行できません）" : "企業情報をAIフォームに転記"}
+          {saved && saveUrl ? "保存済み（再実行不可）" : "企業情報をAIフォームに転記"}
         </button>
       </div>
 
@@ -77,8 +77,8 @@ export function CompanyAiPanel({
         initialSummary={initialSummary}
         saveUrl={saveUrl}
         saveId={saveId}
-        title="AI企業要約パネル"
-        hint="企業名は必須。URLやステータスを入れると精度向上。情報不足の場合は推測せず「情報不足」と表示します。"
+        title="AI企業ブリーフパネル"
+        hint="企業名は必須。URLやステータスがあると精度が上がります。情報不足の場合は推測せず、情報不足と記載します。"
         onSaved={() => setSaved(true)}
       />
     </div>

@@ -34,7 +34,7 @@ export interface Database {
           status: string | null;
           tags: string[] | null;
           score: number | null;
-          ai_summary: Json | null;
+          ai_summary: string | null;
           company_name: string | null;
           company_url: string | null;
           selection_status: string | null;
@@ -52,7 +52,7 @@ export interface Database {
           status?: string | null;
           tags?: string[] | null;
           score?: number | null;
-          ai_summary?: Json | null;
+          ai_summary?: string | null;
           company_name?: string | null;
           company_url?: string | null;
           selection_status?: string | null;
@@ -62,6 +62,39 @@ export interface Database {
           updated_at?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["es_entries"]["Insert"]>;
+      };
+      companies: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          name: string;
+          url: string | null;
+          mypage_id: string | null;
+          mypage_url: string | null;
+          memo: string | null;
+          stage: string | null;
+          preference: number | null;
+          favorite: boolean | null;
+          ai_summary: Json | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          name: string;
+          url?: string | null;
+          mypage_id?: string | null;
+          mypage_url?: string | null;
+          memo?: string | null;
+          stage?: string | null;
+          preference?: number | null;
+          favorite?: boolean | null;
+          ai_summary?: Json | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["companies"]["Insert"]>;
       };
       calendar_events: {
         Row: {
@@ -86,35 +119,6 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["calendar_events"]["Insert"]>;
       };
-      companies: {
-        Row: {
-          id: string;
-          user_id: string | null;
-          name: string;
-          url: string | null;
-          memo: string | null;
-          stage: string | null;
-          preference: number | null;
-          favorite: boolean | null;
-          ai_summary: Json | null;
-          created_at: string | null;
-          updated_at: string | null;
-        };
-        Insert: {
-          id?: string;
-          user_id?: string | null;
-          name: string;
-          url?: string | null;
-          memo?: string | null;
-          stage?: string | null;
-          preference?: number | null;
-          favorite?: boolean | null;
-          ai_summary?: Json | null;
-          created_at?: string | null;
-          updated_at?: string | null;
-        };
-        Update: Partial<Database["public"]["Tables"]["companies"]["Insert"]>;
-      };
       xp_logs: {
         Row: {
           id: string;
@@ -135,5 +139,9 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["xp_logs"]["Insert"]>;
       };
     };
+    Views: {};
+    Functions: {};
+    Enums: {};
   };
 }
+

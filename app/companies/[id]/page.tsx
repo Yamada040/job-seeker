@@ -1,18 +1,19 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 
-import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
-import { AppLayout } from "@/app/_components/layout";
 import { updateCompany, deleteCompany } from "../actions";
 import { CompanyAiPanel } from "../_components/company-ai-panel";
+import { AppLayout } from "@/app/_components/layout";
+import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 
 export default async function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) throw new Error("Supabase client unavailable");
+  if (!supabase) return redirect("/login");
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
+
   const { data, error } = await supabase
     .from("companies")
     .select("*")
@@ -22,124 +23,155 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
 
   if (error || !data) return notFound();
 
-  const handleUpdate = updateCompany.bind(null, id);
-  const handleDelete = deleteCompany.bind(null, id);
+  const headerActions = (
+    <div className="flex flex-wrap gap-3">
+      <Link href="/" className="mvp-button mvp-button-secondary">
+        <HomeIcon className="h-4 w-4" />
+        MVPホーム
+      </Link>
+      <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+        <ArrowUturnLeftIcon className="h-4 w-4" />
+        ダッシュボードへ
+      </Link>
+      <Link href="/companies" className="mvp-button mvp-button-secondary">
+        <ArrowLeftIcon className="h-4 w-4" />
+        一覧へ戻る
+      </Link>
+    </div>
+  );
+
+  const updateCompanyAction = updateCompany.bind(null, id);
+  const deleteCompanyAction = deleteCompany.bind(null, id);
 
   return (
     <AppLayout
-      headerTitle="企業詳細"
-      headerDescription="企業情報を編集し、AI要約パネルで確認できます。"
-      headerActions={
-        <div className="flex flex-wrap gap-3">
-          <Link href="/" className="mvp-button mvp-button-secondary">
-            <HomeIcon className="h-4 w-4" />
-            MVPへ
-          </Link>
-          <Link href="/dashboard" className="mvp-button mvp-button-secondary">
-            <ArrowUturnLeftIcon className="h-4 w-4" />
-            ダッシュボード
-          </Link>
-          <Link href="/companies" className="mvp-button mvp-button-secondary">
-            <ArrowLeftIcon className="h-4 w-4" />
-            一覧へ戻る
-          </Link>
-        </div>
-      }
+      headerTitle="企業カード編集"
+      headerDescription="企業情報と選考ステータスを更新"
+      headerActions={headerActions}
       className="flex flex-col gap-8"
     >
-      <div className="grid gap-4 lg:grid-cols-[1.2fr,0.8fr]">
-        <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-          <form action={handleUpdate} className="space-y-6">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className="block space-y-2">
-                <span className="text-sm font-medium text-slate-700">企業名</span>
-                <input
-                  name="name"
-                  defaultValue={data.name ?? ""}
-                  required
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
-                />
-              </label>
-              <label className="block space-y-2">
-                <span className="text-sm font-medium text-slate-700">URL</span>
-                <input
-                  name="url"
-                  defaultValue={data.url ?? ""}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
-                />
-              </label>
-              <label className="block space-y-2">
-                <span className="text-sm font-medium text-slate-700">ステータス</span>
-                <input
-                  name="stage"
-                  defaultValue={data.stage ?? ""}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
-                  placeholder="Screening / 面接 / 内定 など"
-                />
-              </label>
-              <label className="block space-y-2">
-                <span className="text-sm font-medium text-slate-700">志望度 (1-5)</span>
-                <input
-                  name="preference"
-                  type="number"
-                  min="1"
-                  max="5"
-                  defaultValue={data.preference ?? 3}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
-                />
-              </label>
-            </div>
+      <form
+        action={updateCompanyAction}
+        className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80"
+      >
+        <div className="space-y-6">
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-slate-700">企業名</span>
+            <input
+              name="name"
+              defaultValue={data.name ?? ""}
+              required
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              placeholder="例）Alpha SaaS"
+            />
+          </label>
+
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-slate-700">URL</span>
+            <input
+              name="url"
+              defaultValue={data.url ?? ""}
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              placeholder="https://example.com"
+            />
+          </label>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-700">マイページID</span>
+              <input
+                name="mypage_id"
+                defaultValue={data.mypage_id ?? ""}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                placeholder="ログインID"
+              />
+            </label>
 
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700">メモ</span>
-              <textarea
-                name="memo"
-                rows={4}
-                defaultValue={data.memo ?? ""}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
-                placeholder="気づき、面接メモなどを自由に記載"
-              />
-            </label>
-
-            <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-              注意: 企業名は必須です。確認できない場合は「情報不足」と表示し、推測で記載しません。URLは公式サイト等があれば入力してください。
-            </div>
-
-            <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+              <span className="text-sm font-medium text-slate-700">マイページURL</span>
               <input
-                type="checkbox"
-                name="favorite"
-                defaultChecked={Boolean(data.favorite)}
-                className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400"
+                name="mypage_url"
+                defaultValue={data.mypage_url ?? ""}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                placeholder="https://mypage.example.com"
               />
-              お気に入りにする
             </label>
+          </div>
 
-            <div className="flex justify-between gap-3">
-              <button type="submit" className="mvp-button mvp-button-primary">
-                保存する
-              </button>
-              <button formAction={handleDelete} className="mvp-button mvp-button-secondary text-red-600">
-                <TrashIcon className="h-4 w-4" />
-                削除
-              </button>
-            </div>
-          </form>
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-slate-700">ステータス</span>
+            <input
+              name="stage"
+              defaultValue={data.stage ?? ""}
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              placeholder="Screening / Document passed など"
+            />
+          </label>
+
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-slate-700">志望度（1-5）</span>
+            <input
+              name="preference"
+              type="number"
+              min="1"
+              max="5"
+              defaultValue={data.preference ?? ""}
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              placeholder="3"
+            />
+          </label>
+
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-slate-700">メモ</span>
+            <textarea
+              name="memo"
+              rows={3}
+              defaultValue={data.memo ?? ""}
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              placeholder="興味を持った理由、応募メモ、インターン日程など"
+            />
+          </label>
+
+          <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+            <input
+              type="checkbox"
+              name="favorite"
+              defaultChecked={data.favorite ?? false}
+              className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400"
+            />
+            お気に入りに追加
+          </label>
         </div>
 
-        <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-          <CompanyAiPanel
-            name={data.name}
-            url={data.url}
-            stage={data.stage}
-            preference={data.preference}
-            memo={data.memo}
-            cacheKey={data.id}
-            initialSummary={data.ai_summary}
-            saveUrl="/api/company-ai-save"
-            saveId={data.id}
-          />
+        <div className="mt-6 flex flex-wrap justify-end gap-3">
+          <Link href="/companies" className="mvp-button mvp-button-secondary">
+            キャンセル
+          </Link>
+          <button type="submit" className="mvp-button mvp-button-primary">
+            保存する
+          </button>
         </div>
+      </form>
+
+      <form action={deleteCompanyAction} className="mt-4 flex justify-end">
+        <button type="submit" className="mvp-button mvp-button-secondary text-red-600">
+          削除する
+        </button>
+      </form>
+
+      <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+        <h2 className="mb-3 text-base font-semibold text-slate-900 dark:text-slate-100">AI企業分析</h2>
+        <CompanyAiPanel
+          name={data.name}
+          url={data.url}
+          stage={data.stage}
+          preference={data.preference}
+          memo={data.memo}
+          cacheKey={`company-${id}`}
+          initialSummary={data.ai_summary}
+          saveId={id}
+          saveUrl="/api/ai/company"
+        />
       </div>
     </AppLayout>
   );
