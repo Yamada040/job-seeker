@@ -9,6 +9,7 @@ import {
   UserIcon,
   ArrowRightOnRectangleIcon,
   Cog6ToothIcon,
+  SparklesIcon,
 } from "@heroicons/react/24/outline";
 import { clsx } from "clsx";
 
@@ -36,7 +37,13 @@ const navigationItems: NavItem[] = [
     label: "企業管理",
     href: "/companies",
     icon: BuildingOfficeIcon,
-    description: "企業情報と進捗の記録",
+    description: "企業情報と進捗を記録",
+  },
+  {
+    label: "適性チェック",
+    href: "/aptitude",
+    icon: SparklesIcon,
+    description: "業界・職種の向き不向きを診断",
   },
   {
     label: "プロフィール",

@@ -64,7 +64,7 @@ export function EsAiPanel({
           disabled={saved && !!saveUrl}
           className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-800 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-800"
         >
-          {saved && saveUrl ? "保存済み（再実行できません）" : "AIに送る内容を更新"}
+          {saved && saveUrl ? "保存済み（再実行不可）" : "AIに送る内容を転記"}
         </button>
       </div>
 
@@ -78,7 +78,7 @@ export function EsAiPanel({
         saveUrl={saveUrl}
         saveId={saveId}
         title="AI添削パネル"
-        hint="ボタンでES情報を転記してから送信してください。"
+        hint="ボタンでES内容を転記してから送信してください。保存後は再実行できません。"
         onSaved={() => setSaved(true)}
       />
     </div>

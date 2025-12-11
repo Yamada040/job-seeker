@@ -57,20 +57,20 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
   return (
     <AppLayout
       headerTitle="ES詳細"
-      headerDescription="ESを編集して保存し、AI添削パネルで確認できます。"
+      headerDescription="ESの内容を編集し、AI添削でブラッシュアップ"
       headerActions={
         <div className="flex flex-wrap gap-3">
           <Link href="/" className="mvp-button mvp-button-secondary">
             <HomeIcon className="h-4 w-4" />
-            MVPへ
+            MVPホーム
           </Link>
           <Link href="/dashboard" className="mvp-button mvp-button-secondary">
             <ArrowUturnLeftIcon className="h-4 w-4" />
-            ダッシュボード
+            ダッシュボードへ
           </Link>
           <Link href="/es" className="mvp-button mvp-button-secondary">
             <ArrowLeftIcon className="h-4 w-4" />
-            一覧へ戻る
+            一覧に戻る
           </Link>
         </div>
       }
@@ -85,7 +85,7 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
                 name="company_name"
                 defaultValue={data.company_name ?? ""}
                 className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
-                placeholder="例: Alpha SaaS"
+                placeholder="例）Alpha SaaS"
               />
             </div>
 
@@ -108,8 +108,8 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
                 >
                   <option value="draft">下書き</option>
-                  <option value="submitted">提出済み</option>
-                  <option value="reviewed">添削済み</option>
+                  <option value="submitted">提出済</option>
+                  <option value="reviewed">レビュー済</option>
                   <option value="done">完了</option>
                 </select>
               </label>
@@ -119,28 +119,40 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
                   name="tags"
                   defaultValue={(data.tags ?? []).join(", ")}
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
-                  placeholder="SaaS, Webサービス, 本選考"
+                  placeholder="SaaS, Web系, 新規事業"
                 />
               </label>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2">
               <label className="block space-y-1 text-xs text-slate-600">
                 選考ステータス
                 <input
                   name="selection_status"
                   defaultValue={data.selection_status ?? ""}
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
-                  placeholder="書類提出 / 面接 / 最終面接"
+                  placeholder="書類選考 / 一次面接 など"
                 />
               </label>
               <label className="block space-y-1 text-xs text-slate-600">
-                企業ホームページURL
+                企業URL
                 <input
                   name="company_url"
                   defaultValue={data.company_url ?? ""}
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
                   placeholder="https://example.com"
+                />
+              </label>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block space-y-1 text-xs text-slate-600">
+                締切日
+                <input
+                  name="deadline"
+                  type="date"
+                  defaultValue={data.deadline ?? ""}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
                 />
               </label>
               <label className="block space-y-1 text-xs text-slate-600">
@@ -149,30 +161,33 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
                   name="memo"
                   defaultValue={data.memo ?? ""}
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
-                  placeholder="選考メモや補足など"
-                />
-              </label>
-              <label className="block space-y-1 text-xs text-slate-600">
-                応募締切（日付）
-                <input
-                  type="date"
-                  name="deadline"
-                  defaultValue={data.deadline ?? ""}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                  placeholder="応募メモなど"
                 />
               </label>
             </div>
 
-            <QuestionsEditor initialQuestions={questions.length ? questions : [{ id: crypto.randomUUID(), prompt: "自己PR", answer_md: data.content_md ?? "" }]} />
+            <QuestionsEditor initialQuestions={questions} />
 
-            <div className="flex justify-between gap-3">
+            <label className="block space-y-2 text-xs text-slate-600">
+              本文（Markdown可）
+              <textarea
+                name="content_md"
+                rows={8}
+                defaultValue={data.content_md ?? ""}
+                className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                placeholder="本文を入力してください"
+              />
+            </label>
+
+            <input type="hidden" name="questions_json" value={JSON.stringify(questions)} />
+
+            <div className="flex flex-wrap gap-3">
               <button type="submit" className="mvp-button mvp-button-primary">
                 保存する
               </button>
-              <button formAction={handleDelete} className="mvp-button mvp-button-secondary text-red-600">
-                <TrashIcon className="h-4 w-4" />
-                削除
-              </button>
+              <Link href="/es" className="mvp-button mvp-button-secondary">
+                キャンセル
+              </Link>
             </div>
           </form>
         </div>
@@ -180,17 +195,24 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
         <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
           <EsAiPanel
             content={combinedContent}
-            cacheKey={data.id}
+            cacheKey={`es-${id}`}
             initialSummary={data.ai_summary}
-            saveUrl="/api/es-ai-save"
-            saveId={data.id}
-            defaultCompanyName={data.company_name ?? ""}
-            defaultStatus={data.selection_status ?? data.status ?? ""}
-            defaultCompanyUrl={data.company_url ?? data.tags?.find((t: string) => t.startsWith("http")) ?? ""}
-            defaultTitle={data.title ?? ""}
+            saveUrl="/api/ai/es"
+            saveId={id}
+            defaultCompanyName={data.company_name}
+            defaultStatus={data.status ?? undefined}
+            defaultCompanyUrl={data.company_url}
+            defaultTitle={data.title}
           />
         </div>
       </div>
+
+      <form action={handleDelete} className="flex justify-end">
+        <button type="submit" className="mvp-button mvp-button-secondary text-rose-600">
+          <TrashIcon className="h-4 w-4" />
+          削除する
+        </button>
+      </form>
     </AppLayout>
   );
 }

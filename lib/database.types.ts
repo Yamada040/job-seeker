@@ -138,10 +138,26 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["xp_logs"]["Insert"]>;
       };
+      aptitude_results: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          answers: Json;
+          ai_summary: string | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          answers: Json;
+          ai_summary?: string | null;
+          created_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["aptitude_results"]["Insert"]>;
+      };
     };
     Views: {};
     Functions: {};
     Enums: {};
   };
 }
-
