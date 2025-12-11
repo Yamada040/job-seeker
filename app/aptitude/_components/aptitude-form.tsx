@@ -241,9 +241,6 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">診断結果</p>
               <p className="text-xs text-slate-500 dark:text-slate-400">業界/職種の向き不向きを表示</p>
             </div>
-            <Link href="/companies" className="mvp-button mvp-button-secondary">
-              企業を探す
-            </Link>
           </div>
           <div className="mt-4">
             <AiPanel
