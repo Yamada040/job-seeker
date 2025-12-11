@@ -17,6 +17,7 @@ type Answers = {
   industryWish: string;
   roleWish: string;
   otherNotes: string;
+  mbti: string;
 };
 
 type Props = {
@@ -67,6 +68,25 @@ const valueOptions = [
   "グローバル環境",
 ];
 
+const mbtiOptions = [
+  "ISTJ",
+  "ISFJ",
+  "INFJ",
+  "INTJ",
+  "ISTP",
+  "ISFP",
+  "INFP",
+  "INTP",
+  "ESTP",
+  "ESFP",
+  "ENFP",
+  "ENTP",
+  "ESTJ",
+  "ESFJ",
+  "ENFJ",
+  "ENTJ",
+];
+
 const defaultAnswers: Answers = {
   interests: [],
   strengths: [],
@@ -79,6 +99,7 @@ const defaultAnswers: Answers = {
   industryWish: "",
   roleWish: "",
   otherNotes: "",
+  mbti: "",
 };
 
 const buildPrompt = (a: Answers) =>
@@ -93,6 +114,7 @@ const buildPrompt = (a: Answers) =>
     `希望勤務地/働き方: ${a.location || "未記入"}`,
     `興味のある業界: ${a.industryWish || "未記入"}`,
     `興味のある職種: ${a.roleWish || "未記入"}`,
+    `MBTI: ${a.mbti || "未記入"}`,
     `補足メモ: ${a.otherNotes || "未記入"}`,
   ].join("\n");
 
@@ -183,10 +205,17 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
           <TextArea label="希望勤務地/働き方" value={answers.location} onChange={(v) => handleChange("location", v)} />
           <TextArea label="興味のある業界" value={answers.industryWish} onChange={(v) => handleChange("industryWish", v)} />
           <TextArea label="興味のある職種" value={answers.roleWish} onChange={(v) => handleChange("roleWish", v)} />
+          <SelectBox
+            label="MBTIタイプ（任意）"
+            value={answers.mbti}
+            onChange={(v) => handleChange("mbti", v)}
+            options={mbtiOptions}
+            placeholder="選択してください"
+          />
           <TextArea label="補足メモ" value={answers.otherNotes} onChange={(v) => handleChange("otherNotes", v)} />
-          <div className="flex flex-wrap gap-3">
+          <div className="flex justify-end pt-2">
             <button onClick={handleSaveAnswers} disabled={saving} className="mvp-button mvp-button-primary">
-              {saving ? "保存中..." : "保存する"}
+              {saving ? "保存中..." : "保存してAIに送る"}
             </button>
           </div>
         </div>
@@ -262,6 +291,38 @@ function TextArea({
         rows={3}
         className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
       />
+    </label>
+  );
+}
+
+function SelectBox({
+  label,
+  value,
+  onChange,
+  options,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  placeholder?: string;
+}) {
+  return (
+    <label className="block space-y-2">
+      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+      >
+        <option value="">{placeholder || "選択してください"}</option>
+        {options.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
     </label>
   );
 }
