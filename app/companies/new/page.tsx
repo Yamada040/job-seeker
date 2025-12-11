@@ -20,7 +20,7 @@ export default async function NewCompanyPage() {
       </Link>
       <Link href="/dashboard" className="mvp-button mvp-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
-        ダッシュボード
+        ダッシュボードへ
       </Link>
       <Link href="/companies" className="mvp-button mvp-button-secondary">
         <ArrowLeftIcon className="h-4 w-4" />
@@ -36,15 +36,18 @@ export default async function NewCompanyPage() {
       headerActions={headerActions}
       className="flex flex-col gap-8"
     >
-      <form action={createCompany} className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+      <form
+        action={createCompany}
+        className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80"
+      >
         <div className="space-y-6">
           <label className="block space-y-2">
-            <span className="text-sm font-medium text-slate-700">企業名*</span>
+            <span className="text-sm font-medium text-slate-700">企業名</span>
             <input
               name="name"
               required
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
-              placeholder="例: Alpha SaaS"
+              placeholder="例）Alpha SaaS"
             />
           </label>
 
@@ -56,6 +59,26 @@ export default async function NewCompanyPage() {
               placeholder="https://example.com"
             />
           </label>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-700">マイページID</span>
+              <input
+                name="mypage_id"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                placeholder="ログインID"
+              />
+            </label>
+
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-700">マイページURL</span>
+              <input
+                name="mypage_url"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                placeholder="https://mypage.example.com"
+              />
+            </label>
+          </div>
 
           <label className="block space-y-2">
             <span className="text-sm font-medium text-slate-700">ステータス</span>
@@ -84,7 +107,7 @@ export default async function NewCompanyPage() {
               name="memo"
               rows={3}
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
-              placeholder="興味を持った理由、選考ポイントなど"
+              placeholder="興味を持った理由、応募メモ、インターン日程など"
             />
           </label>
 

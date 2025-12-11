@@ -46,6 +46,8 @@ create table if not exists public.companies (
   user_id uuid references auth.users(id) on delete cascade,
   name text not null,
   url text,
+  mypage_id text,
+  mypage_url text,
   memo text,
   stage text,
   preference integer,

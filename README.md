@@ -1,22 +1,21 @@
 # 就活AI Copilot (MVP)
 
-就活のES添削・企業管理・進捗確認を、AIとゲーミフィケーションで前向きに進めるためのMVP版Webアプリです。Gemini/GPTを環境変数だけで差し替えできる薄いラッパー構成になっています。
+就活の ES 作成・添削、企業管理、進捗確認を AI とゲーミフィケーションで支援する Next.js + Supabase 製の MVP です。Gemini/GPT は環境変数で差し替え可能なラッパー構成です。
 
-## 実装済みの主な機能
-- 認証: Supabase Auth (Magic Link / Google OAuth)。認証コールバックでセッションをCookieに保存。
-- ダッシュボード: ユーザー専用データを集約（ES/企業/XP、AIキュー、フォーカス、メトリクス）。ログイン必須。
-- ES管理: 一覧フィルタ、質問カード形式で作成/編集、AI添削パネル、タグ、ステータス、削除。ログイン必須。
-- 企業管理: 企業カードの作成/編集/削除、志望度・ステータス・メモ・お気に入り。ログイン必須。
-- プロフィール: 氏名/大学/学部/アバター（固定2種）を保存。ログイン必須。
-- ホーム（MVP紹介）: 白基調のガラス風UIで、ログイン/新規登録導線と機能紹介を表示。
-- 共通UI: 抽象グラデ背景（`public/bg-abstract.svg`）、Sidebar/Breadcrumb、MVPボタン/カードスタイル、Tailwind v4準拠（`bg-linear-to-*`）、ライト/ダーク切替（自前Providerでローカル保存）。
+## 主要機能
+- 認証: Supabase Auth（Magic Link / Google OAuth）、認証後は `/dashboard` へ。未ログイン時は各ページで `/login` にリダイレクト。
+- ダッシュボード: ES/企業カード/XP のサマリー、フォーカス、カレンダー表示。カレンダーでは ES 締切・面接・インターンなどの予定を追加/更新して保存（`/api/calendar-events`）し、ES 締切も自動表示。
+- ES 管理: 一覧・作成/編集・削除、Markdown 入力、タグ/ステータス、AI 添削パネル。
+- 企業管理: 企業カード作成/編集/削除、ステージ・志望度・メモ、AI 企業分析パネル。
+- プロフィール: 氏名/大学/学部/アバター（固定画像）を保存。
+- ホーム（MVP紹介）: 白基調のガラス風 UI。ログイン/新規登録導線と機能紹介。
+- 共通: ダーク/ライト切替（class 切替）、Tailwind v4 推奨クラス（`bg-linear-to-*` など）で警告回避。
 
 ## 技術スタック
 - Next.js (App Router) + TypeScript + Tailwind CSS v4
 - Supabase (Auth/DB/Storage, RLS)
-- AI: provider-agnostic ラッパー（Gemini/GPTを環境変数で切替）
-- Hosting: Vercel想定
-
+- AI: provider-agnostic（Gemini/GPT を環境変数で切替）
+- Hosting: Vercel 想定
 
 ## セットアップ
 ```bash
@@ -25,39 +24,54 @@ npm run dev
 # http://localhost:3000
 ```
 
-## 認証設定（Supabase）
-1. Supabase Dashboard → Authentication → URL Configuration  
-   - Site URL: `http://localhost:3000`  
-   - Redirect URLs:  
-     - `http://localhost:3000/auth/callback`  
-     - `http://localhost:3000/dashboard`
-2. Next.js route handler: `app/auth/callback/route.ts` で `exchangeCodeForSession` を実行（実装済み）。
-3. ログイン必須: ダッシュボード/ES/企業/プロフィール/新規作成/詳細は未ログイン時に `/login` へリダイレクト。
+## 環境変数 (.env.local)
+```env
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+# AI
+AI_PROVIDER=gemini|openai
+AI_PROVIDER_API_KEY=...
+```
 
-## DB
-- スキーマ: `supabase/schema.sql`（profiles / es_entries / companies / xp_logs）。RLS有効。
-- `es_entries.questions` は JSONB 推奨。列が無い環境でもフォールバック挿入で動作。
+## 認証設定 (Supabase)
+Supabase Dashboard → Authentication → URL Configuration
+- Site URL: `http://localhost:3000`
+- Redirect URLs:
+  - `http://localhost:3000/auth/callback`
+  - `http://localhost:3000/dashboard`
 
-## 実装ルール（AIも参照する想定）
-- YAGNI/DRYを徹底し、MVPに不要な複雑化を避ける。
-- 認証が必要なデータ取得は必ず `user_id` でスコープする（未ログインはリダイレクト）。
-- Supabase SSRクライアント:
-  - Server Action/Route HandlerでCookie書き込みが必要な場合のみ `createSupabaseActionClient` を使用。
-  - Server Componentでは `createSupabaseReadonlyClient` を使用し、Cookie書き込みは禁止。
-- Tailwindは推奨クラス（例: `bg-linear-to-*`）を使い、警告を避ける。
-- AI呼び出しは `lib/ai/` の薄いラッパー経由。環境変数でGemini/GPTを切替。キー未設定時は安全に失敗させる。
-- ログイン必須ページでは未ログイン時 `/login` へ即リダイレクトする。
-- フォームのサーバーアクションは `"use server"` か Route Handler で定義し、Client Componentに直接関数を渡さない。
+Next.js 認証コールバック: `app/auth/callback/route.ts` で `exchangeCodeForSession` を実行。
+
+## DB スキーマ概要
+`supabase/schema.sql` に定義（すべて RLS 有効）
+- `profiles`: ユーザープロフィール
+- `es_entries`: ES 本文/ステータス/締切など
+- `companies`: 企業カード
+- `xp_logs`: XP ログ
+- `calendar_events`: カレンダー予定（ES締切/面接/インターンなど）
+
+カレンダー予定 API:
+- `GET /api/calendar-events` （ログインユーザーの予定取得）
+- `POST /api/calendar-events` （予定追加）
+- `PUT /api/calendar-events/:id` （予定更新）
+
+## 開発ルール
+- YAGNI/DRY を徹底、MVP 以外の過剰実装は避ける。
+- サーバー側で Cookie 書き込みが必要な場合は Route Handler / Server Action で `createSupabaseActionClient` を使用。Server Component では `createSupabaseReadonlyClient` を使用し Cookie 書き込みは禁止。
+- 認証が必要なデータ取得は `user_id` でスコープする。未ログインはリダイレクト。
+- Tailwind は推奨クラス（`bg-linear-to-*` など）を優先して警告を回避。
+- AI 呼び出しは `lib/ai/` の薄いラッパー経由。キー未設定時は安全に失敗させる。
 
 ## ページ一覧
 - `/` ホーム（MVP紹介、ログイン/新規登録導線）
-- `/login` ログイン（Magic Link / Google）
+- `/login` ログイン
 - `/auth/callback` 認証コールバック
 - `/dashboard` ダッシュボード（ログイン必須）
-- `/es` / `/es/new` / `/es/[id]` ES管理（ログイン必須）
-- `/companies` / `/companies/new` / `/companies/[id]` 企業管理（ログイン必須）
+- `/es`, `/es/new`, `/es/[id]` ES 管理（ログイン必須）
+- `/companies`, `/companies/new`, `/companies/[id]` 企業管理（ログイン必須）
 - `/profile` プロフィール編集（ログイン必須）
 
-## 次に必要なキー
+## 必要なキー
 - Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
-- AI: `AI_PROVIDER_API_KEY`（Gemini/GPTどちらか） and `AI_PROVIDER` 指定
+- AI: `AI_PROVIDER_API_KEY`（Gemini/GPT に応じて設定）, `AI_PROVIDER`
