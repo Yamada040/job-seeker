@@ -21,49 +21,17 @@ interface NavItem {
 }
 
 const navigationItems: NavItem[] = [
-  {
-    label: "ダッシュボード",
-    href: "/dashboard",
-    icon: HomeIcon,
-    description: "全体の概要を確認",
-  },
-  {
-    label: "ES管理",
-    href: "/es",
-    icon: DocumentTextIcon,
-    description: "エントリーシートを整理",
-  },
-  {
-    label: "企業管理",
-    href: "/companies",
-    icon: BuildingOfficeIcon,
-    description: "企業情報と進捗を記録",
-  },
-  {
-    label: "適性チェック",
-    href: "/aptitude",
-    icon: SparklesIcon,
-    description: "業界・職種の向き不向きを診断",
-  },
-  {
-    label: "プロフィール",
-    href: "/profile",
-    icon: UserIcon,
-    description: "ユーザー設定とアバター",
-  },
+  { label: "ダッシュボード", href: "/dashboard", icon: HomeIcon, description: "全体の概要を確認" },
+  { label: "ES管理", href: "/es", icon: DocumentTextIcon, description: "エントリーシートを整理" },
+  { label: "企業管理", href: "/companies", icon: BuildingOfficeIcon, description: "企業情報と進捗を記録" },
+  { label: "適性チェック", href: "/aptitude", icon: SparklesIcon, description: "業界/職種の向き不向きを診断" },
+  { label: "自己分析", href: "/self-analysis", icon: SparklesIcon, description: "強み・価値観を整理" },
+  { label: "プロフィール", href: "/profile", icon: UserIcon, description: "ユーザー設定とアバター" },
 ];
 
 const bottomItems: NavItem[] = [
-  {
-    label: "設定",
-    href: "/settings",
-    icon: Cog6ToothIcon,
-  },
-  {
-    label: "ログアウト",
-    href: "/login",
-    icon: ArrowRightOnRectangleIcon,
-  },
+  { label: "設定", href: "/settings", icon: Cog6ToothIcon },
+  { label: "ログアウト", href: "/login", icon: ArrowRightOnRectangleIcon },
 ];
 
 export function Sidebar() {
