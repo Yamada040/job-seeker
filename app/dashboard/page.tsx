@@ -12,6 +12,8 @@ import { InteractiveCalendar } from "./_components/interactive-calendar";
 type EsRow = Database["public"]["Tables"]["es_entries"]["Row"];
 type CompanyRow = Database["public"]["Tables"]["companies"]["Row"];
 type CalendarRow = Database["public"]["Tables"]["calendar_events"]["Row"];
+type XpRow = Database["public"]["Tables"]["xp_logs"]["Row"];
+type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
 type CalendarEvent = {
   id: string;
@@ -88,6 +90,9 @@ const fallbackCompanies: CompanyRow[] = [
     ai_summary: null,
     created_at: null,
     updated_at: null,
+    industry: null,
+    mypage_id: null,
+    mypage_url: null,
   },
   {
     id: "fallback-c2",
@@ -101,6 +106,9 @@ const fallbackCompanies: CompanyRow[] = [
     ai_summary: null,
     created_at: null,
     updated_at: null,
+    industry: null,
+    mypage_id: null,
+    mypage_url: null,
   },
 ];
 
@@ -133,7 +141,7 @@ async function getDashboardData() {
       .from("profiles")
       .select("full_name,avatar_id,university,faculty")
       .eq("id", userId)
-      .maybeSingle(),
+      .maybeSingle<Pick<ProfileRow, "full_name" | "avatar_id" | "university" | "faculty">>(),
     supabase
       .from("calendar_events")
       .select("*")
@@ -143,14 +151,14 @@ async function getDashboardData() {
 
   const esEntries = esRes.data ?? fallbackEs;
   const companies = companyRes.data ?? fallbackCompanies;
-  const xp = (xpRes.data ?? []).reduce((sum, row) => sum + (row.xp || 0), 0) || FALLBACK_XP;
+  const xp = ((xpRes.data as XpRow[] | null) ?? []).reduce((sum, row) => sum + (row.xp || 0), 0) || FALLBACK_XP;
 
   return {
     esEntries,
     companies,
     xp,
     user: userData?.user ?? null,
-    profile: profileRes.data ?? null,
+    profile: profileRes.data as (Pick<ProfileRow, "full_name" | "avatar_id" | "university" | "faculty"> | null),
     calendarEvents: (calendarRes.data as CalendarRow[] | null) ?? [],
   };
 }

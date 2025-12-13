@@ -6,11 +6,14 @@ import { ArrowLeftIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { updateProfile } from "./actions";
 import { AppLayout } from "@/app/_components/layout";
+import { Database } from "@/lib/database.types";
 
 const avatarOptions = [
   { id: "sunrise", label: "Sunrise", src: "/avatars/sunrise.svg" },
   { id: "ocean", label: "Ocean", src: "/avatars/ocean.svg" },
 ];
+
+type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
 export default async function ProfilePage() {
   const supabase = await createSupabaseReadonlyClient();
@@ -18,9 +21,14 @@ export default async function ProfilePage() {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
   const userId = userData.user.id;
-  const { data: profileData } = await supabase.from("profiles").select("full_name, university, faculty, avatar_id").eq("id", userId).maybeSingle();
+  const { data: profileData } = await supabase
+    .from("profiles")
+    .select("full_name, university, faculty, avatar_id")
+    .eq("id", userId)
+    .maybeSingle<Pick<ProfileRow, "full_name" | "university" | "faculty" | "avatar_id">>();
 
-  const profile = profileData ?? {
+  const profile: Pick<ProfileRow, "full_name" | "university" | "faculty" | "avatar_id"> =
+    profileData ?? {
     full_name: "",
     university: "",
     faculty: "",

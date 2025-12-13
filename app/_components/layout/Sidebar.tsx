@@ -27,6 +27,7 @@ const navigationItems: NavItem[] = [
   { label: "適性チェック", href: "/aptitude", icon: SparklesIcon, description: "業界・職種の向き不向きを診断" },
   { label: "自己分析", href: "/self-analysis", icon: SparklesIcon, description: "強み・価値観を整理" },
   { label: "面接ログ", href: "/interviews", icon: DocumentTextIcon, description: "面接の質問・回答を記録" },
+  { label: "Webテスト対策", href: "/webtests", icon: DocumentTextIcon, description: "演習用の問題を管理" },
   { label: "プロフィール", href: "/profile", icon: UserIcon, description: "ユーザー設定とアバター" },
 ];
 
