@@ -1,6 +1,6 @@
 export type AiProvider = "gemini" | "gpt";
 
-export type AiPromptKind = "es_review" | "company_analysis" | "aptitude_analysis" | "self_analysis";
+export type AiPromptKind = "es_review" | "company_analysis" | "aptitude_analysis" | "self_analysis" | "interview_review";
 
 export interface AiResponse {
   summary: string;
