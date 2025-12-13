@@ -18,6 +18,7 @@ export async function createCompany(formData: FormData) {
   const payload = {
     user_id: userData.user.id,
     name,
+    industry: (formData.get("industry") as string | null) || null,
     url: (formData.get("url") as string | null) || null,
     mypage_id: (formData.get("mypage_id") as string | null) || null,
     mypage_url: (formData.get("mypage_url") as string | null) || null,
@@ -46,6 +47,7 @@ export async function updateCompany(id: string, formData: FormData) {
 
   const payload = {
     name,
+    industry: (formData.get("industry") as string | null) || null,
     url: (formData.get("url") as string | null) || null,
     mypage_id: (formData.get("mypage_id") as string | null) || null,
     mypage_url: (formData.get("mypage_url") as string | null) || null,

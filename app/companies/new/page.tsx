@@ -52,6 +52,15 @@ export default async function NewCompanyPage() {
           </label>
 
           <label className="block space-y-2">
+            <span className="text-sm font-medium text-slate-700">業界</span>
+            <input
+              name="industry"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              placeholder="例）IT / コンサル / メーカー"
+            />
+          </label>
+
+          <label className="block space-y-2">
             <span className="text-sm font-medium text-slate-700">URL</span>
             <input
               name="url"

@@ -68,6 +68,7 @@ export interface Database {
           id: string;
           user_id: string | null;
           name: string;
+          industry: string | null;
           url: string | null;
           mypage_id: string | null;
           mypage_url: string | null;
@@ -83,6 +84,7 @@ export interface Database {
           id?: string;
           user_id?: string | null;
           name: string;
+          industry?: string | null;
           url?: string | null;
           mypage_id?: string | null;
           mypage_url?: string | null;
