@@ -1,6 +1,12 @@
 # 就活AI Copilot (MVP)
 
 就活の ES 作成・添削、企業管理、進捗確認を AI とゲーミフィケーションで支援する Next.js + Supabase 製の MVP です。Gemini/GPT は環境変数で差し替え可能なラッパー構成です。
+このアプリの本質的価値は
+
+就活を頑張らせること
+ではなく
+就活を“やらない時間”を消していくこと
+にあります。
 
 ## 主要機能
 - 認証: Supabase Auth（Magic Link / Google OAuth）、認証後は `/dashboard` へ。未ログイン時は各ページで `/login` にリダイレクト。
