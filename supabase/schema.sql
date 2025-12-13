@@ -88,6 +88,36 @@ alter table public.companies enable row level security;
 alter table public.xp_logs enable row level security;
 alter table public.aptitude_results enable row level security;
 alter table public.self_analysis_results enable row level security;
+alter table public.interview_logs enable row level security;
+
+-- Webテスト問題バンク
+create table if not exists public.webtest_questions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
+  title text not null,
+  body text not null,
+  test_type text,
+  choices jsonb,
+  answer text not null,
+  explanation text,
+  category text,
+  format text,
+  difficulty text,
+  time_limit integer,
+  created_at timestamptz default now()
+);
+
+create table if not exists public.webtest_attempts (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
+  question_id uuid references public.webtest_questions(id) on delete cascade,
+  is_correct boolean,
+  time_spent integer,
+  created_at timestamptz default now()
+);
+
+alter table public.webtest_questions enable row level security;
+alter table public.webtest_attempts enable row level security;
 create table if not exists public.interview_logs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete cascade,
@@ -269,5 +299,49 @@ begin
     select 1 from pg_policies where schemaname='public' and tablename='interview_logs' and policyname='Enable delete own interviews'
   ) then
     create policy "Enable delete own interviews" on public.interview_logs for delete using (auth.uid() = user_id);
+  end if;
+
+  -- webtest_questions
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='webtest_questions' and policyname='Enable read own webtest questions'
+  ) then
+    create policy "Enable read own webtest questions" on public.webtest_questions for select using (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='webtest_questions' and policyname='Enable insert own webtest questions'
+  ) then
+    create policy "Enable insert own webtest questions" on public.webtest_questions for insert with check (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='webtest_questions' and policyname='Enable update own webtest questions'
+  ) then
+    create policy "Enable update own webtest questions" on public.webtest_questions for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='webtest_questions' and policyname='Enable delete own webtest questions'
+  ) then
+    create policy "Enable delete own webtest questions" on public.webtest_questions for delete using (auth.uid() = user_id);
+  end if;
+
+  -- webtest_attempts
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='webtest_attempts' and policyname='Enable read own webtest attempts'
+  ) then
+    create policy "Enable read own webtest attempts" on public.webtest_attempts for select using (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='webtest_attempts' and policyname='Enable insert own webtest attempts'
+  ) then
+    create policy "Enable insert own webtest attempts" on public.webtest_attempts for insert with check (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='webtest_attempts' and policyname='Enable update own webtest attempts'
+  ) then
+    create policy "Enable update own webtest attempts" on public.webtest_attempts for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='webtest_attempts' and policyname='Enable delete own webtest attempts'
+  ) then
+    create policy "Enable delete own webtest attempts" on public.webtest_attempts for delete using (auth.uid() = user_id);
   end if;
 end$$;

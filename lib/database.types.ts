@@ -201,6 +201,58 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["interview_logs"]["Insert"]>;
       };
+      webtest_questions: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          title: string;
+          body: string;
+          test_type: string | null;
+          choices: Json | null;
+          answer: string;
+          explanation: string | null;
+          category: string | null;
+          format: string | null;
+          difficulty: string | null;
+          time_limit: number | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          title: string;
+          body: string;
+          test_type?: string | null;
+          choices?: Json | null;
+          answer: string;
+          explanation?: string | null;
+          category?: string | null;
+          format?: string | null;
+          difficulty?: string | null;
+          time_limit?: number | null;
+          created_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["webtest_questions"]["Insert"]>;
+      };
+      webtest_attempts: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          question_id: string | null;
+          is_correct: boolean | null;
+          time_spent: number | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          question_id?: string | null;
+          is_correct?: boolean | null;
+          time_spent?: number | null;
+          created_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["webtest_attempts"]["Insert"]>;
+      };
     };
     Views: {};
     Functions: {};
