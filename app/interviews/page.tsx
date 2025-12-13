@@ -21,10 +21,6 @@ export default async function InterviewsListPage() {
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href="/interviews/new" className="mvp-button mvp-button-primary">
-        <PlusIcon className="h-4 w-4" />
-        新規作成
-      </Link>
       <Link href="/dashboard" className="mvp-button mvp-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
@@ -32,6 +28,10 @@ export default async function InterviewsListPage() {
       <Link href="/" className="mvp-button mvp-button-secondary">
         <HomeIcon className="h-4 w-4" />
         MVPホーム
+      </Link>
+      <Link href="/interviews/new" className="mvp-button mvp-button-primary">
+        <PlusIcon className="h-4 w-4" />
+        新規作成
       </Link>
     </div>
   );

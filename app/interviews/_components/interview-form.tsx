@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AiPanel } from "@/app/_components/ai-panel";
 
 type QA = { question: string; answer: string };
+
+type CompanyOption = { value: string; label: string };
 
 type Props = {
   mode: "create" | "update";
   interviewId?: string;
   initialCompanyName?: string;
+  companyOptions?: CompanyOption[];
   initialTitle?: string | null;
   initialStage?: string | null;
   initialDate?: string | null;
@@ -23,6 +26,7 @@ export default function InterviewForm({
   mode,
   interviewId,
   initialCompanyName,
+  companyOptions = [],
   initialTitle,
   initialStage,
   initialDate,
@@ -40,10 +44,6 @@ export default function InterviewForm({
   const [resultId, setResultId] = useState<string | null>(interviewId ?? null);
   const [presetKey, setPresetKey] = useState<string | undefined>(undefined);
   const [presetText, setPresetText] = useState<string>("");
-
-  useEffect(() => {
-    setPresetText(prompt);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const prompt = useMemo(() => {
     const lines = [
@@ -73,7 +73,7 @@ export default function InterviewForm({
 
   const handleSave = async () => {
     if (!companyName.trim()) {
-      alert("企業名は必須です。");
+      alert("企業名は必須です。企業管理で登録した企業を選択してください。");
       return;
     }
     setSaving(true);
@@ -102,10 +102,16 @@ export default function InterviewForm({
       setPresetKey(`${Date.now()}`);
     } catch (err) {
       console.error(err);
-      alert("保存に失敗しました。もう一度お試しください。");
     } finally {
       setSaving(false);
     }
+  };
+
+  const withMissingOption = (): CompanyOption[] => {
+    if (companyName && !companyOptions.find((o) => o.value === companyName)) {
+      return [{ value: companyName, label: `${companyName}（既存データ）` }, ...companyOptions];
+    }
+    return companyOptions;
   };
 
   return (
@@ -120,7 +126,18 @@ export default function InterviewForm({
 
         <div className="mt-4 space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="企業名（必須）" value={companyName} onChange={setCompanyName} required placeholder="例）Alpha株式会社" />
+            {companyOptions.length > 0 ? (
+              <SelectField
+                label="企業名（必須）"
+                value={companyName}
+                onChange={setCompanyName}
+                options={withMissingOption()}
+                required
+                placeholder="企業管理から選択"
+              />
+            ) : (
+              <Field label="企業名（必須）" value={companyName} onChange={setCompanyName} required placeholder="例）Alpha株式会社" />
+            )}
             <Field label="タイトル/面接種別" value={title} onChange={setTitle} placeholder="一次/最終/カジュアルなど" />
           </div>
           <div className="grid gap-4 md:grid-cols-2">
@@ -146,7 +163,7 @@ export default function InterviewForm({
             <div className="space-y-3">
               {questions.map((qa, idx) => (
                 <div
-                  key={idx}
+                  key={`${idx}-${qa.question}-${qa.answer}`}
                   className="rounded-xl border border-slate-200 bg-white/90 p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800/80"
                 >
                   <div className="grid gap-2 md:grid-cols-2">
@@ -242,6 +259,47 @@ function Field({
         placeholder={placeholder}
         className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
       />
+    </label>
+  );
+}
+
+function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+  required,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: CompanyOption[];
+  required?: boolean;
+  placeholder?: string;
+}) {
+  const opts = options;
+  return (
+    <label className="block space-y-2">
+      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+        {label}
+        {required ? <span className="text-rose-500"> *</span> : null}
+      </span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required={required}
+        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+      >
+        <option value="" disabled className="text-slate-400">
+          {placeholder || "選択してください"}
+        </option>
+        {opts.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
     </label>
   );
 }

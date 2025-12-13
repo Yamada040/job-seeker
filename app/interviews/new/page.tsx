@@ -12,6 +12,10 @@ export default async function InterviewNewPage() {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
+  const { data: companies } = await supabase.from("companies").select("name").eq("user_id", userData.user.id).order("created_at", { ascending: false });
+  const companyOptions =
+    companies?.filter((c) => c.name).map((c) => ({ value: c.name as string, label: c.name as string })) ?? [];
+
   const headerActions = (
     <div className="flex flex-wrap gap-3">
       <Link href="/interviews" className="mvp-button mvp-button-secondary">
@@ -27,7 +31,7 @@ export default async function InterviewNewPage() {
 
   return (
     <AppLayout headerTitle="面接ログを新規作成" headerDescription="質問・回答・自己評価を記録" headerActions={headerActions}>
-      <InterviewForm mode="create" />
+      <InterviewForm mode="create" companyOptions={companyOptions} />
     </AppLayout>
   );
 }

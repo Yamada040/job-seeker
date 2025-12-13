@@ -13,14 +13,15 @@ export default async function InterviewDetailPage({ params }: { params: Promise<
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
-  const { data, error } = await supabase
-    .from("interview_logs")
-    .select("*")
-    .eq("id", id)
-    .eq("user_id", userData.user.id)
-    .maybeSingle();
+  const [{ data, error }, { data: companies }] = await Promise.all([
+    supabase.from("interview_logs").select("*").eq("id", id).eq("user_id", userData.user.id).maybeSingle(),
+    supabase.from("companies").select("name").eq("user_id", userData.user.id).order("created_at", { ascending: false }),
+  ]);
 
   if (error || !data) return notFound();
+
+  const companyOptions =
+    companies?.filter((c) => c.name).map((c) => ({ value: c.name as string, label: c.name as string })) ?? [];
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
@@ -49,6 +50,7 @@ export default async function InterviewDetailPage({ params }: { params: Promise<
       <InterviewForm
         mode="update"
         interviewId={id}
+        companyOptions={companyOptions}
         initialCompanyName={data.company_name ?? ""}
         initialTitle={data.interview_title}
         initialStage={data.stage}
