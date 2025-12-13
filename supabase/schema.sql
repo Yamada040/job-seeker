@@ -45,6 +45,7 @@ create table if not exists public.companies (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete cascade,
   name text not null,
+  industry text,
   url text,
   mypage_id text,
   mypage_url text,
