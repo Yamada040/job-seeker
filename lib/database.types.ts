@@ -172,6 +172,33 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["self_analysis_results"]["Insert"]>;
       };
+      interview_logs: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          company_name: string;
+          interview_title: string | null;
+          interview_date: string | null;
+          stage: string | null;
+          questions: Json | null;
+          self_review: string | null;
+          ai_summary: string | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          company_name: string;
+          interview_title?: string | null;
+          interview_date?: string | null;
+          stage?: string | null;
+          questions?: Json | null;
+          self_review?: string | null;
+          ai_summary?: string | null;
+          created_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["interview_logs"]["Insert"]>;
+      };
     };
     Views: {};
     Functions: {};

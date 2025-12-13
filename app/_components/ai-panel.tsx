@@ -5,7 +5,7 @@ import { CheckIcon, ClipboardDocumentIcon, CloudArrowUpIcon } from "@heroicons/r
 import { BlockingOverlay } from "./blocking-overlay";
 
 type Props = {
-  kind: "es_review" | "company_analysis" | "aptitude_analysis" | "self_analysis";
+  kind: "es_review" | "company_analysis" | "aptitude_analysis" | "self_analysis" | "interview_review";
   defaultInput: string;
   title: string;
   hint?: string;

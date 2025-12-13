@@ -87,6 +87,20 @@ alter table public.companies enable row level security;
 alter table public.xp_logs enable row level security;
 alter table public.aptitude_results enable row level security;
 alter table public.self_analysis_results enable row level security;
+create table if not exists public.interview_logs (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
+  company_name text not null,
+  interview_title text,
+  interview_date date,
+  stage text,
+  questions jsonb,
+  self_review text,
+  ai_summary text,
+  created_at timestamptz default now()
+);
+
+alter table public.interview_logs enable row level security;
 
 do $$
 begin
@@ -232,5 +246,27 @@ begin
     select 1 from pg_policies where schemaname='public' and tablename='self_analysis_results' and policyname='Enable delete own self analysis'
   ) then
     create policy "Enable delete own self analysis" on public.self_analysis_results for delete using (auth.uid() = user_id);
+  end if;
+
+  -- interview_logs
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='interview_logs' and policyname='Enable read own interviews'
+  ) then
+    create policy "Enable read own interviews" on public.interview_logs for select using (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='interview_logs' and policyname='Enable insert own interviews'
+  ) then
+    create policy "Enable insert own interviews" on public.interview_logs for insert with check (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='interview_logs' and policyname='Enable update own interviews'
+  ) then
+    create policy "Enable update own interviews" on public.interview_logs for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='interview_logs' and policyname='Enable delete own interviews'
+  ) then
+    create policy "Enable delete own interviews" on public.interview_logs for delete using (auth.uid() = user_id);
   end if;
 end$$;
