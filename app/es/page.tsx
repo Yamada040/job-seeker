@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { redirect } from "next/navigation";
 import { PlusIcon, ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 
@@ -16,7 +16,12 @@ export default async function EsListPage() {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
-  const { data: esData } = await supabase.from("es_entries").select("*").eq("user_id", userData.user.id).order("updated_at", { ascending: false }).limit(20);
+  const { data: esData } = await supabase
+    .from("es_entries")
+    .select("*")
+    .eq("user_id", userData.user.id)
+    .order("updated_at", { ascending: false })
+    .limit(50);
   const esList: EsRow[] = esData ?? [];
 
   const headerActions = (
@@ -27,7 +32,7 @@ export default async function EsListPage() {
       </Link>
       <Link href="/dashboard" className="mvp-button mvp-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
-        ダッシュボード
+        ダッシュボードへ
       </Link>
       <Link href="/es/new" className="mvp-button mvp-button-primary">
         <PlusIcon className="h-4 w-4" />
@@ -37,11 +42,16 @@ export default async function EsListPage() {
   );
 
   return (
-    <AppLayout headerTitle="ES管理" headerDescription="エントリーシートを整理し、AI添削に送る" headerActions={headerActions}>
+    <AppLayout
+      headerTitle="ES管理"
+      headerDescription="下書きと提出済みを分けて管理できます"
+      headerActions={headerActions}
+      className="space-y-4"
+    >
       <div className="rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
         <div className="flex flex-col gap-2">
           <p className="text-sm font-semibold text-amber-700">ES一覧</p>
-          <p className="text-sm text-slate-700">ステータスやタグで絞り込み、気になるESをすぐ開けます。</p>
+          <p className="text-sm text-slate-700">下書きと提出済みをタブレス表示。提出済みは閲覧のみです。</p>
         </div>
         <div className="mt-4 rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-inner">
           <EsListClient initialItems={esList} />

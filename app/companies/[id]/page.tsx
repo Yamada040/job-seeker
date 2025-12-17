@@ -159,6 +159,12 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
           </div>
         </form>
       </div>
+      <form action={deleteCompanyAction} className="flex justify-end">
+        <button type="submit" className="mvp-button mvp-button-secondary text-rose-600">
+          <TrashIcon className="h-4 w-4" />
+          削除する
+        </button>
+      </form>
 
       <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
         <CompanyAiPanel
@@ -173,13 +179,6 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
           saveUrl="/api/ai/company"
         />
       </div>
-
-      <form action={deleteCompanyAction} className="flex justify-end">
-        <button type="submit" className="mvp-button mvp-button-secondary text-rose-600">
-          <TrashIcon className="h-4 w-4" />
-          削除する
-        </button>
-      </form>
     </AppLayout>
   );
 }

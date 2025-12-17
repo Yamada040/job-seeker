@@ -126,13 +126,13 @@ export default async function NewCompanyPage() {
           </label>
         </div>
 
-        <div className="mt-6 flex justify-end gap-3">
-          <Link href="/companies" className="mvp-button mvp-button-secondary">
-            キャンセル
-          </Link>
+        <div className="mt-6 flex justify-wrap gap-3">
           <button type="submit" className="mvp-button mvp-button-primary">
             追加する
           </button>
+          <Link href="/companies" className="mvp-button mvp-button-secondary">
+            キャンセル
+          </Link>
         </div>
       </form>
     </AppLayout>

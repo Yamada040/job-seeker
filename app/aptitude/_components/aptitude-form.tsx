@@ -213,9 +213,9 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
             placeholder="選択してください"
           />
           <TextArea label="補足メモ" value={answers.otherNotes} onChange={(v) => handleChange("otherNotes", v)} />
-          <div className="flex justify-end pt-2">
+          <div className="flex flex-wrap gap-3">
             <button onClick={handleSaveAnswers} disabled={saving} className="mvp-button mvp-button-primary">
-              {saving ? "保存中..." : "保存してAIに送る"}
+              {saving ? "保存中..." : "保存する"}
             </button>
           </div>
         </div>

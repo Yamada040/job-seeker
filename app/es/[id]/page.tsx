@@ -1,22 +1,27 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
 
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { AppLayout } from "@/app/_components/layout";
-import { QuestionsEditor } from "../_components/questions-editor";
-import { EsAiPanel } from "../_components/ai-es-panel";
 import { deleteEs, updateEs } from "../actions";
+import { EsDetailClient } from "../_components/es-detail-client";
 
 type Question = { id: string; prompt: string; answer_md: string };
 
+function makeId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  return Math.random().toString(36).slice(2);
+}
+
 function parseQuestions(questions: unknown): Question[] {
   if (!questions) return [];
-  if (Array.isArray(questions)) {
-    return questions.map((q) => ({
-      id: typeof q.id === "string" ? q.id : crypto.randomUUID(),
-      prompt: typeof q.prompt === "string" ? q.prompt : "",
-      answer_md: typeof q.answer_md === "string" ? q.answer_md : "",
+  const parsed = typeof questions === "string" ? (() => { try { return JSON.parse(questions); } catch { return []; } })() : questions;
+  if (Array.isArray(parsed)) {
+    return parsed.map((q) => ({
+      id: typeof q?.id === "string" ? q.id : makeId(),
+      prompt: typeof q?.prompt === "string" ? q.prompt : "",
+      answer_md: typeof q?.answer_md === "string" ? q.answer_md : "",
     }));
   }
   return [];
@@ -57,7 +62,7 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
   return (
     <AppLayout
       headerTitle="ES詳細"
-      headerDescription="ESの内容を編集し、AI添削でブラッシュアップ"
+      headerDescription="提出済みはプレビュー、編集ボタンで編集モードに切り替え"
       headerActions={
         <div className="flex flex-wrap gap-3">
           <Link href="/" className="mvp-button mvp-button-secondary">
@@ -76,143 +81,25 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
       }
       className="flex flex-col gap-8"
     >
-      <div className="grid gap-4 lg:grid-cols-[1.4fr,0.9fr]">
-        <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-          <form action={handleUpdate} className="space-y-4">
-            <div className="space-y-2">
-              <label className="block text-xs text-slate-600">企業名</label>
-              <input
-                name="company_name"
-                defaultValue={data.company_name ?? ""}
-                className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
-                placeholder="例）Alpha SaaS"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-xs text-slate-600">ESタイトル*</label>
-              <input
-                name="title"
-                defaultValue={data.title ?? ""}
-                required
-                className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
-              />
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="block space-y-1 text-xs text-slate-600">
-                ステータス
-                <select
-                  name="status"
-                  defaultValue={data.status ?? "draft"}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
-                >
-                  <option value="draft">下書き</option>
-                  <option value="submitted">提出済</option>
-                  <option value="reviewed">レビュー済</option>
-                  <option value="done">完了</option>
-                </select>
-              </label>
-              <label className="block space-y-1 text-xs text-slate-600">
-                タグ（カンマ区切り）
-                <input
-                  name="tags"
-                  defaultValue={(data.tags ?? []).join(", ")}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
-                  placeholder="SaaS, Web系, 新規事業"
-                />
-              </label>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="block space-y-1 text-xs text-slate-600">
-                選考ステータス
-                <input
-                  name="selection_status"
-                  defaultValue={data.selection_status ?? ""}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
-                  placeholder="書類選考 / 一次面接 など"
-                />
-              </label>
-              <label className="block space-y-1 text-xs text-slate-600">
-                企業URL
-                <input
-                  name="company_url"
-                  defaultValue={data.company_url ?? ""}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
-                  placeholder="https://example.com"
-                />
-              </label>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="block space-y-1 text-xs text-slate-600">
-                締切日
-                <input
-                  name="deadline"
-                  type="date"
-                  defaultValue={data.deadline ?? ""}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
-                />
-              </label>
-              <label className="block space-y-1 text-xs text-slate-600">
-                メモ
-                <input
-                  name="memo"
-                  defaultValue={data.memo ?? ""}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
-                  placeholder="応募メモなど"
-                />
-              </label>
-            </div>
-
-            <QuestionsEditor initialQuestions={questions} />
-
-            <label className="block space-y-2 text-xs text-slate-600">
-              本文（Markdown可）
-              <textarea
-                name="content_md"
-                rows={8}
-                defaultValue={data.content_md ?? ""}
-                className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
-                placeholder="本文を入力してください"
-              />
-            </label>
-
-            <input type="hidden" name="questions_json" value={JSON.stringify(questions)} />
-
-            <div className="flex flex-wrap gap-3">
-              <button type="submit" className="mvp-button mvp-button-primary">
-                保存する
-              </button>
-              <Link href="/es" className="mvp-button mvp-button-secondary">
-                キャンセル
-              </Link>
-            </div>
-          </form>
-        </div>
-
-        <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-          <EsAiPanel
-            content={combinedContent}
-            cacheKey={`es-${id}`}
-            initialSummary={data.ai_summary}
-            saveUrl="/api/ai/es"
-            saveId={id}
-            defaultCompanyName={data.company_name}
-            defaultStatus={data.status ?? undefined}
-            defaultCompanyUrl={data.company_url}
-            defaultTitle={data.title}
-          />
-        </div>
-      </div>
-
-      <form action={handleDelete} className="flex justify-end">
-        <button type="submit" className="mvp-button mvp-button-secondary text-rose-600">
-          <TrashIcon className="h-4 w-4" />
-          削除する
-        </button>
-      </form>
+      <EsDetailClient
+        entry={{
+          id: data.id,
+          company_name: data.company_name,
+          selection_status: data.selection_status,
+          company_url: data.company_url,
+          memo: data.memo,
+          deadline: data.deadline,
+          title: data.title,
+          status: data.status,
+          content_md: data.content_md,
+          tags: data.tags,
+          ai_summary: data.ai_summary,
+        }}
+        questions={questions}
+        combinedContent={combinedContent}
+        handleUpdate={handleUpdate}
+        handleDelete={handleDelete}
+      />
     </AppLayout>
   );
 }
