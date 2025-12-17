@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createServerClient } from "@supabase/ssr";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import { Database } from "../database.types";
 
 const getEnv = () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -11,10 +12,10 @@ const getEnv = () => {
   return { supabaseUrl, supabaseAnonKey };
 };
 
-export const createSupabaseServerReadonlyClient = async () => {
+export const createSupabaseServerReadonlyClient = async (): Promise<SupabaseClient<any>> => {
   const { supabaseUrl, supabaseAnonKey } = getEnv();
   const cookieStore = await cookies();
-  return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+  return createServerClient<any>(supabaseUrl, supabaseAnonKey, {
     cookies: {
       get(name: string) {
         return cookieStore.get(name)?.value;
@@ -23,10 +24,10 @@ export const createSupabaseServerReadonlyClient = async () => {
   });
 };
 
-export const createSupabaseServerActionClient = async () => {
+export const createSupabaseServerActionClient = async (): Promise<SupabaseClient<any>> => {
   const { supabaseUrl, supabaseAnonKey } = getEnv();
   const cookieStore = await cookies();
-  return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+  return createServerClient<any>(supabaseUrl, supabaseAnonKey, {
     cookies: {
       get(name: string) {
         return cookieStore.get(name)?.value;

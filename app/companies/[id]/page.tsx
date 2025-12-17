@@ -1,6 +1,6 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeftIcon, ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, ArrowUturnLeftIcon, HomeIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 import { updateCompany, deleteCompany } from "../actions";
 import { CompanyAiPanel } from "../_components/company-ai-panel";
@@ -149,16 +149,22 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
             お気に入りに追加
           </label>
 
-            <div className="flex flex-wrap gap-3">
-              <button type="submit" className="mvp-button mvp-button-primary">
-                保存する
-              </button>
-              <Link href="/es" className="mvp-button mvp-button-secondary">
-                キャンセル
-              </Link>
-            </div>
+          <div className="flex flex-wrap gap-3">
+            <button type="submit" className="mvp-button mvp-button-primary">
+              保存する
+            </button>
+            <Link href="/companies" className="mvp-button mvp-button-secondary">
+              キャンセル
+            </Link>
+          </div>
         </form>
       </div>
+      <form action={deleteCompanyAction} className="flex justify-end">
+        <button type="submit" className="mvp-button mvp-button-secondary text-rose-600">
+          <TrashIcon className="h-4 w-4" />
+          削除する
+        </button>
+      </form>
 
       <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
         <CompanyAiPanel

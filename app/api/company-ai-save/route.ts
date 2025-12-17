@@ -4,7 +4,7 @@ import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id, summary } = body as { id?: string; summary?: any };
+    const { id, summary } = body as { id?: string; summary?: string };
 
     if (!id || !summary) {
       return NextResponse.json({ error: "id and summary are required" }, { status: 400 });

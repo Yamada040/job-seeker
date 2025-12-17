@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
 
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } },
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await context.params;
   const supabase = await createSupabaseServerActionClient();
   const { data: userData, error: userError } = await supabase.auth.getUser();
   if (userError || !userData?.user) {
@@ -27,7 +28,7 @@ export async function PUT(
       type: type ?? "other",
       time: time ?? null,
     })
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("user_id", userData.user.id)
     .select()
     .maybeSingle();

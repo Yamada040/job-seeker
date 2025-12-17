@@ -4,15 +4,12 @@ import { clsx } from "clsx";
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "primary" | "ghost" | "destructive";
   size?: "sm" | "md" | "lg";
-  asChild?: boolean;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "default", size = "md", asChild = false, ...props }, ref) => {
-    const Comp = asChild ? "div" : "button";
-    
+  ({ className, variant = "default", size = "md", ...props }, ref) => {
     return (
-      <Comp
+      <button
         className={clsx(
           // Base styles
           "inline-flex items-center justify-center gap-2 rounded-sm font-medium transition-all duration-100",
@@ -22,15 +19,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           // Variant styles
           {
             // Default
-            "bg-white border border-[var(--border-light)] text-[var(--foreground)] hover:bg-[var(--background-secondary)] hover:border-[var(--border-medium)]": 
+            "bg-white border border-(--border-light) text-foreground hover:bg-(--background-secondary) hover:border-(--border-medium)": 
               variant === "default",
             
             // Primary
-            "bg-[var(--accent-blue)] border border-[var(--accent-blue)] text-white hover:bg-[var(--accent-blue-hover)] hover:border-[var(--accent-blue-hover)]": 
+            "bg-(--accent-blue) border border-(--accent-blue) text-white hover:bg-(--accent-blue-hover) hover:border-(--accent-blue-hover)": 
               variant === "primary",
             
             // Ghost
-            "border-transparent bg-transparent text-[var(--foreground-secondary)] hover:bg-[var(--background-secondary)] hover:text-[var(--foreground)]": 
+            "border-transparent bg-transparent text-(--foreground-secondary) hover:bg-(--background-secondary) hover:text-foreground": 
               variant === "ghost",
             
             // Destructive

@@ -5,6 +5,7 @@ import { ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { AppLayout } from "@/app/_components/layout";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import AptitudeForm from "./_components/aptitude-form";
+import { AptitudeAnswers } from "./types";
 
 export default async function AptitudePage() {
   const supabase = await createSupabaseReadonlyClient();
@@ -41,7 +42,7 @@ export default async function AptitudePage() {
       className="space-y-6"
     >
       <AptitudeForm
-        initialAnswers={(data?.answers as Record<string, unknown>) ?? null}
+        initialAnswers={(data?.answers as AptitudeAnswers) ?? null}
         initialSummary={data?.ai_summary ?? null}
         initialResultId={data?.id ?? null}
       />

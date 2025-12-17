@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
@@ -19,7 +19,7 @@ function parseQuestions(questionsJson: string | null): Question[] {
         prompt: typeof q?.prompt === "string" ? q.prompt : "",
         answer_md: typeof q?.answer_md === "string" ? q.answer_md : "",
       }))
-      .filter((q) => q.prompt || q.answer_md);
+      .filter((q) => q.prompt.trim() || q.answer_md.trim());
   } catch {
     return [];
   }
@@ -44,15 +44,16 @@ export async function createEs(formData: FormData) {
   if (!userData?.user) throw new Error("Not authenticated");
 
   const company_name = (formData.get("company_name") as string | null)?.trim() || null;
-  const selection_status = (formData.get("selection_status") as string | null)?.trim() || null;
+  const selection_status = (formData.get("selection_status") as string | null)?.trim() || null; // 職種/募集枠
   const company_url = (formData.get("company_url") as string | null)?.trim() || null;
   const memo = (formData.get("memo") as string | null)?.trim() || null;
-  const deadline = (formData.get("deadline") as string | null)?.trim() || null;
+  const deadline = (formData.get("deadline") as string | null)?.trim() || null; // 提出日
   const title = (formData.get("title") as string | null)?.trim();
-  const status = (formData.get("status") as string | null) ?? "draft";
   const content_md = (formData.get("content_md") as string | null) ?? "";
   const tagsRaw = (formData.get("tags") as string | null) ?? "";
   const questions = parseQuestions(formData.get("questions_json") as string | null);
+  const intent = (formData.get("intent") as string | null) ?? "save";
+  const nextStatus = intent === "submit" ? "submitted" : "draft";
 
   const tags = tagsRaw
     .split(",")
@@ -60,6 +61,11 @@ export async function createEs(formData: FormData) {
     .filter(Boolean);
 
   if (!title) throw new Error("タイトルは必須です");
+  if (nextStatus === "submitted") {
+    if (!company_name) throw new Error("提出には企業名が必要です");
+    if (!selection_status) throw new Error("提出には職種/募集枠が必要です");
+    if (!deadline) throw new Error("提出日を入力してください");
+  }
 
   const combinedContent = combineContent(questions, content_md);
 
@@ -71,35 +77,14 @@ export async function createEs(formData: FormData) {
     memo,
     deadline,
     title,
-    status,
+    status: nextStatus,
     content_md: combinedContent,
     questions,
     tags: tags.length ? tags : null,
   };
 
-  try {
-    const { error } = await supabase.from("es_entries").insert(payload);
-    if (error) throw error;
-  } catch (err) {
-    const msg = (err as { message?: string }).message ?? "";
-    if (msg.includes("questions") || msg.includes("deadline")) {
-      const { error: retryError } = await supabase.from("es_entries").insert({
-        user_id: userData.user.id,
-        company_name,
-        selection_status,
-        company_url,
-        memo,
-        deadline,
-        title,
-        status,
-        content_md: combinedContent,
-        tags: tags.length ? tags : null,
-      });
-      if (retryError) throw retryError;
-    } else {
-      throw err;
-    }
-  }
+  const { error } = await supabase.from("es_entries").insert(payload);
+  if (error) throw error;
 
   revalidatePath("/es");
   redirect("/es");
@@ -111,16 +96,17 @@ export async function updateEs(id: string, formData: FormData) {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) throw new Error("Not authenticated");
 
-  const company_name = (formData.get("company_name") as string | null)?.trim() || null;
-  const selection_status = (formData.get("selection_status") as string | null)?.trim() || null;
+  const company_name = (formData.get("company_name") as string | null)?.trim() || null; // 職種/募集枠
+  const selection_status = (formData.get("selection_status") as string | null)?.trim() || null; // 職種/募集枠
   const company_url = (formData.get("company_url") as string | null)?.trim() || null;
   const memo = (formData.get("memo") as string | null)?.trim() || null;
-  const deadline = (formData.get("deadline") as string | null)?.trim() || null;
+  const deadline = (formData.get("deadline") as string | null)?.trim() || null; // 提出日
   const title = (formData.get("title") as string | null)?.trim();
-  const status = (formData.get("status") as string | null) ?? "draft";
   const content_md = (formData.get("content_md") as string | null) ?? "";
   const tagsRaw = (formData.get("tags") as string | null) ?? "";
   const questions = parseQuestions(formData.get("questions_json") as string | null);
+  const intent = (formData.get("intent") as string | null) ?? "save";
+  const nextStatus = intent === "submit" ? "submitted" : "draft";
 
   const tags = tagsRaw
     .split(",")
@@ -128,50 +114,31 @@ export async function updateEs(id: string, formData: FormData) {
     .filter(Boolean);
 
   if (!title) throw new Error("タイトルは必須です");
+  if (nextStatus === "submitted") {
+    if (!company_name) throw new Error("提出には企業名が必要です");
+    if (!selection_status) throw new Error("提出には職種/募集枠が必要です");
+    if (!deadline) throw new Error("提出日を入力してください");
+  }
 
   const combinedContent = combineContent(questions, content_md);
 
-  try {
-    const { error } = await supabase
-      .from("es_entries")
-      .update({
-        company_name,
-        selection_status,
-        company_url,
-        memo,
-        deadline,
-        title,
-        status,
-        content_md: combinedContent,
-        tags: tags.length ? tags : null,
-        questions,
-      })
-      .eq("id", id)
-      .eq("user_id", userData.user.id);
-    if (error) throw error;
-  } catch (err) {
-    const msg = (err as { message?: string }).message ?? "";
-    if (msg.includes("questions") || msg.includes("deadline")) {
-      const { error: retryError } = await supabase
-        .from("es_entries")
-        .update({
-          company_name,
-          selection_status,
-          company_url,
-          memo,
-          deadline,
-          title,
-          status,
-          content_md: combinedContent,
-          tags: tags.length ? tags : null,
-        })
-        .eq("id", id)
-        .eq("user_id", userData.user.id);
-      if (retryError) throw retryError;
-    } else {
-      throw err;
-    }
-  }
+  const { error } = await supabase
+    .from("es_entries")
+    .update({
+      company_name,
+      selection_status,
+      company_url,
+      memo,
+      deadline,
+      title,
+      status: nextStatus,
+      content_md: combinedContent,
+      tags: tags.length ? tags : null,
+      questions,
+    })
+    .eq("id", id)
+    .eq("user_id", userData.user.id);
+  if (error) throw error;
 
   revalidatePath("/es");
   revalidatePath(`/es/${id}`);

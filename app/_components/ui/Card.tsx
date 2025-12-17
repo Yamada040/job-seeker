@@ -18,16 +18,16 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
           
           // Variant styles
           {
-            "border-[var(--border-light)] shadow-[var(--shadow-subtle)]": variant === "default",
-            "border-[var(--border-light)] shadow-[var(--shadow-medium)]": variant === "elevated",
-            "border-[var(--border-medium)] shadow-none": variant === "outlined",
+            "border-(--border-light) shadow-(--shadow-subtle)": variant === "default",
+            "border-(--border-light) shadow-(--shadow-medium)": variant === "elevated",
+            "border-(--border-medium) shadow-none": variant === "outlined",
           },
           
           // Hover effect
           {
-            "hover:shadow-[var(--shadow-medium)] cursor-pointer": hover && variant === "default",
-            "hover:shadow-[var(--shadow-strong)] cursor-pointer": hover && variant === "elevated",
-            "hover:border-[var(--border-medium)] cursor-pointer": hover && variant === "outlined",
+            "hover:shadow-(--shadow-medium) cursor-pointer": hover && variant === "default",
+            "hover:shadow-(--shadow-strong) cursor-pointer": hover && variant === "elevated",
+            "hover:border-(--border-medium) cursor-pointer": hover && variant === "outlined",
           },
           
           // Padding styles
@@ -63,7 +63,7 @@ export const CardTitle = forwardRef<HTMLParagraphElement, React.HTMLAttributes<H
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={clsx("font-medium leading-none tracking-tight text-[var(--foreground)]", className)}
+      className={clsx("font-medium leading-none tracking-tight text-foreground", className)}
       {...props}
     />
   )
@@ -74,7 +74,7 @@ export const CardDescription = forwardRef<HTMLParagraphElement, React.HTMLAttrib
   ({ className, ...props }, ref) => (
     <p
       ref={ref}
-      className={clsx("text-sm text-[var(--foreground-secondary)]", className)}
+      className={clsx("text-sm text-(--foreground-secondary)", className)}
       {...props}
     />
   )

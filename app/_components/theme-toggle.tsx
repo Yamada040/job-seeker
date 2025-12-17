@@ -1,24 +1,22 @@
-"use client";
+﻿"use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useAppTheme } from "@/app/theme-provider";
 
 export function ThemeToggle() {
   const { theme, resolvedTheme, setTheme } = useAppTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
 
   const isDark = (theme === "system" ? resolvedTheme : theme) === "dark";
-
+  const label = useMemo(() => (isDark ? "ダーク" : "ライト"), [isDark]);
   const toggle = () => setTheme(isDark ? "light" : "dark");
 
   return (
     <button
       type="button"
       onClick={toggle}
-      aria-label="テーマ切替"
+      aria-label="テーマ切り替え"
       className={clsx(
         "flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold transition",
         isDark
@@ -27,7 +25,7 @@ export function ThemeToggle() {
       )}
     >
       {isDark ? <MoonIcon className="h-4 w-4" /> : <SunIcon className="h-4 w-4" />}
-      <span>{mounted ? (isDark ? "ダーク" : "ライト") : "テーマ"}</span>
+      <span>{label}</span>
     </button>
   );
 }

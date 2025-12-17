@@ -7,7 +7,7 @@ import { AiPanel } from "@/app/_components/ai-panel";
 type Props = {
   content: string;
   cacheKey?: string;
-  initialSummary?: any;
+  initialSummary?: unknown;
   saveUrl?: string;
   saveId?: string;
   defaultCompanyName?: string | null;
