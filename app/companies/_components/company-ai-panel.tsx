@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { AiPanel } from "@/app/_components/ai-panel";
@@ -26,9 +26,7 @@ export function CompanyAiPanel({
   saveUrl,
   saveId,
 }: Props) {
-  const [presetKey, setPresetKey] = useState<string | undefined>(undefined);
   const [presetText, setPresetText] = useState<string>("");
-  const [saved, setSaved] = useState(false);
 
   const aiInput = useMemo(() => {
     const lines = [
@@ -50,13 +48,11 @@ export function CompanyAiPanel({
       kind="company_analysis"
       defaultInput={aiInput}
       presetText={presetText}
-      presetKey={presetKey}
       cacheKey={cacheKey}
       initialSummary={initialSummary}
       saveUrl={saveUrl}
       saveId={saveId}
-      onSaved={() => setSaved(true)}
-      title="AI企業分析"
+      title="AI企業要約"
       hint="企業概要・強み弱み・社風・就活への示唆を要約します。保存後は再実行できません。"
       showOneShotNotice
     />

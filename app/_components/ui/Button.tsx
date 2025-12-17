@@ -4,15 +4,12 @@ import { clsx } from "clsx";
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "primary" | "ghost" | "destructive";
   size?: "sm" | "md" | "lg";
-  asChild?: boolean;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "default", size = "md", asChild = false, ...props }, ref) => {
-    const Comp = asChild ? "div" : "button";
-    
+  ({ className, variant = "default", size = "md", ...props }, ref) => {
     return (
-      <Comp
+      <button
         className={clsx(
           // Base styles
           "inline-flex items-center justify-center gap-2 rounded-sm font-medium transition-all duration-100",

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeftIcon, ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 
-import { updateCompany, deleteCompany } from "../actions";
+import { updateCompany } from "../actions";
 import { CompanyAiPanel } from "../_components/company-ai-panel";
 import { AppLayout } from "@/app/_components/layout";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
@@ -41,7 +41,6 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
   );
 
   const updateCompanyAction = updateCompany.bind(null, id);
-  const deleteCompanyAction = deleteCompany.bind(null, id);
 
   return (
     <AppLayout

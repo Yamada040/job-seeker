@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
@@ -28,29 +28,25 @@ function applyTheme(resolved: "light" | "dark") {
 }
 
 export function AppThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("system");
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(getSystemTheme());
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window === "undefined") return "system";
+    const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
+    return stored ?? "dark";
+  });
+  const [systemTheme, setSystemTheme] = useState<"light" | "dark">(getSystemTheme());
 
-  // 初期読み込み（localStorage → system fallback）
-  useEffect(() => {
-    const stored = typeof window !== "undefined" ? (localStorage.getItem(STORAGE_KEY) as Theme | null) : null;
-    // 夜間利用を優先し、未保存時はダークを初期値にする
-    const initial = stored ?? "dark";
-    const resolved = initial === "system" ? getSystemTheme() : initial;
-    setThemeState(initial);
-    setResolvedTheme(resolved);
-    applyTheme(resolved);
-  }, []);
+  const resolvedTheme: "light" | "dark" = theme === "system" ? systemTheme : theme;
 
-  // system変更を拾う
   useEffect(() => {
+    applyTheme(resolvedTheme);
+  }, [resolvedTheme]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
     if (theme !== "system") return;
     const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const handler = () => {
-      const next = media.matches ? "dark" : "light";
-      setResolvedTheme(next);
-      applyTheme(next);
-    };
+    const handler = () => setSystemTheme(media.matches ? "dark" : "light");
+    handler();
     media.addEventListener("change", handler);
     return () => media.removeEventListener("change", handler);
   }, [theme]);
@@ -58,7 +54,7 @@ export function AppThemeProvider({ children }: { children: React.ReactNode }) {
   const setTheme = (next: Theme) => {
     const resolved = next === "system" ? getSystemTheme() : next;
     setThemeState(next);
-    setResolvedTheme(resolved);
+    setSystemTheme(resolved);
     if (typeof window !== "undefined") {
       localStorage.setItem(STORAGE_KEY, next);
     }

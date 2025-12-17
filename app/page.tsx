@@ -157,7 +157,7 @@ export default function Home() {
         <section className="grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
           <div className="rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-900">Today's Focus</h2>
+              <h2 className="text-lg font-semibold text-slate-900">Today&apos;s Focus</h2>
               <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs text-amber-700 shadow">{focusItems.length} 件</span>
             </div>
             <ul className="mt-4 grid gap-3 md:grid-cols-2">
