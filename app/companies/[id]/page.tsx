@@ -1,8 +1,8 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeftIcon, ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, ArrowUturnLeftIcon, HomeIcon, TrashIcon } from "@heroicons/react/24/outline";
 
-import { updateCompany } from "../actions";
+import { updateCompany, deleteCompany } from "../actions";
 import { CompanyAiPanel } from "../_components/company-ai-panel";
 import { AppLayout } from "@/app/_components/layout";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
@@ -41,6 +41,7 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
   );
 
   const updateCompanyAction = updateCompany.bind(null, id);
+  const deleteCompanyAction = deleteCompany.bind(null, id);
 
   return (
     <AppLayout
@@ -148,14 +149,14 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
             お気に入りに追加
           </label>
 
-            <div className="flex flex-wrap gap-3">
-              <button type="submit" className="mvp-button mvp-button-primary">
-                保存する
-              </button>
-              <Link href="/es" className="mvp-button mvp-button-secondary">
-                キャンセル
-              </Link>
-            </div>
+          <div className="flex flex-wrap gap-3">
+            <button type="submit" className="mvp-button mvp-button-primary">
+              保存する
+            </button>
+            <Link href="/companies" className="mvp-button mvp-button-secondary">
+              キャンセル
+            </Link>
+          </div>
         </form>
       </div>
 
@@ -172,6 +173,13 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
           saveUrl="/api/ai/company"
         />
       </div>
+
+      <form action={deleteCompanyAction} className="flex justify-end">
+        <button type="submit" className="mvp-button mvp-button-secondary text-rose-600">
+          <TrashIcon className="h-4 w-4" />
+          削除する
+        </button>
+      </form>
     </AppLayout>
   );
 }
