@@ -32,87 +32,13 @@ const todayTasks = [
 ];
 
 const kpis = [
-  { title: "ES", value: "下書き3 / 提出2", icon: "📝" },
+  { title: "ES", value: "下書き3 / 提出2", icon: "✏️" },
   { title: "企業分析", value: "今週: 4件", icon: "🏢" },
-  { title: "選考状況", value: "面接 2 / 通過 1", icon: "🎯" },
-  { title: "タスク", value: "残り 3 件", icon: "📑" },
+  { title: "選考状況", value: "面接 2 / 通過 1", icon: "✅" },
+  { title: "タスク", value: "残り 3 件", icon: "📋" },
 ];
 
-const fallbackEs: EsRow[] = [
-  {
-    id: "fallback-1",
-    user_id: null,
-    title: "SaaS PM インターン ES",
-    content_md: "",
-    questions: null,
-    status: "draft",
-    tags: ["SaaS"],
-    score: null,
-    ai_summary: null,
-    company_name: "Alpha SaaS",
-    company_url: null,
-    selection_status: "書類提出",
-    memo: null,
-    deadline: "2025-01-20",
-    created_at: null,
-    updated_at: null,
-  },
-  {
-    id: "fallback-2",
-    user_id: null,
-    title: "マーケ職向け ES",
-    content_md: "",
-    questions: null,
-    status: "submitted",
-    tags: ["Marketing"],
-    score: null,
-    ai_summary: null,
-    company_name: "Sky Finance",
-    company_url: null,
-    selection_status: "面接",
-    memo: null,
-    deadline: "2025-01-10",
-    created_at: null,
-    updated_at: null,
-  },
-];
-
-const fallbackCompanies: CompanyRow[] = [
-  {
-    id: "fallback-c1",
-    user_id: null,
-    name: "Alpha SaaS",
-    url: "alphasaas.jp",
-    memo: null,
-    stage: "Screening",
-    preference: 3,
-    favorite: false,
-    ai_summary: null,
-    created_at: null,
-    updated_at: null,
-    industry: null,
-    mypage_id: null,
-    mypage_url: null,
-  },
-  {
-    id: "fallback-c2",
-    user_id: null,
-    name: "Sky Finance",
-    url: "skyfin.co.jp",
-    memo: null,
-    stage: "Document passed",
-    preference: 4,
-    favorite: false,
-    ai_summary: null,
-    created_at: null,
-    updated_at: null,
-    industry: null,
-    mypage_id: null,
-    mypage_url: null,
-  },
-];
-
-const FALLBACK_XP = 150;
+const FALLBACK_XP = 0;
 const XP_NEXT_LEVEL = 180;
 
 async function getDashboardData() {
@@ -149,8 +75,8 @@ async function getDashboardData() {
       .order("date", { ascending: true }),
   ]);
 
-  const esEntries = esRes.data ?? fallbackEs;
-  const companies = companyRes.data ?? fallbackCompanies;
+  const esEntries = (esRes.data as EsRow[] | null) ?? [];
+  const companies = (companyRes.data as CompanyRow[] | null) ?? [];
   const xp = ((xpRes.data as XpRow[] | null) ?? []).reduce((sum, row) => sum + (row.xp || 0), 0) || FALLBACK_XP;
 
   return {
@@ -174,21 +100,32 @@ export default async function DashboardPage() {
       id: evt.id,
       date: evt.date ?? "",
       title: evt.title ?? "予定",
-      company: evt.company,
+      company: evt.company ?? null,
       type: (evt.type as CalendarEvent["type"]) ?? "other",
-      time: evt.time,
+      time: evt.time ?? null,
     })),
-    ...((data.esEntries.length ? data.esEntries : fallbackEs)
+    ...(data.esEntries
       .filter((es) => !!es.deadline)
       .map((es) => ({
         id: `es-${es.id}`,
         date: es.deadline as string,
-        title: es.title || "ES",
+        title: es.title || "ES締切",
         company: es.company_name,
         type: "es" as const,
         time: null,
       }))),
   ];
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const pendingEs = [...data.esEntries]
+    .filter((es) => es.status !== "submitted" && es.deadline && new Date(es.deadline) >= today)
+    .sort((a, b) => {
+      if (!a.deadline && !b.deadline) return 0;
+      if (!a.deadline) return 1;
+      if (!b.deadline) return -1;
+      return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+    });
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
@@ -211,14 +148,12 @@ export default async function DashboardPage() {
       <section className="rounded-3xl border border-white/70 bg-white/80 p-8 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
         <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
           <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-600">
-              Dashboard
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-600">Dashboard</p>
             <h1 className="text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl">
               AIとゲーミフィケーションで就活を前向きに
             </h1>
             <p className="max-w-2xl text-sm leading-7 text-slate-700">
-              ESドラフト・企業管理・AIフィードバックを1か所に集約し、XPで進捗を可視化。毎週のモチベーション維持を支援します。
+              ESドラフト・企業管理・AIフィードバックをまとめて可視化。XPで進捗を確認しながら、毎週のモチベーション維持を支援します。
             </p>
           </div>
           <div className="w-full rounded-2xl border border-slate-200 bg-white/90 p-5 text-sm shadow-soft backdrop-blur">
@@ -239,9 +174,7 @@ export default async function DashboardPage() {
               <div className="flex-1">
                 <p className="text-xs text-slate-600">レベル進捗</p>
                 <p className="text-sm font-semibold text-slate-900">Lv.3 / {data.xp} XP</p>
-                <p className="text-xs text-amber-700">
-                  次のレベルまで {Math.max(XP_NEXT_LEVEL - data.xp, 0)} XP
-                </p>
+                <p className="text-xs text-amber-700">次のレベルまで {Math.max(XP_NEXT_LEVEL - data.xp, 0)} XP</p>
               </div>
             </div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
@@ -274,7 +207,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-[1.9fr_1fr]">
-        <div className="rounded-2xl border border-white/70 bg-white/90 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80 min-h-[720px]">
+        <div className="min-h-[720px] rounded-2xl border border-white/70 bg-white/90 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-slate-900">締切カレンダー</h2>
             <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs text-emerald-700">
@@ -316,26 +249,25 @@ export default async function DashboardPage() {
               </Link>
             </div>
             <div className="mt-4 space-y-3">
-              {(data.esEntries.length ? data.esEntries : fallbackEs)
-                .slice(0, 2)
-                .map((es) => (
+              {pendingEs.length === 0 ? (
+                <p className="text-xs text-slate-500">未来の締切を持つESがありません。</p>
+              ) : (
+                pendingEs.slice(0, 2).map((es) => (
                   <Link
                     key={es.id}
                     href={`/es/${es.id}`}
                     className="block rounded-xl border border-slate-200 bg-white px-4 py-3 shadow transition-all hover:-translate-y-1 hover:shadow-md"
                   >
-                    <p className="text-xs font-semibold text-slate-600">
-                      {es.company_name || "企業名未設定"}
-                    </p>
+                    <p className="text-xs font-semibold text-slate-600">{es.company_name || "企業名未設定"}</p>
                     <p className="text-sm font-semibold text-slate-900">{es.title}</p>
                     <div className="mt-2 flex items-center justify-between text-[11px] text-slate-700">
-                      <span className="rounded-full bg-slate-100 px-3 py-1 capitalize">{es.status}</span>
                       <span className="text-slate-500">
-                        締切: {es.deadline ? new Date(es.deadline).toLocaleDateString() : "-"}
+                        締切 {es.deadline ? new Date(es.deadline).toLocaleDateString() : "-"}
                       </span>
                     </div>
                   </Link>
-                ))}
+                ))
+              )}
             </div>
           </article>
 
@@ -350,9 +282,10 @@ export default async function DashboardPage() {
               </Link>
             </div>
             <div className="mt-4 space-y-3">
-              {(data.companies.length ? data.companies : fallbackCompanies)
-                .slice(0, 2)
-                .map((company) => (
+              {data.companies.length === 0 ? (
+                <p className="text-xs text-slate-500">企業カードがありません。</p>
+              ) : (
+                data.companies.slice(0, 2).map((company) => (
                   <Link
                     key={company.id}
                     href={`/companies/${company.id}`}
@@ -368,7 +301,8 @@ export default async function DashboardPage() {
                       </span>
                     </div>
                   </Link>
-                ))}
+                ))
+              )}
             </div>
           </article>
         </div>

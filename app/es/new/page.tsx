@@ -95,7 +95,7 @@ export default async function NewEsPage() {
               />
             </label>
             <label className="block space-y-1 text-xs text-slate-600">
-              提出日（任意）
+              締切日（任意）
               <input
                 type="date"
                 name="deadline"

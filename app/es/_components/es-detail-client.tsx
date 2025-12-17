@@ -87,7 +87,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
                   />
                 </label>
                 <label className="block space-y-1 text-xs text-slate-600">
-                  提出日
+                  締切日
                   <input
                     name="deadline"
                     type="date"
@@ -186,7 +186,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
                   <p className="rounded-lg border border-slate-200 bg-white px-3 py-2">{entry.selection_status || "-"}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-600">提出日</p>
+                  <p className="text-xs text-slate-600">締切日</p>
                   <p className="rounded-lg border border-slate-200 bg-white px-3 py-2">{entry.deadline || "-"}</p>
                 </div>
               </div>
