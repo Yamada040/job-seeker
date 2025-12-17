@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 
@@ -22,6 +22,11 @@ export function QuestionsEditor({ initialQuestions }: Props) {
   };
 
   const handleAdd = () => setQuestions((prev) => [...prev, createQuestion()]);
+  const handleRemove = (id: string) =>
+    setQuestions((prev) => {
+      const next = prev.filter((q) => q.id !== id);
+      return next.length ? next : [createQuestion()];
+    });
 
   const serialized = useMemo(() => JSON.stringify(questions), [questions]);
 
@@ -45,11 +50,11 @@ export function QuestionsEditor({ initialQuestions }: Props) {
                 value={q.prompt}
                 onChange={(e) => handleChange(q.id, "prompt", e.target.value)}
                 className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
-                placeholder="例: 学生時代に力を入れたこと"
+                placeholder="例） 学生時代に力を入れたこと"
               />
             </label>
             <label className="mt-2 block space-y-1 text-xs text-slate-600">
-              回答 (Markdown可)
+              回答（Markdown可）
               <textarea
                 value={q.answer_md}
                 onChange={(e) => handleChange(q.id, "answer_md", e.target.value)}
@@ -58,6 +63,15 @@ export function QuestionsEditor({ initialQuestions }: Props) {
                 placeholder="回答を入力"
               />
             </label>
+            <div className="mt-3 flex justify-end">
+              <button
+                type="button"
+                onClick={() => handleRemove(q.id)}
+                className="rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-600 transition hover:bg-slate-50"
+              >
+                削除
+              </button>
+            </div>
           </div>
         ))}
       </div>

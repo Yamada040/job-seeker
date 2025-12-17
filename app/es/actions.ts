@@ -19,7 +19,7 @@ function parseQuestions(questionsJson: string | null): Question[] {
         prompt: typeof q?.prompt === "string" ? q.prompt : "",
         answer_md: typeof q?.answer_md === "string" ? q.answer_md : "",
       }))
-      .filter((q) => q.prompt || q.answer_md);
+      .filter((q) => q.prompt.trim() || q.answer_md.trim());
   } catch {
     return [];
   }
@@ -77,29 +77,8 @@ export async function createEs(formData: FormData) {
     tags: tags.length ? tags : null,
   };
 
-  try {
-    const { error } = await supabase.from("es_entries").insert(payload);
-    if (error) throw error;
-  } catch (err) {
-    const msg = (err as { message?: string }).message ?? "";
-    if (msg.includes("questions") || msg.includes("deadline")) {
-      const { error: retryError } = await supabase.from("es_entries").insert({
-        user_id: userData.user.id,
-        company_name,
-        selection_status,
-        company_url,
-        memo,
-        deadline,
-        title,
-        status,
-        content_md: combinedContent,
-        tags: tags.length ? tags : null,
-      });
-      if (retryError) throw retryError;
-    } else {
-      throw err;
-    }
-  }
+  const { error } = await supabase.from("es_entries").insert(payload);
+  if (error) throw error;
 
   revalidatePath("/es");
   redirect("/es");
@@ -131,47 +110,23 @@ export async function updateEs(id: string, formData: FormData) {
 
   const combinedContent = combineContent(questions, content_md);
 
-  try {
-    const { error } = await supabase
-      .from("es_entries")
-      .update({
-        company_name,
-        selection_status,
-        company_url,
-        memo,
-        deadline,
-        title,
-        status,
-        content_md: combinedContent,
-        tags: tags.length ? tags : null,
-        questions,
-      })
-      .eq("id", id)
-      .eq("user_id", userData.user.id);
-    if (error) throw error;
-  } catch (err) {
-    const msg = (err as { message?: string }).message ?? "";
-    if (msg.includes("questions") || msg.includes("deadline")) {
-      const { error: retryError } = await supabase
-        .from("es_entries")
-        .update({
-          company_name,
-          selection_status,
-          company_url,
-          memo,
-          deadline,
-          title,
-          status,
-          content_md: combinedContent,
-          tags: tags.length ? tags : null,
-        })
-        .eq("id", id)
-        .eq("user_id", userData.user.id);
-      if (retryError) throw retryError;
-    } else {
-      throw err;
-    }
-  }
+  const { error } = await supabase
+    .from("es_entries")
+    .update({
+      company_name,
+      selection_status,
+      company_url,
+      memo,
+      deadline,
+      title,
+      status,
+      content_md: combinedContent,
+      tags: tags.length ? tags : null,
+      questions,
+    })
+    .eq("id", id)
+    .eq("user_id", userData.user.id);
+  if (error) throw error;
 
   revalidatePath("/es");
   revalidatePath(`/es/${id}`);
