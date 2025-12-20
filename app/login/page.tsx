@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
+import { ROUTES } from "@/lib/constants/routes";
 import { LoginClient } from "./login-client";
 
 export default async function LoginPage() {
@@ -11,7 +12,7 @@ export default async function LoginPage() {
   }
   const { data } = await supabase.auth.getUser();
   if (data.user) {
-    return redirect("/dashboard");
+    return redirect(ROUTES.DASHBOARD);
   }
 
   return (
@@ -26,7 +27,7 @@ export default async function LoginPage() {
             </span>
             就活Copilot
           </div>
-          <Link href="/" className="text-sm text-amber-700 hover:underline">
+          <Link href={ROUTES.HOME} className="text-sm text-amber-700 hover:underline">
             ホームへ戻る
           </Link>
         </div>
@@ -45,7 +46,7 @@ export default async function LoginPage() {
               <p className="text-xs text-amber-700">ご利用前に</p>
               <p className="text-sm text-slate-700">サインイン後は、アカウントに紐づくデータが自動で読み込まれます。</p>
             </div>
-            <Link href="/dashboard" className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-800 transition hover:bg-white">
+            <Link href={ROUTES.DASHBOARD} className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-800 transition hover:bg-white">
               ダッシュボードを見る
             </Link>
           </div>

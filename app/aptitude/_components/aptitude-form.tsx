@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 
 import { AiPanel } from "@/app/_components/ai-panel";
+import { ROUTES } from "@/lib/constants/routes";
 
 type Answers = {
   interests: string[];
@@ -174,7 +175,7 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
             <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">適性チェック</h2>
             <p className="text-sm text-slate-600 dark:text-slate-300">興味・強み・価値観を整理してAI診断へ送信</p>
           </div>
-          <Link href="/companies" className="mvp-button mvp-button-secondary">
+          <Link href={ROUTES.COMPANIES} className="mvp-button mvp-button-secondary">
             企業一覧へ
           </Link>
         </div>

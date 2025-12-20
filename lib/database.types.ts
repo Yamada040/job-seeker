@@ -16,6 +16,8 @@ export interface Database {
           university: string | null;
           faculty: string | null;
           avatar_id: string | null;
+          target_industry: string | null;
+          career_axis: string | null;
           created_at: string | null;
           updated_at: string | null;
         };
@@ -25,6 +27,8 @@ export interface Database {
           university?: string | null;
           faculty?: string | null;
           avatar_id?: string | null;
+          target_industry?: string | null;
+          career_axis?: string | null;
           created_at?: string | null;
           updated_at?: string | null;
         };

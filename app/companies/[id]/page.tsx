@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { ArrowLeftIcon, ArrowUturnLeftIcon, HomeIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 import { updateCompany, deleteCompany } from "../actions";
+import { ROUTES } from "@/lib/constants/routes";
 import { CompanyAiPanel } from "../_components/company-ai-panel";
 import { AppLayout } from "@/app/_components/layout";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
@@ -10,9 +11,9 @@ import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 export default async function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect("/login");
+  if (!supabase) return redirect(ROUTES.LOGIN);
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect("/login");
+  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const { data, error } = await supabase
     .from("companies")
@@ -25,15 +26,15 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href="/" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
         <HomeIcon className="h-4 w-4" />
         MVPホーム
       </Link>
-      <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href="/companies" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.COMPANIES} className="mvp-button mvp-button-secondary">
         <ArrowLeftIcon className="h-4 w-4" />
         一覧へ戻る
       </Link>
@@ -153,7 +154,7 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
             <button type="submit" className="mvp-button mvp-button-primary">
               保存する
             </button>
-            <Link href="/companies" className="mvp-button mvp-button-secondary">
+            <Link href={ROUTES.COMPANIES} className="mvp-button mvp-button-secondary">
               キャンセル
             </Link>
           </div>

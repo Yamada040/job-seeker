@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
 
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
+import { ROUTES } from "@/lib/constants/routes";
 import { AppLayout } from "@/app/_components/layout";
 import { deleteEs, updateEs } from "../actions";
 import { EsDetailClient } from "../_components/es-detail-client";
@@ -34,7 +35,7 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
   const { data: userData } = await supabase.auth.getUser();
   const userId = userData?.user?.id ?? null;
 
-  if (!userId) return redirect("/login");
+  if (!userId) return redirect(ROUTES.LOGIN);
 
   const { data, error } = await supabase
     .from("es_entries")
@@ -44,7 +45,7 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
     .maybeSingle();
 
   if (error || !data) {
-    return redirect("/es");
+    return redirect(ROUTES.ES);
   }
 
   const questions = parseQuestions(data.questions);
@@ -65,15 +66,15 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
       headerDescription="提出済みはプレビュー、編集ボタンで編集モードに切り替え"
       headerActions={
         <div className="flex flex-wrap gap-3">
-          <Link href="/" className="mvp-button mvp-button-secondary">
+          <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
             <HomeIcon className="h-4 w-4" />
             MVPホーム
           </Link>
-          <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+          <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
             <ArrowUturnLeftIcon className="h-4 w-4" />
             ダッシュボードへ
           </Link>
-          <Link href="/es" className="mvp-button mvp-button-secondary">
+          <Link href={ROUTES.ES} className="mvp-button mvp-button-secondary">
             <ArrowLeftIcon className="h-4 w-4" />
             一覧に戻る
           </Link>

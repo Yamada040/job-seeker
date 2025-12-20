@@ -7,6 +7,8 @@ create table if not exists public.profiles (
   university text,
   faculty text,
   avatar_id text,
+  target_industry text,
+  career_axis text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );

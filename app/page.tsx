@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { ArrowRightIcon, SparklesIcon, ShieldCheckIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 
 import { useAppTheme } from "@/app/theme-provider";
+import { ROUTES } from "@/lib/constants/routes";
 
 const heroBadges = [
   { label: "MVPプラン", detail: "すぐ着手可能" },
@@ -66,13 +67,13 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-3 text-sm">
             <Link
-              href="/login"
+              href={ROUTES.LOGIN}
               className="rounded-full border border-white/70 bg-white/80 px-4 py-2 font-semibold text-slate-800 shadow-sm transition hover:bg-white"
             >
               ログイン
             </Link>
             <Link
-              href="/login?mode=signup"
+              href={`${ROUTES.LOGIN}?mode=signup`}
               className="rounded-full bg-linear-to-r from-amber-400 via-orange-400 to-rose-400 px-5 py-2 font-semibold text-slate-900 shadow-lg shadow-amber-300/40 transition hover:translate-y-0.5"
             >
               新規登録
@@ -107,7 +108,7 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link
-                  href="/dashboard"
+                  href={ROUTES.DASHBOARD}
                   className="rounded-full bg-linear-to-r from-amber-400 via-orange-400 to-rose-400 px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-amber-300/40 transition hover:translate-y-0.5"
                 >
                   ダッシュボードを開く
@@ -222,14 +223,14 @@ export default function Home() {
               <li>AIキーを未設定でもスタブで安全に動作</li>
             </ul>
             <div className="mt-4 flex flex-wrap gap-3">
-              <Link href="/dashboard" className="mvp-button mvp-button-primary">
+              <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-primary">
                 ダッシュボードへ
                 <ArrowRightIcon className="h-4 w-4" />
               </Link>
-              <Link href="/es" className="mvp-button mvp-button-secondary">
+              <Link href={ROUTES.ES} className="mvp-button mvp-button-secondary">
                 ESを確認
               </Link>
-              <Link href="/companies" className="mvp-button mvp-button-secondary">
+              <Link href={ROUTES.COMPANIES} className="mvp-button mvp-button-secondary">
                 企業カードを見る
               </Link>
             </div>

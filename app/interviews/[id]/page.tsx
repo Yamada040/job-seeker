@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 
 import { AppLayout } from "@/app/_components/layout";
+import { ROUTES } from "@/lib/constants/routes";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import InterviewForm from "../_components/interview-form";
 import { InterviewQuestionsPayload } from "../types";
@@ -19,9 +20,9 @@ export default async function InterviewDetailPage({ params }: { params: { id: st
   const id = typeof resolvedParams === "object" ? (resolvedParams as { id?: string }).id : undefined;
   if (!id || id === "undefined") return notFound();
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect("/login");
+  if (!supabase) return redirect(ROUTES.LOGIN);
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect("/login");
+  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const { data: log } = await supabase
     .from("interview_logs")
@@ -43,11 +44,11 @@ export default async function InterviewDetailPage({ params }: { params: { id: st
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href="/interviews" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.INTERVIEWS} className="mvp-button mvp-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         面接ログ一覧へ
       </Link>
-      <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
         <HomeIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>

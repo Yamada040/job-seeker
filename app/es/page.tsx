@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { PlusIcon, ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 
 import { Database } from "@/lib/database.types";
+import { ROUTES } from "@/lib/constants/routes";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { AppLayout } from "@/app/_components/layout";
 import { EsListClient } from "./_components/es-list-client";
@@ -11,10 +12,10 @@ type EsRow = Database["public"]["Tables"]["es_entries"]["Row"];
 
 export default async function EsListPage() {
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect("/login");
+  if (!supabase) return redirect(ROUTES.LOGIN);
 
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect("/login");
+  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const { data: esData } = await supabase
     .from("es_entries")
@@ -26,15 +27,15 @@ export default async function EsListPage() {
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href="/" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
         <HomeIcon className="h-4 w-4" />
         MVPホーム
       </Link>
-      <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href="/es/new" className="mvp-button mvp-button-primary">
+      <Link href={ROUTES.ES_NEW} className="mvp-button mvp-button-primary">
         <PlusIcon className="h-4 w-4" />
         新規作成
       </Link>
