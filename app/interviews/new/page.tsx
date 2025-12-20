@@ -12,7 +12,12 @@ export default async function InterviewNewPage() {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
-  const { data: companies } = await supabase.from("companies").select("name").eq("user_id", userData.user.id).order("created_at", { ascending: false });
+  const { data: companies } = await supabase
+    .from("companies")
+    .select("name")
+    .eq("user_id", userData.user.id)
+    .order("created_at", { ascending: false });
+
   const companyOptions =
     companies?.filter((c) => c.name).map((c) => ({ value: c.name as string, label: c.name as string })) ?? [];
 
@@ -20,7 +25,7 @@ export default async function InterviewNewPage() {
     <div className="flex flex-wrap gap-3">
       <Link href="/interviews" className="mvp-button mvp-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
-        一覧へ戻る
+        面接ログ一覧へ
       </Link>
       <Link href="/dashboard" className="mvp-button mvp-button-secondary">
         <HomeIcon className="h-4 w-4" />
@@ -30,7 +35,12 @@ export default async function InterviewNewPage() {
   );
 
   return (
-    <AppLayout headerTitle="面接ログを新規作成" headerDescription="質問・回答・自己評価を記録" headerActions={headerActions}>
+    <AppLayout
+      headerTitle="面接終了後のログを追加"
+      headerDescription="面接後の質問・回答・自己評価を雛形に沿って記録し、次回改善に備えます。"
+      headerActions={headerActions}
+      className="space-y-6"
+    >
       <InterviewForm mode="create" companyOptions={companyOptions} />
     </AppLayout>
   );

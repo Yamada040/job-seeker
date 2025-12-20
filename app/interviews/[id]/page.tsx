@@ -1,24 +1,42 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeftIcon, ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
+import { ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 
 import { AppLayout } from "@/app/_components/layout";
-import InterviewForm from "../_components/interview-form";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
+import InterviewForm from "../_components/interview-form";
+import { InterviewQuestionsPayload } from "../types";
 
-export default async function InterviewDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+function parseQuestions(raw: unknown): InterviewQuestionsPayload | null {
+  if (!raw) return null;
+  if (Array.isArray(raw)) return raw as InterviewQuestionsPayload;
+  if (typeof raw === "object") return raw as InterviewQuestionsPayload;
+  return null;
+}
+
+export default async function InterviewDetailPage({ params }: { params: { id: string } | Promise<{ id: string }> }) {
+  const resolvedParams = await Promise.resolve(params);
+  const id = typeof resolvedParams === "object" ? (resolvedParams as { id?: string }).id : undefined;
+  if (!id || id === "undefined") return notFound();
   const supabase = await createSupabaseReadonlyClient();
   if (!supabase) return redirect("/login");
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
-  const [{ data, error }, { data: companies }] = await Promise.all([
-    supabase.from("interview_logs").select("*").eq("id", id).eq("user_id", userData.user.id).maybeSingle(),
-    supabase.from("companies").select("name").eq("user_id", userData.user.id).order("created_at", { ascending: false }),
-  ]);
+  const { data: log } = await supabase
+    .from("interview_logs")
+    .select("*")
+    .eq("id", id)
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
 
-  if (error || !data) return notFound();
+  if (!log) return notFound();
+
+  const { data: companies } = await supabase
+    .from("companies")
+    .select("name")
+    .eq("user_id", userData.user.id)
+    .order("created_at", { ascending: false });
 
   const companyOptions =
     companies?.filter((c) => c.name).map((c) => ({ value: c.name as string, label: c.name as string })) ?? [];
@@ -26,38 +44,35 @@ export default async function InterviewDetailPage({ params }: { params: Promise<
   const headerActions = (
     <div className="flex flex-wrap gap-3">
       <Link href="/interviews" className="mvp-button mvp-button-secondary">
-        <ArrowLeftIcon className="h-4 w-4" />
-        一覧へ戻る
+        <ArrowUturnLeftIcon className="h-4 w-4" />
+        面接ログ一覧へ
       </Link>
       <Link href="/dashboard" className="mvp-button mvp-button-secondary">
-        <ArrowUturnLeftIcon className="h-4 w-4" />
-        ダッシュボードへ
-      </Link>
-      <Link href="/" className="mvp-button mvp-button-secondary">
         <HomeIcon className="h-4 w-4" />
-        MVPホーム
+        ダッシュボードへ
       </Link>
     </div>
   );
 
   return (
     <AppLayout
-      headerTitle="面接ログ編集"
-      headerDescription="記録した質問・回答・自己評価を編集し、AI改善サマリーを保存"
+      headerTitle="面接ログを編集"
+      headerDescription="面接後のログを更新し、次回改善に役立ててください。"
       headerActions={headerActions}
       className="space-y-6"
     >
       <InterviewForm
         mode="update"
-        interviewId={id}
+        interviewId={log.id}
+        initialCompanyName={log.company_name ?? undefined}
         companyOptions={companyOptions}
-        initialCompanyName={data.company_name ?? ""}
-        initialTitle={data.interview_title}
-        initialStage={data.stage}
-        initialDate={data.interview_date}
-        initialSelfReview={data.self_review}
-        initialQuestions={(data.questions as { question: string; answer: string }[] | null) ?? []}
-        initialAiSummary={data.ai_summary}
+        initialStage={log.stage}
+        initialDate={(log.interview_date as string | null) ?? undefined}
+        initialSelfReview={log.self_review}
+        initialQuestions={parseQuestions(log.questions)}
+        initialFormat={log.interview_title}
+        initialAiSummary={log.ai_summary}
+        initialIsTemplate={(log.stage ?? "").toLowerCase() === "template"}
       />
     </AppLayout>
   );
