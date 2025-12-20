@@ -38,9 +38,11 @@ async function getDashboardData() {
       .limit(12),
     supabase
       .from("profiles")
-      .select("full_name,avatar_id,university,faculty")
+      .select("full_name,avatar_id,university,faculty,target_industry,career_axis")
       .eq("id", userId)
-      .maybeSingle<Pick<ProfileRow, "full_name" | "avatar_id" | "university" | "faculty">>(),
+      .maybeSingle<
+        Pick<ProfileRow, "full_name" | "avatar_id" | "university" | "faculty" | "target_industry" | "career_axis">
+      >(),
     supabase
       .from("calendar_events")
       .select("*")
@@ -53,7 +55,9 @@ async function getDashboardData() {
   return {
     esEntries,
     user: userData?.user ?? null,
-    profile: profileRes.data as (Pick<ProfileRow, "full_name" | "avatar_id" | "university" | "faculty"> | null),
+    profile: profileRes.data as
+      | Pick<ProfileRow, "full_name" | "avatar_id" | "university" | "faculty" | "target_industry" | "career_axis">
+      | null,
     calendarEvents: (calendarRes.data as CalendarRow[] | null) ?? [],
   };
 }
@@ -122,12 +126,12 @@ export default async function DashboardPage() {
           <p className="text-sm text-slate-700 dark:text-slate-300">
             志望業界・職種や大切にしたい軸を短く書き留めておくと、日々の行動が目標に結びつきます。
           </p>
-          <div className="flex flex-wrap gap-2 text-sm text-slate-800 dark:text-slate-100">
-            <span className="rounded-full bg-amber-50 px-3 py-1 text-amber-800 dark:bg-amber-900/30 dark:text-amber-100">
-              志望業界: 未設定
+          <div className="grid gap-3 md:grid-cols-2 text-lg font-semibold text-slate-800 dark:text-slate-100">
+            <span className="block rounded-2xl bg-amber-50 px-5 py-3 text-amber-800 shadow-sm ring-1 ring-amber-100 dark:bg-amber-900/30 dark:text-amber-100 dark:ring-amber-500/30">
+              志望業界: {data.profile?.target_industry || "未設定"}
             </span>
-            <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-100">
-              重視する軸: 未設定
+            <span className="block rounded-2xl bg-emerald-50 px-5 py-3 text-emerald-800 shadow-sm ring-1 ring-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-100 dark:ring-emerald-500/30">
+              重視する軸: {data.profile?.career_axis || "未設定"}
             </span>
           </div>
           <Link href={ROUTES.PROFILE} className="mvp-button mvp-button-secondary inline-flex">

@@ -9,7 +9,10 @@ import {
   UserIcon,
   ArrowRightOnRectangleIcon,
   Cog6ToothIcon,
-  SparklesIcon,
+  ChatBubbleLeftRightIcon,
+  AcademicCapIcon,
+  ClipboardDocumentCheckIcon,
+  LightBulbIcon,
 } from "@heroicons/react/24/outline";
 import { clsx } from "clsx";
 
@@ -24,10 +27,10 @@ const navigationItems: NavItem[] = [
   { label: "ダッシュボード", href: "/dashboard", icon: HomeIcon, description: "全体の概要を確認" },
   { label: "ES管理", href: "/es", icon: DocumentTextIcon, description: "エントリーシートを整理" },
   { label: "企業管理", href: "/companies", icon: BuildingOfficeIcon, description: "企業カードと進捗を記録" },
-  { label: "適性チェック", href: "/aptitude", icon: SparklesIcon, description: "業界・職種の向き不向きを診断" },
-  { label: "自己分析", href: "/self-analysis", icon: SparklesIcon, description: "強み・価値観を整理" },
-  { label: "面接ログ", href: "/interviews", icon: DocumentTextIcon, description: "面接の質問・回答を記録" },
-  { label: "Webテスト対策", href: "/webtests", icon: DocumentTextIcon, description: "演習用の問題を管理" },
+  { label: "適性チェック", href: "/aptitude", icon: LightBulbIcon, description: "業界・職種の向き不向きを診断" },
+  { label: "自己分析", href: "/self-analysis", icon: ClipboardDocumentCheckIcon, description: "強み・価値観を整理" },
+  { label: "面接ログ", href: "/interviews", icon: ChatBubbleLeftRightIcon, description: "面接の質問・回答を記録" },
+  { label: "Webテスト対策", href: "/webtests", icon: AcademicCapIcon, description: "演習用の問題を管理" },
   { label: "プロフィール", href: "/profile", icon: UserIcon, description: "ユーザー設定とアバター" },
 ];
 
