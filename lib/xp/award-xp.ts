@@ -21,8 +21,8 @@ type XpAction = keyof typeof XP_CONFIG;
 type Client = Awaited<ReturnType<typeof createSupabaseActionClient>>;
 
 function computeLevel(xp: number) {
-  // Level 1 at 0xp, +1 level per 50xp
-  return Math.max(1, Math.floor(xp / 50) + 1);
+  // Level 1 at 0xp, +1 level per 25xp
+  return Math.max(1, Math.floor(xp / 25) + 1);
 }
 
 function startOfToday() {
