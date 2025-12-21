@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
+import { awardXp } from "@/lib/xp/award-xp";
 
 export async function POST(req: NextRequest) {
   const supabase = await createSupabaseServerActionClient();
@@ -23,6 +25,9 @@ export async function POST(req: NextRequest) {
   if (error || !data?.id) {
     return NextResponse.json({ error: error?.message ?? "failed to insert" }, { status: 500 });
   }
+
+  await awardXp(userData.user.id, "aptitude_complete", { refId: data.id, supabase });
+  revalidatePath("/dashboard");
 
   return NextResponse.json({ id: data.id });
 }

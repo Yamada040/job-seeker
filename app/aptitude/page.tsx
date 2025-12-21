@@ -37,8 +37,6 @@ export default async function AptitudePage() {
 
   return (
     <AppLayout
-      headerTitle="適性チェック"
-      headerDescription="興味・強み・価値観から業界/職種の向き不向きをAIが診断します"
       headerActions={headerActions}
       className="space-y-6"
     >

@@ -84,7 +84,7 @@ export default function SelfAnalysisForm({
     <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr]">
       <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">自己分析 質問リスト</h2>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">質問リスト</h2>
         </div>
         <div className="mt-4 space-y-3">
           <TextArea label="強み・得意なこと" value={answers.strengths} onChange={(v) => handleChange("strengths", v)} />

@@ -19,6 +19,8 @@ export interface Database {
           target_industry: string | null;
           career_axis: string | null;
           goal_state: string | null;
+          xp: number;
+          level: number;
           created_at: string | null;
           updated_at: string | null;
         };
@@ -31,6 +33,8 @@ export interface Database {
           target_industry?: string | null;
           career_axis?: string | null;
           goal_state?: string | null;
+          xp?: number;
+          level?: number;
           created_at?: string | null;
           updated_at?: string | null;
         };
@@ -142,12 +146,16 @@ export interface Database {
           id: string;
           user_id: string | null;
           xp: number;
+          action: string;
+          ref_id: string | null;
           created_at: string | null;
         };
         Insert: {
           id?: string;
           user_id?: string | null;
           xp: number;
+          action?: string;
+          ref_id?: string | null;
           created_at?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["xp_logs"]["Insert"]>;

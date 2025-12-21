@@ -8,13 +8,13 @@ import {
   BuildingOfficeIcon,
   UserIcon,
   ArrowRightOnRectangleIcon,
-  Cog6ToothIcon,
   ChatBubbleLeftRightIcon,
   AcademicCapIcon,
   ClipboardDocumentCheckIcon,
   LightBulbIcon,
 } from "@heroicons/react/24/outline";
 import { clsx } from "clsx";
+import { ThemeToggle } from "../theme-toggle";
 
 interface NavItem {
   label: string;
@@ -35,7 +35,6 @@ const navigationItems: NavItem[] = [
 ];
 
 const bottomItems: NavItem[] = [
-  { label: "設定", href: "/settings", icon: Cog6ToothIcon },
   { label: "ログアウト", href: "/login", icon: ArrowRightOnRectangleIcon },
 ];
 
@@ -92,10 +91,15 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-white/60 p-4 dark:border-gray-800">
-        <div className="space-y-2">
-          {bottomItems.map((item) => (
-            <NavLink key={item.href} item={item} isActive={pathname === item.href} />
-          ))}
+        <div className="space-y-3">
+          <div className="flex justify-center">
+            <ThemeToggle />
+          </div>
+          <div className="space-y-2">
+            {bottomItems.map((item) => (
+              <NavLink key={item.href} item={item} isActive={pathname === item.href} />
+            ))}
+          </div>
         </div>
       </div>
 

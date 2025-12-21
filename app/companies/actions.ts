@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
 import { MAX_TEXT_LEN, tooLong, required } from "@/app/_components/validation";
+import { awardXp } from "@/lib/xp/award-xp";
 
 const checkLen = (value: string | null, label: string) => {
   if (value && value.length > MAX_TEXT_LEN) {
@@ -46,8 +47,11 @@ export async function createCompany(formData: FormData) {
     favorite: formData.get("favorite") === "on",
   };
 
-  const { error } = await supabase.from("companies").insert(payload);
-  if (error) throw error;
+  const { data, error } = await supabase.from("companies").insert(payload).select("id").single();
+  if (error || !data?.id) throw error || new Error("作成に失敗しました");
+
+  await awardXp(userData.user.id, "company_new", { refId: data.id, supabase });
+  revalidatePath("/dashboard");
 
   revalidatePath("/companies");
   redirect("/companies");

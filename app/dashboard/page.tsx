@@ -12,6 +12,7 @@ type EsRow = Database["public"]["Tables"]["es_entries"]["Row"];
 type CalendarRow = Database["public"]["Tables"]["calendar_events"]["Row"];
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 type InterviewRow = Database["public"]["Tables"]["interview_logs"]["Row"];
+type XpLogRow = Database["public"]["Tables"]["xp_logs"]["Row"];
 
 type CalendarEvent = {
   id: string;
@@ -30,7 +31,7 @@ async function getDashboardData() {
   const userId = userData?.user?.id ?? null;
   if (!userId) throw new Error("No user");
 
-  const [esRes, profileRes, calendarRes, interviewsRes] = await Promise.all([
+  const [esRes, profileRes, calendarRes, interviewsRes, xpLogsRes] = await Promise.all([
     supabase
       .from("es_entries")
       .select("*")
@@ -39,12 +40,12 @@ async function getDashboardData() {
       .limit(12),
     supabase
       .from("profiles")
-      .select("full_name,avatar_id,university,faculty,target_industry,career_axis,goal_state")
+      .select("full_name,avatar_id,university,faculty,target_industry,career_axis,goal_state,xp,level")
       .eq("id", userId)
       .maybeSingle<
         Pick<
           ProfileRow,
-          "full_name" | "avatar_id" | "university" | "faculty" | "target_industry" | "career_axis" | "goal_state"
+          "full_name" | "avatar_id" | "university" | "faculty" | "target_industry" | "career_axis" | "goal_state" | "xp" | "level"
         >
       >(),
     supabase
@@ -56,6 +57,12 @@ async function getDashboardData() {
       .from("interview_logs")
       .select("id, company_name, interview_date, self_review, questions")
       .eq("user_id", userId),
+    supabase
+      .from("xp_logs")
+      .select("xp, action, created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(5),
   ]);
 
   const esEntries = (esRes.data as EsRow[] | null) ?? [];
@@ -67,12 +74,17 @@ async function getDashboardData() {
     profile: profileRes.data as
       | Pick<
           ProfileRow,
-          "full_name" | "avatar_id" | "university" | "faculty" | "target_industry" | "career_axis" | "goal_state"
+          "full_name" | "avatar_id" | "university" | "faculty" | "target_industry" | "career_axis" | "goal_state" | "xp" | "level"
         >
       | null,
     calendarEvents: (calendarRes.data as CalendarRow[] | null) ?? [],
     interviewLogs,
+    xpLogs: (xpLogsRes.data as XpLogRow[] | null) ?? [],
   };
+}
+
+function computeLevel(xp: number) {
+  return Math.max(1, Math.floor(xp / 500) + 1);
 }
 
 export default async function DashboardPage() {
@@ -139,8 +151,40 @@ export default async function DashboardPage() {
     ...interviewActions,
   ].slice(0, 2);
 
-  const headerActions = (
-    <div className="flex flex-wrap gap-3">
+  const recentXpLogs = data.xpLogs ?? [];
+  const fallbackXp = recentXpLogs.reduce((sum, log) => sum + (log.xp ?? 0), 0);
+  const xp = data.profile?.xp ?? fallbackXp;
+  const level = data.profile?.level ?? computeLevel(xp);
+  const prevThreshold = Math.max(0, (level - 1) * 50);
+  const nextThreshold = level * 50;
+  const progress = nextThreshold > prevThreshold ? Math.min(1, (xp - prevThreshold) / (nextThreshold - prevThreshold)) : 0;
+
+  const levelDisplay = (
+      <div className="flex min-w-[360px] flex-1 items-center gap-4 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3 text-amber-900 shadow-sm dark:border-amber-500/40 dark:bg-amber-900/30 dark:text-amber-50">
+        <div className="flex items-baseline gap-2">
+          <span className="text-xs font-semibold">Level</span>
+          <span className="text-2xl font-bold">Lv.{level}</span>
+          <span className="text-sm text-amber-700 dark:text-amber-200">XP {xp}</span>
+        </div>
+        <div className="flex flex-1 flex-col gap-1 min-w-[180px]">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-amber-100/80 dark:bg-amber-800/50">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-amber-400 to-rose-400 transition-all"
+              style={{ width: `${Math.round(progress * 100)}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-[11px] text-amber-800/80 dark:text-amber-100/80">
+            <span>次まで {Math.max(0, nextThreshold - xp)} XP</span>
+            <span>
+              {prevThreshold} / {nextThreshold} XP
+            </span>
+          </div>
+        </div>
+      </div>
+  );
+
+  const navigationActions = (
+    <div className="flex flex-wrap items-center gap-3">
       <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
         MVPホーム
       </Link>
@@ -156,7 +200,12 @@ export default async function DashboardPage() {
   );
 
   return (
-    <AppLayout headerActions={headerActions} className="space-y-6">
+    <AppLayout 
+      headerLeftContent={levelDisplay}
+      headerActions={navigationActions} 
+      actionsPlacement="left" 
+      className="space-y-6"
+    >
       {/* 目標エリア */}
       <section className="rounded-3xl border border-white/70 bg-white/90 p-8 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-600">My Goal</p>
@@ -190,6 +239,7 @@ export default async function DashboardPage() {
           </Link>
         </div>
       </section>
+
 
       {/* カレンダー + サイドカラム */}
       <section className="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
@@ -262,6 +312,35 @@ export default async function DashboardPage() {
               {nextActions.length === 0 && (
                 <div className="rounded-xl border border-dashed border-slate-300 bg-white/70 p-3 text-xs text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
                   取り掛かるべきアクションはありません。
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 最近のXP獲得 */}
+          <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/80">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50">最近の獲得</h3>
+              <span className="text-[11px] text-slate-500">最新5件</span>
+            </div>
+            <div className="mt-3 space-y-2">
+              {recentXpLogs.map((log, idx) => (
+                <div
+                  key={`${log.created_at}-${idx}`}
+                  className="rounded-xl border border-slate-200/70 bg-white/90 p-3 text-sm shadow-sm dark:border-slate-700/70 dark:bg-slate-800/80"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-slate-900 dark:text-slate-50">+{log.xp} XP</span>
+                    <span className="text-xs text-slate-500">
+                      {log.created_at ? new Date(log.created_at).toLocaleDateString() : ""}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-300">{log.action || "行動"}</p>
+                </div>
+              ))}
+              {recentXpLogs.length === 0 && (
+                <div className="rounded-xl border border-dashed border-slate-300 bg-white/70 p-3 text-xs text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
+                  まだXPはありません。ES提出や面接ログでXPを獲得できます。
                 </div>
               )}
             </div>

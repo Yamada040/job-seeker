@@ -10,6 +10,8 @@ create table if not exists public.profiles (
   target_industry text,
   career_axis text,
   goal_state text,
+  xp integer default 0 not null,
+  level integer default 1 not null,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -64,7 +66,9 @@ create table if not exists public.companies (
 create table if not exists public.xp_logs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete cascade,
-  xp integer,
+  xp integer default 0 not null,
+  action text default 'action' not null,
+  ref_id uuid,
   created_at timestamptz default now()
 );
 

@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
 import { InterviewQA } from "@/app/interviews/types";
 import { MAX_TEXT_LEN, tooLong, required } from "@/app/_components/validation";
+import { awardXp } from "@/lib/xp/award-xp";
+import { revalidatePath } from "next/cache";
 
 type QuestionsInput =
   | {
@@ -93,5 +95,7 @@ export async function POST(request: Request) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  await awardXp(userData.user.id, "interview_log", { refId: data.id, supabase });
+  revalidatePath("/dashboard");
   return NextResponse.json({ id: data.id });
 }
