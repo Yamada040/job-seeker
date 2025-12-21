@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MAX_TEXT_LEN } from "./validation";
 
 type FieldConfig = {
   name: string;
@@ -9,11 +10,12 @@ type FieldConfig = {
 
 type Props = {
   formId: string;
-  maxLen: number;
+  maxLen?: number;
   fields: ReadonlyArray<FieldConfig>;
 };
 
 export function FormLengthGuard({ formId, maxLen, fields }: Props) {
+  const limit = maxLen ?? MAX_TEXT_LEN;
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -24,11 +26,11 @@ export function FormLengthGuard({ formId, maxLen, fields }: Props) {
       const formData = new FormData(form);
       for (const { name, label } of fields) {
         const value = (formData.get(name) as string | null) ?? null;
-        if (value && value.length > maxLen) {
+        if (value && value.length > limit) {
           e.preventDefault();
-          setMessage(`${label}は${maxLen}文字以内で入力してください`);
+          setMessage(`${label}は${limit}文字以内で入力してください`);
           window.clearTimeout((FormLengthGuard as unknown as { timer?: number }).timer);
-          (FormLengthGuard as unknown as { timer?: number }).timer = window.setTimeout(() => setMessage(null), 3500);
+          (FormLengthGuard as unknown as { timer?: number }).timer = window.setTimeout(() => setMessage(null), 3200);
           return;
         }
       }
@@ -39,7 +41,7 @@ export function FormLengthGuard({ formId, maxLen, fields }: Props) {
     return () => {
       form.removeEventListener("submit", handleSubmit);
     };
-  }, [formId, maxLen, fields]);
+  }, [formId, limit, fields]);
 
   if (!message) return null;
 

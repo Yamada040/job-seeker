@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
 import { InterviewQA } from "@/app/interviews/types";
-import { MAX_TEXT_LEN, tooLong } from "@/app/_components/validation";
+import { MAX_TEXT_LEN, tooLong, required } from "@/app/_components/validation";
 
 type QuestionsInput =
   | {
@@ -63,9 +63,7 @@ export async function PUT(
 
   const body = await request.json().catch(() => null);
   const companyName = (body?.companyName as string | undefined)?.trim();
-  if (!companyName) {
-    return NextResponse.json({ error: "企業名は必須です" }, { status: 400 });
-  }
+  if (!companyName) return NextResponse.json({ error: required("企業名") }, { status: 400 });
 
   const stage = (body?.stage as string | undefined)?.trim() || null;
   const interviewDate = (body?.interviewDate as string | undefined) ?? null;

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
-import { MAX_TEXT_LEN, tooLong } from "@/app/_components/validation";
+import { MAX_TEXT_LEN, tooLong, required } from "@/app/_components/validation";
 
 export async function updateProfile(formData: FormData) {
   const supabase = await createSupabaseServerClient();
@@ -23,7 +23,11 @@ export async function updateProfile(formData: FormData) {
   const checkLen = (value: string | null, label: string) => {
     if (value && value.length > MAX_TEXT_LEN) throw new Error(tooLong(label));
   };
+  const checkRequired = (value: string | null, label: string) => {
+    if (value === null || value === undefined || value === "") throw new Error(required(label));
+  };
 
+  checkRequired(full_name, "氏名");
   checkLen(full_name, "氏名");
   checkLen(university, "大学");
   checkLen(faculty, "学部/学科");

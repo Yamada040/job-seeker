@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
-import { MAX_TEXT_LEN, tooLong } from "@/app/_components/validation";
+import { MAX_TEXT_LEN, tooLong, required } from "@/app/_components/validation";
 
 const checkLen = (value: string | null, label: string) => {
   if (value && value.length > MAX_TEXT_LEN) {
@@ -18,9 +18,7 @@ export async function createCompany(formData: FormData) {
   if (!userData?.user) return redirect("/login");
 
   const name = (formData.get("name") as string | null)?.trim();
-  if (!name) {
-    throw new Error("企業名は必須です");
-  }
+  if (!name) throw new Error(required("企業名"));
 
   const industry = ((formData.get("industry") as string | null) || null)?.trim() || null;
   const url = ((formData.get("url") as string | null) || null)?.trim() || null;
@@ -61,9 +59,7 @@ export async function updateCompany(id: string, formData: FormData) {
   if (!userData?.user) return redirect("/login");
 
   const name = (formData.get("name") as string | null)?.trim();
-  if (!name) {
-    throw new Error("企業名は必須です");
-  }
+  if (!name) throw new Error(required("企業名"));
 
   const industry = ((formData.get("industry") as string | null) || null)?.trim() || null;
   const url = ((formData.get("url") as string | null) || null)?.trim() || null;
