@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
+import { MAX_TEXT_LEN, tooLong } from "@/app/_components/validation";
 
 export async function updateProfile(formData: FormData) {
   const supabase = await createSupabaseServerClient();
@@ -18,6 +19,18 @@ export async function updateProfile(formData: FormData) {
   const target_industry = (formData.get("target_industry") as string | null) ?? null;
   const career_axis = (formData.get("career_axis") as string | null) ?? null;
   const goal_state = (formData.get("goal_state") as string | null) ?? null;
+
+  const checkLen = (value: string | null, label: string) => {
+    if (value && value.length > MAX_TEXT_LEN) throw new Error(tooLong(label));
+  };
+
+  checkLen(full_name, "氏名");
+  checkLen(university, "大学");
+  checkLen(faculty, "学部/学科");
+  checkLen(avatar_id, "アバター");
+  checkLen(target_industry, "志望業界");
+  checkLen(career_axis, "就活の軸");
+  checkLen(goal_state, "就活で達成したい状態");
 
   const { error } = await supabase
     .from("profiles")

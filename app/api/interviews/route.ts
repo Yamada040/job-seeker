@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
 import { InterviewQA } from "@/app/interviews/types";
+import { MAX_TEXT_LEN, tooLong } from "@/app/_components/validation";
 
 type QuestionsInput =
   | {
@@ -11,8 +12,6 @@ type QuestionsInput =
   | InterviewQA[]
   | null
   | undefined;
-
-const MAX_LEN = 100;
 
 function normalizeQuestions(input: QuestionsInput): {
   items: InterviewQA[];
@@ -46,13 +45,6 @@ function normalizeQuestions(input: QuestionsInput): {
   };
 }
 
-function lengthError(value: string | null, label: string) {
-  if (value && value.length > MAX_LEN) {
-    return `${label}は${MAX_LEN}文字以内で入力してください`;
-  }
-  return null;
-}
-
 export async function POST(request: Request) {
   const supabase = await createSupabaseServerActionClient();
   const { data: userData } = await supabase.auth.getUser();
@@ -72,15 +64,10 @@ export async function POST(request: Request) {
   const interviewTitle = (body?.interviewTitle as string | undefined)?.trim() || null;
   const template = Boolean(body?.template);
 
-  const lengthErrors = [
-    lengthError(companyName, "企業名"),
-    lengthError(stage, "面接回次/ステージ"),
-    lengthError(format, "面接形式"),
-    lengthError(interviewTitle, "タイトル"),
-  ].filter(Boolean) as string[];
-  if (lengthErrors.length) {
-    return NextResponse.json({ error: lengthErrors[0] }, { status: 400 });
-  }
+  if (companyName.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("企業名") }, { status: 400 });
+  if (stage && stage.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("面接回次/ステージ") }, { status: 400 });
+  if (format && format.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("面接形式") }, { status: 400 });
+  if (interviewTitle && interviewTitle.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("タイトル") }, { status: 400 });
 
   const normalized = normalizeQuestions(body?.questions as QuestionsInput);
   if (!normalized.items.length) {

@@ -4,6 +4,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
+import { MAX_TEXT_LEN, tooLong } from "@/app/_components/validation";
+
+const checkLen = (value: string | null, label: string) => {
+  if (value && value.length > MAX_TEXT_LEN) {
+    throw new Error(tooLong(label));
+  }
+};
 
 export async function createCompany(formData: FormData) {
   const supabase = await createSupabaseActionClient();
@@ -15,15 +22,28 @@ export async function createCompany(formData: FormData) {
     throw new Error("企業名は必須です");
   }
 
+  const industry = ((formData.get("industry") as string | null) || null)?.trim() || null;
+  const url = ((formData.get("url") as string | null) || null)?.trim() || null;
+  const mypage_id = ((formData.get("mypage_id") as string | null) || null)?.trim() || null;
+  const mypage_url = ((formData.get("mypage_url") as string | null) || null)?.trim() || null;
+  const stage = ((formData.get("stage") as string | null) || null)?.trim() || null;
+
+  checkLen(name, "企業名");
+  checkLen(industry, "業界");
+  checkLen(url, "企業サイトURL");
+  checkLen(mypage_id, "マイページID");
+  checkLen(mypage_url, "マイページURL");
+  checkLen(stage, "選考状況");
+
   const payload = {
     user_id: userData.user.id,
     name,
-    industry: (formData.get("industry") as string | null) || null,
-    url: (formData.get("url") as string | null) || null,
-    mypage_id: (formData.get("mypage_id") as string | null) || null,
-    mypage_url: (formData.get("mypage_url") as string | null) || null,
+    industry,
+    url,
+    mypage_id,
+    mypage_url,
     memo: (formData.get("memo") as string | null) || null,
-    stage: (formData.get("stage") as string | null) || null,
+    stage,
     preference: formData.get("preference") ? Number(formData.get("preference")) : null,
     favorite: formData.get("favorite") === "on",
   };
@@ -45,14 +65,27 @@ export async function updateCompany(id: string, formData: FormData) {
     throw new Error("企業名は必須です");
   }
 
+  const industry = ((formData.get("industry") as string | null) || null)?.trim() || null;
+  const url = ((formData.get("url") as string | null) || null)?.trim() || null;
+  const mypage_id = ((formData.get("mypage_id") as string | null) || null)?.trim() || null;
+  const mypage_url = ((formData.get("mypage_url") as string | null) || null)?.trim() || null;
+  const stage = ((formData.get("stage") as string | null) || null)?.trim() || null;
+
+  checkLen(name, "企業名");
+  checkLen(industry, "業界");
+  checkLen(url, "企業サイトURL");
+  checkLen(mypage_id, "マイページID");
+  checkLen(mypage_url, "マイページURL");
+  checkLen(stage, "選考状況");
+
   const payload = {
     name,
-    industry: (formData.get("industry") as string | null) || null,
-    url: (formData.get("url") as string | null) || null,
-    mypage_id: (formData.get("mypage_id") as string | null) || null,
-    mypage_url: (formData.get("mypage_url") as string | null) || null,
+    industry,
+    url,
+    mypage_id,
+    mypage_url,
     memo: (formData.get("memo") as string | null) || null,
-    stage: (formData.get("stage") as string | null) || null,
+    stage,
     preference: formData.get("preference") ? Number(formData.get("preference")) : null,
     favorite: formData.get("favorite") === "on",
   };

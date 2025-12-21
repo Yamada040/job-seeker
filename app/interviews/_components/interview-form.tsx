@@ -5,6 +5,7 @@ import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 import { AiPanel } from "@/app/_components/ai-panel";
 import { InterviewQA, InterviewQuestionsPayload } from "../types";
+import { MAX_TEXT_LEN, tooLong } from "@/app/_components/validation";
 
 type CompanyOption = { value: string; label: string };
 
@@ -25,7 +26,6 @@ type Props = {
 type Reflection = { improvement: string; unexpected: string };
 
 const emptyQA: InterviewQA = { question: "", answer: "", rating: "average" };
-const MAX_LEN = 100;
 
 function normalizeInitialQuestions(input?: InterviewQuestionsPayload | null): {
   items: InterviewQA[];
@@ -127,8 +127,8 @@ export default function InterviewForm({
   };
 
   const ensureLength = (value: string, label: string) => {
-    if (value && value.length > MAX_LEN) {
-      throw new Error(`${label}は${MAX_LEN}文字以内で入力してください`);
+    if (value && value.length > MAX_TEXT_LEN) {
+      throw new Error(tooLong(label));
     }
   };
 
