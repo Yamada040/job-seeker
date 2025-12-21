@@ -6,6 +6,7 @@ import { AppLayout } from "@/app/_components/layout";
 import { ROUTES } from "@/lib/constants/routes";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { createWebtestQuestion } from "../actions";
+import { FormLengthGuard } from "@/app/_components/form-length-guard";
 
 export default async function WebtestNewPage() {
   const supabase = await createSupabaseReadonlyClient();
@@ -28,7 +29,11 @@ export default async function WebtestNewPage() {
 
   return (
     <AppLayout headerTitle="Webテスト問題を追加" headerDescription="オリジナル問題を登録し、演習に使います" headerActions={headerActions}>
-      <form action={createWebtestQuestion} className="space-y-4 rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-md dark:border-slate-700 dark:bg-slate-900/80">
+      <form
+        id="webtest-form-new"
+        action={createWebtestQuestion}
+        className="space-y-4 rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-md dark:border-slate-700 dark:bg-slate-900/80"
+      >
         <div className="grid gap-4 md:grid-cols-2">
           <Field name="title" label="タイトル" required placeholder="例）表の読み取り（売上推移）" />
           <Field name="category" label="カテゴリ" placeholder="非言語 / 言語 / 英語 など" />
@@ -78,6 +83,18 @@ export default async function WebtestNewPage() {
           </button>
         </div>
       </form>
+      <FormLengthGuard
+        formId="webtest-form-new"
+        maxLen={100}
+        fields={[
+          { name: "title", label: "タイトル" },
+          { name: "category", label: "カテゴリ" },
+          { name: "test_type", label: "テスト形式" },
+          { name: "format", label: "出題形式" },
+          { name: "difficulty", label: "難易度" },
+          { name: "answer", label: "正解" },
+        ]}
+      />
     </AppLayout>
   );
 }

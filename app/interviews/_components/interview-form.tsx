@@ -25,6 +25,7 @@ type Props = {
 type Reflection = { improvement: string; unexpected: string };
 
 const emptyQA: InterviewQA = { question: "", answer: "", rating: "average" };
+const MAX_LEN = 100;
 
 function normalizeInitialQuestions(input?: InterviewQuestionsPayload | null): {
   items: InterviewQA[];
@@ -125,6 +126,12 @@ export default function InterviewForm({
     return companyOptions;
   };
 
+  const ensureLength = (value: string, label: string) => {
+    if (value && value.length > MAX_LEN) {
+      throw new Error(`${label}は${MAX_LEN}文字以内で入力してください`);
+    }
+  };
+
   const buildPayload = () => {
     const trimmedQuestions = questions
       .map((q) => ({
@@ -138,6 +145,9 @@ export default function InterviewForm({
       throw new Error("質問と回答を1件以上入力してください");
     }
     if (!companyName.trim()) throw new Error("企業名は必須です");
+    ensureLength(companyName.trim(), "企業名");
+    ensureLength(format.trim(), "面接形式");
+    ensureLength(stage.trim(), "面接回数/ステージ");
     if (!asTemplate) {
       if (!stage.trim()) throw new Error("面接回数を入力してください（一次/最終など）");
       if (!date) throw new Error("実施日を入力してください");
@@ -194,15 +204,6 @@ export default function InterviewForm({
   return (
     <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr]">
       <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">面接終了後のログを記録</h2>
-            <p className="text-sm text-slate-600 dark:text-slate-300">
-              雛形に沿って質問・回答・自己評価を残し、次の面接改善につなげます。
-            </p>
-          </div>
-        </div>
-
         <div className="mt-4 space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             {companyOptions.length > 0 ? (

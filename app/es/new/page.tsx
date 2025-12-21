@@ -7,6 +7,7 @@ import { ROUTES } from "@/lib/constants/routes";
 import { QuestionsEditor } from "../_components/questions-editor";
 import { AppLayout } from "@/app/_components/layout";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
+import { FormLengthGuard } from "@/app/_components/form-length-guard";
 
 export default async function NewEsPage() {
   const supabase = await createSupabaseReadonlyClient();
@@ -50,7 +51,7 @@ export default async function NewEsPage() {
           <p className="text-sm text-slate-700">企業名や職種、提出日を入れておくと、後の提出管理が明確になります。</p>
         </div>
 
-        <form action={createEs} className="space-y-4 rounded-xl border border-slate-200 bg-white/80 p-4 shadow-inner">
+        <form id="es-form-new" action={createEs} className="space-y-4 rounded-xl border border-slate-200 bg-white/80 p-4 shadow-inner">
           <div className="space-y-2">
             <label className="block text-xs text-slate-600">企業名</label>
             <input
@@ -116,6 +117,17 @@ export default async function NewEsPage() {
             </Link>
           </div>
         </form>
+        <FormLengthGuard
+          formId="es-form-new"
+          maxLen={100}
+          fields={[
+            { name: "company_name", label: "企業名" },
+            { name: "title", label: "タイトル" },
+            { name: "selection_status", label: "職種/募集枠" },
+            { name: "company_url", label: "企業URL" },
+            { name: "memo", label: "メモ" },
+          ]}
+        />
       </div>
     </AppLayout>
   );

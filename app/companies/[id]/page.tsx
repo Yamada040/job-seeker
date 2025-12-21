@@ -7,6 +7,7 @@ import { ROUTES } from "@/lib/constants/routes";
 import { CompanyAiPanel } from "../_components/company-ai-panel";
 import { AppLayout } from "@/app/_components/layout";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
+import { FormLengthGuard } from "@/app/_components/form-length-guard";
 
 export default async function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -52,7 +53,7 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
       className="flex flex-col gap-8"
     >
       <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-        <form action={updateCompanyAction} className="space-y-6">
+        <form id="company-form" action={updateCompanyAction} className="space-y-6">
           <label className="block space-y-2">
             <span className="text-sm font-medium text-slate-700">企業名</span>
             <input
@@ -159,6 +160,18 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
             </Link>
           </div>
         </form>
+        <FormLengthGuard
+          formId="company-form"
+          maxLen={100}
+          fields={[
+            { name: "name", label: "企業名" },
+            { name: "industry", label: "業界" },
+            { name: "url", label: "企業サイトURL" },
+            { name: "mypage_id", label: "マイページID" },
+            { name: "mypage_url", label: "マイページURL" },
+            { name: "stage", label: "選考状況" },
+          ]}
+        />
       </div>
       <form action={deleteCompanyAction} className="flex justify-end">
         <button type="submit" className="mvp-button mvp-button-secondary text-rose-600">

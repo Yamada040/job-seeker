@@ -56,7 +56,7 @@ export function Sidebar() {
       )}
     >
       <item.icon
-        className={clsx("h-5 w-5 flex-shrink-0 transition-colors", {
+        className={clsx("h-5 w-5 shrink-0 transition-colors", {
           "text-amber-600 dark:text-amber-400": isActive,
           "text-slate-500 group-hover:text-slate-800 dark:text-slate-500 dark:group-hover:text-slate-300": !isActive,
         })}

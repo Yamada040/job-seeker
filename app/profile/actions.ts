@@ -17,6 +17,7 @@ export async function updateProfile(formData: FormData) {
   const avatar_id = (formData.get("avatar_id") as string | null) ?? null;
   const target_industry = (formData.get("target_industry") as string | null) ?? null;
   const career_axis = (formData.get("career_axis") as string | null) ?? null;
+  const goal_state = (formData.get("goal_state") as string | null) ?? null;
 
   const { error } = await supabase
     .from("profiles")
@@ -28,6 +29,7 @@ export async function updateProfile(formData: FormData) {
       avatar_id,
       target_industry,
       career_axis,
+      goal_state,
     })
     .eq("id", userData.user.id);
   if (error) throw error;

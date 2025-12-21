@@ -6,6 +6,7 @@ import { createCompany } from "../actions";
 import { ROUTES } from "@/lib/constants/routes";
 import { AppLayout } from "@/app/_components/layout";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
+import { FormLengthGuard } from "@/app/_components/form-length-guard";
 
 export default async function NewCompanyPage() {
   const supabase = await createSupabaseReadonlyClient();
@@ -38,6 +39,7 @@ export default async function NewCompanyPage() {
       className="flex flex-col gap-8"
     >
       <form
+        id="company-form-new"
         action={createCompany}
         className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80"
       >
@@ -136,6 +138,18 @@ export default async function NewCompanyPage() {
           </Link>
         </div>
       </form>
+      <FormLengthGuard
+        formId="company-form-new"
+        maxLen={100}
+        fields={[
+          { name: "name", label: "企業名" },
+          { name: "industry", label: "業界" },
+          { name: "url", label: "企業サイトURL" },
+          { name: "mypage_id", label: "マイページID" },
+          { name: "mypage_url", label: "マイページURL" },
+          { name: "stage", label: "選考状況" },
+        ]}
+      />
     </AppLayout>
   );
 }

@@ -8,6 +8,7 @@ import { ROUTES } from "@/lib/constants/routes";
 import { updateProfile } from "./actions";
 import { AppLayout } from "@/app/_components/layout";
 import { Database } from "@/lib/database.types";
+import { FormLengthGuard } from "@/app/_components/form-length-guard";
 
 const avatarOptions = [
   { id: "sunrise", label: "Sunrise", src: "/avatars/sunrise.svg" },
@@ -25,15 +26,15 @@ export default async function ProfilePage() {
 
   const { data: profileData } = await supabase
     .from("profiles")
-    .select("full_name, university, faculty, avatar_id, target_industry, career_axis")
+    .select("full_name, university, faculty, avatar_id, target_industry, career_axis, goal_state")
     .eq("id", userId)
     .maybeSingle<
-      Pick<ProfileRow, "full_name" | "university" | "faculty" | "avatar_id" | "target_industry" | "career_axis">
+      Pick<ProfileRow, "full_name" | "university" | "faculty" | "avatar_id" | "target_industry" | "career_axis" | "goal_state">
     >();
 
   const profile: Pick<
     ProfileRow,
-    "full_name" | "university" | "faculty" | "avatar_id" | "target_industry" | "career_axis"
+    "full_name" | "university" | "faculty" | "avatar_id" | "target_industry" | "career_axis" | "goal_state"
   > =
     profileData ?? {
       full_name: "",
@@ -42,6 +43,7 @@ export default async function ProfilePage() {
       avatar_id: "",
       target_industry: "",
       career_axis: "",
+      goal_state: "",
     };
 
   const headerActions = (
@@ -61,6 +63,7 @@ export default async function ProfilePage() {
       className="flex flex-col gap-8"
     >
       <form
+        id="profile-form"
         action={updateProfile}
         className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80"
       >
@@ -127,6 +130,19 @@ export default async function ProfilePage() {
             </label>
           </div>
 
+          <div>
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-700">就活で達成したい状態（短文）</span>
+              <textarea
+                name="goal_state"
+                defaultValue={profile.goal_state ?? ""}
+                rows={3}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                placeholder="例）自社開発で技術を磨ける環境に入社する / 社会課題に取り組む事業で働く など"
+              />
+            </label>
+          </div>
+
           <div className="space-y-3">
             <span className="text-sm font-medium text-slate-700">アバターを選ぶ</span>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -176,6 +192,19 @@ export default async function ProfilePage() {
           </div>
         </div>
       </form>
+      <FormLengthGuard
+        formId="profile-form"
+        maxLen={100}
+        fields={[
+          { name: "full_name", label: "氏名" },
+          { name: "university", label: "大学" },
+          { name: "faculty", label: "学部/学科" },
+          { name: "avatar_id", label: "アバター" },
+          { name: "target_industry", label: "志望業界" },
+          { name: "career_axis", label: "就活の軸" },
+          { name: "goal_state", label: "就活で達成したい状態" },
+        ]}
+      />
     </AppLayout>
   );
 }

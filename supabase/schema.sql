@@ -9,6 +9,7 @@ create table if not exists public.profiles (
   avatar_id text,
   target_industry text,
   career_axis text,
+  goal_state text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );

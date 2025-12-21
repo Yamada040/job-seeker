@@ -18,6 +18,7 @@ export interface Database {
           avatar_id: string | null;
           target_industry: string | null;
           career_axis: string | null;
+          goal_state: string | null;
           created_at: string | null;
           updated_at: string | null;
         };
@@ -29,6 +30,7 @@ export interface Database {
           avatar_id?: string | null;
           target_industry?: string | null;
           career_axis?: string | null;
+          goal_state?: string | null;
           created_at?: string | null;
           updated_at?: string | null;
         };

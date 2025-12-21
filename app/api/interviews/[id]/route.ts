@@ -12,6 +12,8 @@ type QuestionsInput =
   | null
   | undefined;
 
+const MAX_LEN = 100;
+
 function normalizeQuestions(input: QuestionsInput): {
   items: InterviewQA[];
   reflection: { improvement: string; unexpected: string };
@@ -44,6 +46,13 @@ function normalizeQuestions(input: QuestionsInput): {
   };
 }
 
+function lengthError(value: string | null, label: string) {
+  if (value && value.length > MAX_LEN) {
+    return `${label}は${MAX_LEN}文字以内で入力してください`;
+  }
+  return null;
+}
+
 export async function PUT(
   request: Request,
   ctx: { params: { id: string } | Promise<{ id: string }> }
@@ -53,6 +62,7 @@ export async function PUT(
   if (!id) {
     return NextResponse.json({ error: "id is required" }, { status: 400 });
   }
+
   const supabase = await createSupabaseServerActionClient();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) {
@@ -60,29 +70,42 @@ export async function PUT(
   }
 
   const body = await request.json().catch(() => null);
-  const companyName = body?.companyName as string | undefined;
+  const companyName = (body?.companyName as string | undefined)?.trim();
   if (!companyName) {
-    return NextResponse.json({ error: "companyName is required" }, { status: 400 });
+    return NextResponse.json({ error: "企業名は必須です" }, { status: 400 });
   }
-  const template = Boolean(body?.template);
+
   const stage = (body?.stage as string | undefined)?.trim() || null;
   const interviewDate = (body?.interviewDate as string | undefined) ?? null;
   const format = (body?.interviewFormat as string | undefined)?.trim() || null;
+  const interviewTitle = (body?.interviewTitle as string | undefined)?.trim() || null;
+  const template = Boolean(body?.template);
+
+  const lengthErrors = [
+    lengthError(companyName, "企業名"),
+    lengthError(stage, "面接回次/ステージ"),
+    lengthError(format, "面接形式"),
+    lengthError(interviewTitle, "タイトル"),
+  ].filter(Boolean) as string[];
+  if (lengthErrors.length) {
+    return NextResponse.json({ error: lengthErrors[0] }, { status: 400 });
+  }
 
   const normalized = normalizeQuestions(body?.questions as QuestionsInput);
   if (!normalized.items.length) {
-    return NextResponse.json({ error: "At least one question/answer is required" }, { status: 400 });
+    return NextResponse.json({ error: "少なくとも1件の質問/回答を入力してください" }, { status: 400 });
   }
+
   const reflectionText = [
-    normalized.reflection.improvement ? `改善したい点: ${normalized.reflection.improvement}` : "",
-    normalized.reflection.unexpected ? `想定外だったこと: ${normalized.reflection.unexpected}` : "",
+    normalized.reflection.improvement ? `次回改善したい点: ${normalized.reflection.improvement}` : "",
+    normalized.reflection.unexpected ? `想定外だった質問・論点: ${normalized.reflection.unexpected}` : "",
   ]
     .filter(Boolean)
     .join("\n");
 
   const payload = {
     company_name: companyName,
-    interview_title: format || body?.interviewTitle || (template ? "準備用テンプレート" : null),
+    interview_title: format || interviewTitle || (template ? "面接ログテンプレート" : null),
     interview_date: template ? null : interviewDate,
     stage: template ? "template" : stage,
     questions: { items: normalized.items, reflection: normalized.reflection },
