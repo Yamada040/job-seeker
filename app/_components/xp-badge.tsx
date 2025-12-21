@@ -45,7 +45,7 @@ export function XpBadge() {
   }, [data]);
 
   return (
-    <div className="flex min-w-[320px] flex-1 items-center gap-4 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3 text-amber-900 shadow-sm dark:border-amber-500/40 dark:bg-amber-900/30 dark:text-amber-50">
+    <div className="flex min-w-[600px] flex-1 items-center gap-4 rounded-2xl border border-amber-200 bg-amber-50 px-6 py-3 text-amber-900 shadow-sm dark:border-amber-500/40 dark:bg-amber-900/30 dark:text-amber-50">
       <div className="flex items-baseline gap-2">
         <span className="text-xs font-semibold">Level</span>
         <span className="text-2xl font-bold">Lv.{level}</span>

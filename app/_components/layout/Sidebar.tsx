@@ -92,9 +92,6 @@ export function Sidebar() {
 
       <div className="border-t border-white/60 p-4 dark:border-gray-800">
         <div className="space-y-3">
-          <div className="flex justify-center">
-            <ThemeToggle />
-          </div>
           <div className="space-y-2">
             {bottomItems.map((item) => (
               <NavLink key={item.href} item={item} isActive={pathname === item.href} />
@@ -113,6 +110,9 @@ export function Sidebar() {
             <div className="truncate text-xs text-slate-600 dark:text-slate-400">レベル 3 | 150 XP</div>
           </div>
         </div>
+      </div>
+      <div className="flex justify-center">
+        <ThemeToggle />
       </div>
     </div>
   );

@@ -7,6 +7,8 @@ import { ROUTES } from "@/lib/constants/routes";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { AppLayout } from "@/app/_components/layout";
 import { InteractiveCalendar } from "./_components/interactive-calendar";
+import { EventListModal } from "./_components/event-list-modal";
+import { SimpleListModal } from "./_components/simple-list-modal";
 
 type EsRow = Database["public"]["Tables"]["es_entries"]["Row"];
 type CalendarRow = Database["public"]["Tables"]["calendar_events"]["Row"];
@@ -84,7 +86,7 @@ async function getDashboardData() {
 }
 
 function computeLevel(xp: number) {
-  return Math.max(1, Math.floor(xp / 500) + 1);
+  return Math.max(1, Math.floor(xp / 50) + 1);
 }
 
 export default async function DashboardPage() {
@@ -159,30 +161,6 @@ export default async function DashboardPage() {
   const nextThreshold = level * 50;
   const progress = nextThreshold > prevThreshold ? Math.min(1, (xp - prevThreshold) / (nextThreshold - prevThreshold)) : 0;
 
-  const levelDisplay = (
-      <div className="flex min-w-[360px] flex-1 items-center gap-4 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3 text-amber-900 shadow-sm dark:border-amber-500/40 dark:bg-amber-900/30 dark:text-amber-50">
-        <div className="flex items-baseline gap-2">
-          <span className="text-xs font-semibold">Level</span>
-          <span className="text-2xl font-bold">Lv.{level}</span>
-          <span className="text-sm text-amber-700 dark:text-amber-200">XP {xp}</span>
-        </div>
-        <div className="flex flex-1 flex-col gap-1 min-w-[180px]">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-amber-100/80 dark:bg-amber-800/50">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-amber-400 to-rose-400 transition-all"
-              style={{ width: `${Math.round(progress * 100)}%` }}
-            />
-          </div>
-          <div className="flex justify-between text-[11px] text-amber-800/80 dark:text-amber-100/80">
-            <span>次まで {Math.max(0, nextThreshold - xp)} XP</span>
-            <span>
-              {prevThreshold} / {nextThreshold} XP
-            </span>
-          </div>
-        </div>
-      </div>
-  );
-
   const navigationActions = (
     <div className="flex flex-wrap items-center gap-3">
       <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
@@ -200,12 +178,7 @@ export default async function DashboardPage() {
   );
 
   return (
-    <AppLayout 
-      headerLeftContent={levelDisplay}
-      headerActions={navigationActions} 
-      actionsPlacement="left" 
-      className="space-y-6"
-    >
+    <AppLayout headerActions={navigationActions} className="space-y-6">
       {/* 目標エリア */}
       <section className="rounded-3xl border border-white/70 bg-white/90 p-8 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-600">My Goal</p>
@@ -255,96 +228,121 @@ export default async function DashboardPage() {
 
         <div className="space-y-4">
           {/* Urgent */}
-          <div className="rounded-2xl border border-amber-100 bg-amber-50/80 p-4 shadow-sm dark:border-amber-500/30 dark:bg-amber-900/20">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-100">直近で注意すべきこと</h3>
-              <span className="text-[11px] text-amber-800/80 dark:text-amber-100/80">7日以内を表示</span>
-            </div>
-            <div className="mt-3 space-y-3">
-              {calendarEvents
-                .filter((evt) => {
-                  const date = evt.date ? new Date(evt.date) : null;
-                  if (!date) return false;
-                  const diff = (date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
-                  return diff >= 0 && diff <= 7 && (evt.type === "es" || evt.type === "interview");
-                })
-                .slice(0, 4)
-                .map((evt) => (
-                  <div key={evt.id} className="rounded-xl bg-white/70 p-3 text-sm shadow-sm dark:bg-amber-900/30">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-semibold">{evt.type === "es" ? "ES締切" : "面接"}</span>
-                      <span>{evt.date}</span>
-                    </div>
-                    <p className="mt-1 text-sm font-semibold text-amber-900 dark:text-amber-50">{evt.company || evt.title}</p>
-                    <p className="text-xs text-amber-800/80 dark:text-amber-100/80">{evt.title}</p>
-                  </div>
-                ))}
-              {calendarEvents.filter((evt) => {
-                const date = evt.date ? new Date(evt.date) : null;
-                if (!date) return false;
-                const diff = (date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
-                return diff >= 0 && diff <= 7 && (evt.type === "es" || evt.type === "interview");
-              }).length === 0 && (
-                <div className="rounded-xl border border-dashed border-amber-200/80 bg-white/50 p-3 text-xs text-amber-800 dark:border-amber-500/40 dark:bg-amber-900/20 dark:text-amber-50">
-                  直近1週間の締切・面接はありません。
+          <EventListModal
+            events={calendarEvents}
+            trigger={
+              <div className="cursor-pointer rounded-2xl border border-amber-100 bg-amber-50/80 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-amber-500/30 dark:bg-amber-900/20">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-100">直近で注意すべきこと</h3>
+                  <span className="text-[11px] text-amber-800/80 dark:text-amber-100/80">7日以内を表示</span>
                 </div>
-              )}
-            </div>
-          </div>
+                <div className="mt-3 space-y-3">
+                  {calendarEvents
+                    .filter((evt) => {
+                      const date = evt.date ? new Date(evt.date) : null;
+                      if (!date) return false;
+                      const diff = (date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+                      return diff >= 0 && diff <= 7 && (evt.type === "es" || evt.type === "interview");
+                    })
+                    .slice(0, 4)
+                    .map((evt) => (
+                      <div key={evt.id} className="rounded-xl bg-white/70 p-3 text-sm shadow-sm dark:bg-amber-900/30">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-semibold">{evt.type === "es" ? "ES締切" : "面接"}</span>
+                          <span>{evt.date}</span>
+                        </div>
+                        <p className="mt-1 text-sm font-semibold text-amber-900 dark:text-amber-50">{evt.company || evt.title}</p>
+                        <p className="text-xs text-amber-800/80 dark:text-amber-100/80">{evt.title}</p>
+                      </div>
+                    ))}
+                  {calendarEvents.filter((evt) => {
+                    const date = evt.date ? new Date(evt.date) : null;
+                    if (!date) return false;
+                    const diff = (date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+                    return diff >= 0 && diff <= 7 && (evt.type === "es" || evt.type === "interview");
+                  }).length === 0 && (
+                    <div className="rounded-xl border border-dashed border-amber-200/80 bg-white/50 p-3 text-xs text-amber-800 dark:border-amber-500/40 dark:bg-amber-900/20 dark:text-amber-50">
+                      直近1週間の締切・面接はありません。
+                    </div>
+                  )}
+                </div>
+              </div>
+            }
+          />
 
           {/* Next actions */}
-          <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/80">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50">次に取るべき行動</h3>
-              <span className="text-[11px] text-slate-500">最大2件</span>
-            </div>
-            <div className="mt-3 space-y-3">
-              {nextActions.map((action) => (
-                <Link
-                  key={`${action.title}-${action.href}-${action.subtitle}`}
-                  href={action.href}
-                  className="block rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-100"
-                >
-                  <p className="text-xs font-semibold text-amber-700">{action.title}</p>
-                  <p className="mt-1 text-base font-semibold">{action.subtitle}</p>
-                </Link>
-              ))}
-              {nextActions.length === 0 && (
-                <div className="rounded-xl border border-dashed border-slate-300 bg-white/70 p-3 text-xs text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
-                  取り掛かるべきアクションはありません。
+          <SimpleListModal
+            trigger={
+              <div className="cursor-pointer rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700/70 dark:bg-slate-900/80">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50">次に取るべき行動</h3>
+                  <span className="text-[11px] text-slate-500">最大2件</span>
                 </div>
-              )}
-            </div>
-          </div>
+                <div className="mt-3 space-y-3">
+                  {nextActions.map((action) => (
+                    <Link
+                      key={`${action.title}-${action.href}-${action.subtitle}`}
+                      href={action.href}
+                      className="block rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-100"
+                    >
+                      <p className="text-xs font-semibold text-amber-700">{action.title}</p>
+                      <p className="mt-1 text-base font-semibold">{action.subtitle}</p>
+                    </Link>
+                  ))}
+                  {nextActions.length === 0 && (
+                    <div className="rounded-xl border border-dashed border-slate-300 bg-white/70 p-3 text-xs text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
+                      取り掛かるべきアクションはありません。
+                    </div>
+                  )}
+                </div>
+              </div>
+            }
+            items={nextActions.map((action) => ({
+              title: action.title,
+              subtitle: action.subtitle,
+              meta: action.href,
+            }))}
+            emptyText="アクションはありません。"
+          />
 
           {/* 最近のXP獲得 */}
-          <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/80">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50">最近の獲得</h3>
-              <span className="text-[11px] text-slate-500">最新5件</span>
-            </div>
-            <div className="mt-3 space-y-2">
-              {recentXpLogs.map((log, idx) => (
-                <div
-                  key={`${log.created_at}-${idx}`}
-                  className="rounded-xl border border-slate-200/70 bg-white/90 p-3 text-sm shadow-sm dark:border-slate-700/70 dark:bg-slate-800/80"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-900 dark:text-slate-50">+{log.xp} XP</span>
-                    <span className="text-xs text-slate-500">
-                      {log.created_at ? new Date(log.created_at).toLocaleDateString() : ""}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-600 dark:text-slate-300">{log.action || "行動"}</p>
+          <SimpleListModal
+            trigger={
+              <div className="cursor-pointer rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700/70 dark:bg-slate-900/80">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50">最近の獲得</h3>
+                  <span className="text-[11px] text-slate-500">最新5件</span>
                 </div>
-              ))}
-              {recentXpLogs.length === 0 && (
-                <div className="rounded-xl border border-dashed border-slate-300 bg-white/70 p-3 text-xs text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
-                  まだXPはありません。ES提出や面接ログでXPを獲得できます。
+                <div className="mt-3 space-y-2">
+                  {recentXpLogs.map((log, idx) => (
+                    <div
+                      key={`${log.created_at}-${idx}`}
+                      className="rounded-xl border border-slate-200/70 bg-white/90 p-3 text-sm shadow-sm dark:border-slate-700/70 dark:bg-slate-800/80"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-slate-900 dark:text-slate-50">+{log.xp} XP</span>
+                        <span className="text-xs text-slate-500">
+                          {log.created_at ? new Date(log.created_at).toLocaleDateString() : ""}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-300">{log.action || "行動"}</p>
+                    </div>
+                  ))}
+                  {recentXpLogs.length === 0 && (
+                    <div className="rounded-xl border border-dashed border-slate-300 bg-white/70 p-3 text-xs text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
+                      まだXPはありません。ES提出や面接ログでXPを獲得できます。
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
+            }
+            items={recentXpLogs.map((log) => ({
+              title: `+${log.xp} XP`,
+              subtitle: log.action || "行動",
+              meta: log.created_at ? new Date(log.created_at).toLocaleDateString() : "",
+            }))}
+            emptyText="XP獲得履歴がありません。"
+          />
         </div>
       </section>
     </AppLayout>
