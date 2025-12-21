@@ -8,6 +8,7 @@ import { QuestionsEditor } from "../_components/questions-editor";
 import { AppLayout } from "@/app/_components/layout";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { FormLengthGuard } from "@/app/_components/form-length-guard";
+import { ES_NEW_FIELDS, MAX_TEXT_LEN } from "@/app/_components/form-length-guard.config";
 
 export default async function NewEsPage() {
   const supabase = await createSupabaseReadonlyClient();
@@ -117,17 +118,7 @@ export default async function NewEsPage() {
             </Link>
           </div>
         </form>
-        <FormLengthGuard
-          formId="es-form-new"
-          maxLen={100}
-          fields={[
-            { name: "company_name", label: "企業名" },
-            { name: "title", label: "タイトル" },
-            { name: "selection_status", label: "職種/募集枠" },
-            { name: "company_url", label: "企業URL" },
-            { name: "memo", label: "メモ" },
-          ]}
-        />
+        <FormLengthGuard formId="es-form-new" maxLen={MAX_TEXT_LEN} fields={ES_NEW_FIELDS} />
       </div>
     </AppLayout>
   );

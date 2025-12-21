@@ -10,7 +10,7 @@ type FieldConfig = {
 type Props = {
   formId: string;
   maxLen: number;
-  fields: FieldConfig[];
+  fields: ReadonlyArray<FieldConfig>;
 };
 
 export function FormLengthGuard({ formId, maxLen, fields }: Props) {

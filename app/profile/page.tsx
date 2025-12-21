@@ -9,6 +9,7 @@ import { updateProfile } from "./actions";
 import { AppLayout } from "@/app/_components/layout";
 import { Database } from "@/lib/database.types";
 import { FormLengthGuard } from "@/app/_components/form-length-guard";
+import { MAX_TEXT_LEN, PROFILE_FIELDS } from "@/app/_components/form-length-guard.config";
 
 const avatarOptions = [
   { id: "sunrise", label: "Sunrise", src: "/avatars/sunrise.svg" },
@@ -192,19 +193,7 @@ export default async function ProfilePage() {
           </div>
         </div>
       </form>
-      <FormLengthGuard
-        formId="profile-form"
-        maxLen={100}
-        fields={[
-          { name: "full_name", label: "氏名" },
-          { name: "university", label: "大学" },
-          { name: "faculty", label: "学部/学科" },
-          { name: "avatar_id", label: "アバター" },
-          { name: "target_industry", label: "志望業界" },
-          { name: "career_axis", label: "就活の軸" },
-          { name: "goal_state", label: "就活で達成したい状態" },
-        ]}
-      />
+      <FormLengthGuard formId="profile-form" maxLen={MAX_TEXT_LEN} fields={PROFILE_FIELDS} />
     </AppLayout>
   );
 }

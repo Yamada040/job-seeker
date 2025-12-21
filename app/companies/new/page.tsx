@@ -7,6 +7,7 @@ import { ROUTES } from "@/lib/constants/routes";
 import { AppLayout } from "@/app/_components/layout";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { FormLengthGuard } from "@/app/_components/form-length-guard";
+import { COMPANY_FIELDS, MAX_TEXT_LEN } from "@/app/_components/form-length-guard.config";
 
 export default async function NewCompanyPage() {
   const supabase = await createSupabaseReadonlyClient();
@@ -138,18 +139,7 @@ export default async function NewCompanyPage() {
           </Link>
         </div>
       </form>
-      <FormLengthGuard
-        formId="company-form-new"
-        maxLen={100}
-        fields={[
-          { name: "name", label: "企業名" },
-          { name: "industry", label: "業界" },
-          { name: "url", label: "企業サイトURL" },
-          { name: "mypage_id", label: "マイページID" },
-          { name: "mypage_url", label: "マイページURL" },
-          { name: "stage", label: "選考状況" },
-        ]}
-      />
+      <FormLengthGuard formId="company-form-new" maxLen={MAX_TEXT_LEN} fields={COMPANY_FIELDS} />
     </AppLayout>
   );
 }

@@ -6,7 +6,6 @@ import {
   ArrowRightIcon, 
   SparklesIcon, 
   ShieldCheckIcon, 
-  ClipboardDocumentListIcon,
   ChartBarIcon,
   PencilSquareIcon,
   BuildingOffice2Icon,
@@ -234,7 +233,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="grid gap-8 md:grid-cols-3"
           >
-            {features.map((feature, index) => (
+            {features.map((feature) => (
               <motion.div
                 key={feature.title}
                 variants={fadeInUp}

@@ -7,6 +7,7 @@ import { ROUTES } from "@/lib/constants/routes";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { createWebtestQuestion } from "../actions";
 import { FormLengthGuard } from "@/app/_components/form-length-guard";
+import { MAX_TEXT_LEN, WEBTEST_NEW_FIELDS } from "@/app/_components/form-length-guard.config";
 
 export default async function WebtestNewPage() {
   const supabase = await createSupabaseReadonlyClient();
@@ -83,18 +84,7 @@ export default async function WebtestNewPage() {
           </button>
         </div>
       </form>
-      <FormLengthGuard
-        formId="webtest-form-new"
-        maxLen={100}
-        fields={[
-          { name: "title", label: "タイトル" },
-          { name: "category", label: "カテゴリ" },
-          { name: "test_type", label: "テスト形式" },
-          { name: "format", label: "出題形式" },
-          { name: "difficulty", label: "難易度" },
-          { name: "answer", label: "正解" },
-        ]}
-      />
+      <FormLengthGuard formId="webtest-form-new" maxLen={MAX_TEXT_LEN} fields={WEBTEST_NEW_FIELDS} />
     </AppLayout>
   );
 }
