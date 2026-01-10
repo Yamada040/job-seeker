@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
 import { esFormSchema, esQuestionsSchema } from "@/lib/validation/schemas/forms";
+import { awardXp } from "@/lib/xp/award-xp";
 
 type Question = { id: string; prompt: string; answer_md: string };
 
@@ -68,9 +69,9 @@ export async function createEs(formData: FormData) {
     .filter(Boolean);
 
   if (nextStatus === "submitted") {
-    if (!parsed.company_name) throw new Error("提出には企業名が必要です");
-    if (!parsed.selection_status) throw new Error("提出には職種/募集枠が必要です");
-    if (!parsed.deadline) throw new Error("提出日を入力してください");
+    if (!company_name) throw new Error("提出には企業名が必要です");
+    // if (!selection_status) throw new Error("提出には職種/募集枠が必要です");
+    // if (!deadline) throw new Error("提出日を入力してください");
   }
 
   const combinedContent = combineContent(questions, parsed.content_md);
@@ -89,8 +90,13 @@ export async function createEs(formData: FormData) {
     tags: tags.length ? tags : null,
   };
 
-  const { error } = await supabase.from("es_entries").insert(payload);
-  if (error) throw error;
+  const { data, error } = await supabase.from("es_entries").insert(payload).select("id").single();
+  if (error || !data?.id) throw error || new Error("作成に失敗しました");
+
+  if (nextStatus === "submitted") {
+    await awardXp(userData.user.id, "es_submitted", { refId: data.id, supabase });
+    revalidatePath("/dashboard");
+  }
 
   revalidatePath("/es");
   redirect("/es");
@@ -123,9 +129,9 @@ export async function updateEs(id: string, formData: FormData) {
     .filter(Boolean);
 
   if (nextStatus === "submitted") {
-    if (!parsed.company_name) throw new Error("提出には企業名が必要です");
-    if (!parsed.selection_status) throw new Error("提出には職種/募集枠が必要です");
-    if (!parsed.deadline) throw new Error("提出日を入力してください");
+    if (!company_name) throw new Error("提出には企業名が必要です");
+    // if (!selection_status) throw new Error("提出には職種/募集枠が必要です");
+    // if (!deadline) throw new Error("提出日を入力してください");
   }
 
   const combinedContent = combineContent(questions, parsed.content_md);
@@ -147,6 +153,11 @@ export async function updateEs(id: string, formData: FormData) {
     .eq("id", id)
     .eq("user_id", userData.user.id);
   if (error) throw error;
+
+  if (nextStatus === "submitted") {
+    await awardXp(userData.user.id, "es_submitted", { refId: id, supabase });
+    revalidatePath("/dashboard");
+  }
 
   revalidatePath("/es");
   revalidatePath(`/es/${id}`);

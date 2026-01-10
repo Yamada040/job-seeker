@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { ArrowUturnLeftIcon, HomeIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 import { AppLayout } from "@/app/_components/layout";
+import { ROUTES } from "@/lib/constants/routes";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 
 type WebtestListItem = {
@@ -22,9 +23,9 @@ type PageProps = {
 
 export default async function WebtestsPage({ searchParams }: PageProps) {
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect("/login");
+  if (!supabase) return redirect(ROUTES.LOGIN);
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect("/login");
+  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const params = await searchParams;
   const testTypeParam = params?.test_type;
@@ -53,15 +54,15 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href="/" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
         <HomeIcon className="h-4 w-4" />
         MVPホーム
       </Link>
-      <Link href="/webtests/new" className="mvp-button mvp-button-primary">
+      <Link href={ROUTES.WEBTESTS_NEW} className="mvp-button mvp-button-primary">
         <PlusIcon className="h-4 w-4" />
         問題を追加
       </Link>
@@ -80,7 +81,7 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
           <form
             className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-900"
             method="GET"
-            action="/webtests"
+            action={ROUTES.WEBTESTS}
           >
             <span className="text-xs text-slate-500 dark:text-slate-400">テスト形式</span>
             <select
@@ -127,7 +128,7 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
                 items.map((q) => (
                   <tr key={q.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/60">
                     <Td>
-                      <Link href={`/webtests/${q.id}`} className="font-semibold text-amber-700 hover:underline dark:text-amber-300">
+                      <Link href={ROUTES.WEBTEST_DETAIL(q.id)} className="font-semibold text-amber-700 hover:underline dark:text-amber-300">
                         {q.title}
                       </Link>
                     </Td>

@@ -8,10 +8,13 @@ import {
   BuildingOfficeIcon,
   UserIcon,
   ArrowRightOnRectangleIcon,
-  Cog6ToothIcon,
-  SparklesIcon,
+  ChatBubbleLeftRightIcon,
+  AcademicCapIcon,
+  ClipboardDocumentCheckIcon,
+  LightBulbIcon,
 } from "@heroicons/react/24/outline";
 import { clsx } from "clsx";
+import { ThemeToggle } from "../theme-toggle";
 
 interface NavItem {
   label: string;
@@ -24,15 +27,14 @@ const navigationItems: NavItem[] = [
   { label: "ダッシュボード", href: "/dashboard", icon: HomeIcon, description: "全体の概要を確認" },
   { label: "ES管理", href: "/es", icon: DocumentTextIcon, description: "エントリーシートを整理" },
   { label: "企業管理", href: "/companies", icon: BuildingOfficeIcon, description: "企業カードと進捗を記録" },
-  { label: "適性チェック", href: "/aptitude", icon: SparklesIcon, description: "業界・職種の向き不向きを診断" },
-  { label: "自己分析", href: "/self-analysis", icon: SparklesIcon, description: "強み・価値観を整理" },
-  { label: "面接ログ", href: "/interviews", icon: DocumentTextIcon, description: "面接の質問・回答を記録" },
-  { label: "Webテスト対策", href: "/webtests", icon: DocumentTextIcon, description: "演習用の問題を管理" },
+  { label: "適性チェック", href: "/aptitude", icon: LightBulbIcon, description: "業界・職種の向き不向きを診断" },
+  { label: "自己分析", href: "/self-analysis", icon: ClipboardDocumentCheckIcon, description: "強み・価値観を整理" },
+  { label: "面接ログ", href: "/interviews", icon: ChatBubbleLeftRightIcon, description: "面接の質問・回答を記録" },
+  { label: "Webテスト対策", href: "/webtests", icon: AcademicCapIcon, description: "演習用の問題を管理" },
   { label: "プロフィール", href: "/profile", icon: UserIcon, description: "ユーザー設定とアバター" },
 ];
 
 const bottomItems: NavItem[] = [
-  { label: "設定", href: "/settings", icon: Cog6ToothIcon },
   { label: "ログアウト", href: "/login", icon: ArrowRightOnRectangleIcon },
 ];
 
@@ -53,7 +55,7 @@ export function Sidebar() {
       )}
     >
       <item.icon
-        className={clsx("h-5 w-5 flex-shrink-0 transition-colors", {
+        className={clsx("h-5 w-5 shrink-0 transition-colors", {
           "text-amber-600 dark:text-amber-400": isActive,
           "text-slate-500 group-hover:text-slate-800 dark:text-slate-500 dark:group-hover:text-slate-300": !isActive,
         })}
@@ -89,10 +91,12 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-white/60 p-4 dark:border-gray-800">
-        <div className="space-y-2">
-          {bottomItems.map((item) => (
-            <NavLink key={item.href} item={item} isActive={pathname === item.href} />
-          ))}
+        <div className="space-y-3">
+          <div className="space-y-2">
+            {bottomItems.map((item) => (
+              <NavLink key={item.href} item={item} isActive={pathname === item.href} />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -106,6 +110,9 @@ export function Sidebar() {
             <div className="truncate text-xs text-slate-600 dark:text-slate-400">レベル 3 | 150 XP</div>
           </div>
         </div>
+      </div>
+      <div className="flex justify-center">
+        <ThemeToggle />
       </div>
     </div>
   );

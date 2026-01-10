@@ -3,13 +3,14 @@ import { redirect } from "next/navigation";
 import { ArrowUturnLeftIcon, HomeIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 import { AppLayout } from "@/app/_components/layout";
+import { ROUTES } from "@/lib/constants/routes";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 
 export default async function InterviewsListPage() {
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect("/login");
+  if (!supabase) return redirect(ROUTES.LOGIN);
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect("/login");
+  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const { data } = await supabase
     .from("interview_logs")
@@ -21,15 +22,15 @@ export default async function InterviewsListPage() {
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href="/" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
         <HomeIcon className="h-4 w-4" />
         MVPホーム
       </Link>
-      <Link href="/interviews/new" className="mvp-button mvp-button-primary">
+      <Link href={ROUTES.INTERVIEWS_NEW} className="mvp-button mvp-button-primary">
         <PlusIcon className="h-4 w-4" />
         面接終了後のログを追加
       </Link>
@@ -52,7 +53,7 @@ export default async function InterviewsListPage() {
           items.map((item) => (
             <Link
               key={item.id}
-              href={`/interviews/${item.id}`}
+              href={ROUTES.INTERVIEW_DETAIL(item.id)}
               className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white/85 p-4 text-sm text-slate-900 shadow-md backdrop-blur transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100"
             >
               <div className="flex items-center justify-between">

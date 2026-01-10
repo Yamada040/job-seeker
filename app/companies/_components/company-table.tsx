@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { ROUTES } from "@/lib/constants/routes";
 
 type Company = {
   id: string;
@@ -68,14 +69,13 @@ export function CompanyTable({ items }: { items: Company[] }) {
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white/90 shadow-md dark:border-slate-700 dark:bg-slate-900/80">
-        <table className="min-w-full divide-y divide-slate-200 text-sm text-slate-900 dark:divide-slate-700 dark:text-slate-100">
+        <table className="w-full table-fixed divide-y divide-slate-200 text-sm text-slate-900 dark:divide-slate-700 dark:text-slate-100">
           <thead className="bg-slate-50 dark:bg-slate-800">
             <tr>
-              <Th>企業名</Th>
-              <Th>業界</Th>
-              <Th>ステータス</Th>
-              <Th>志望度</Th>
-              <Th>メモ</Th>
+              <Th className="w-[35%]">企業名</Th>
+              <Th className="w-[30%]">業界</Th>
+              <Th className="w-[20%]">ステータス</Th>
+              <Th className="w-[15%]">志望度</Th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
@@ -88,20 +88,29 @@ export function CompanyTable({ items }: { items: Company[] }) {
             ) : (
               filtered.map((c) => (
                 <tr key={c.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/60">
-                  <Td>
-                    <Link href={`/companies/${c.id}`} className="font-semibold text-amber-700 hover:underline dark:text-amber-300">
+                  <Td className="truncate">
+                    <Link 
+                      href={ROUTES.COMPANY_DETAIL(c.id)} 
+                      className="font-semibold text-amber-700 hover:underline dark:text-amber-300 block truncate"
+                      title={c.name}
+                    >
                       {c.name}
                     </Link>
                   </Td>
-                  <Td>{c.industry || "-"}</Td>
-                  <Td>{c.stage || "未設定"}</Td>
-                  <Td>
-                    <span className="rounded-full bg-amber-50 px-2 py-1 text-xs text-amber-700 dark:bg-amber-900/30 dark:text-amber-200">
-                      {c.preference ?? "-"}
+                  <Td className="truncate">
+                    <span title={c.industry || "-"} className="block truncate">
+                      {c.industry || "-"}
+                    </span>
+                  </Td>
+                  <Td className="truncate">
+                    <span title={c.stage || "未設定"} className="block truncate">
+                      {c.stage || "未設定"}
                     </span>
                   </Td>
                   <Td>
-                    <span className="line-clamp-2 text-xs text-slate-600 dark:text-slate-300">{c.memo || "-"}</span>
+                    <span className="rounded-full bg-amber-50 px-2 py-1 text-xs text-amber-700 dark:bg-amber-900/30 dark:text-amber-200 inline-block">
+                      {c.preference ?? "-"}
+                    </span>
                   </Td>
                 </tr>
               ))
@@ -113,7 +122,7 @@ export function CompanyTable({ items }: { items: Company[] }) {
   );
 }
 
-const Th = ({ children }: { children: React.ReactNode }) => (
-  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">{children}</th>
+const Th = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
+  <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300 ${className}`}>{children}</th>
 );
-const Td = ({ children }: { children: React.ReactNode }) => <td className="px-4 py-3 align-top">{children}</td>;
+const Td = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => <td className={`px-4 py-3 align-top ${className}`}>{children}</td>;

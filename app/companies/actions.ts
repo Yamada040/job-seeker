@@ -5,39 +5,54 @@ import { redirect } from "next/navigation";
 
 import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
 import { companyFormSchema } from "@/lib/validation/schemas/forms";
+import { MAX_TEXT_LEN, tooLong, required } from "@/app/_components/validation";
+import { awardXp } from "@/lib/xp/award-xp";
+
+const checkLen = (value: string | null, label: string) => {
+  if (value && value.length > MAX_TEXT_LEN) {
+    throw new Error(tooLong(label));
+  }
+};
 
 export async function createCompany(formData: FormData) {
   const supabase = await createSupabaseActionClient();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
-  const parsed = companyFormSchema.parse({
-    name: formData.get("name"),
-    industry: formData.get("industry"),
-    url: formData.get("url"),
-    mypage_id: formData.get("mypage_id"),
-    mypage_url: formData.get("mypage_url"),
-    memo: formData.get("memo"),
-    stage: formData.get("stage"),
-    preference: formData.get("preference"),
-    favorite: formData.get("favorite"),
-  });
+  const name = (formData.get("name") as string | null)?.trim();
+  if (!name) throw new Error(required("企業名"));
+
+  const industry = ((formData.get("industry") as string | null) || null)?.trim() || null;
+  const url = ((formData.get("url") as string | null) || null)?.trim() || null;
+  const mypage_id = ((formData.get("mypage_id") as string | null) || null)?.trim() || null;
+  const mypage_url = ((formData.get("mypage_url") as string | null) || null)?.trim() || null;
+  const stage = ((formData.get("stage") as string | null) || null)?.trim() || null;
+
+  checkLen(name, "企業名");
+  checkLen(industry, "業界");
+  checkLen(url, "企業サイトURL");
+  checkLen(mypage_id, "マイページID");
+  checkLen(mypage_url, "マイページURL");
+  checkLen(stage, "選考状況");
 
   const payload = {
     user_id: userData.user.id,
-    name: parsed.name,
-    industry: parsed.industry ?? null,
-    url: parsed.url ?? null,
-    mypage_id: parsed.mypage_id ?? null,
-    mypage_url: parsed.mypage_url ?? null,
-    memo: parsed.memo ?? null,
-    stage: parsed.stage ?? null,
-    preference: parsed.preference ?? null,
-    favorite: parsed.favorite,
+    name,
+    industry,
+    url,
+    mypage_id,
+    mypage_url,
+    memo: (formData.get("memo") as string | null) || null,
+    stage,
+    preference: formData.get("preference") ? Number(formData.get("preference")) : null,
+    favorite: formData.get("favorite") === "on",
   };
 
-  const { error } = await supabase.from("companies").insert(payload);
-  if (error) throw error;
+  const { data, error } = await supabase.from("companies").insert(payload).select("id").single();
+  if (error || !data?.id) throw error || new Error("作成に失敗しました");
+
+  await awardXp(userData.user.id, "company_new", { refId: data.id, supabase });
+  revalidatePath("/dashboard");
 
   revalidatePath("/companies");
   redirect("/companies");
@@ -48,28 +63,32 @@ export async function updateCompany(id: string, formData: FormData) {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
-  const parsed = companyFormSchema.parse({
-    name: formData.get("name"),
-    industry: formData.get("industry"),
-    url: formData.get("url"),
-    mypage_id: formData.get("mypage_id"),
-    mypage_url: formData.get("mypage_url"),
-    memo: formData.get("memo"),
-    stage: formData.get("stage"),
-    preference: formData.get("preference"),
-    favorite: formData.get("favorite"),
-  });
+  const name = (formData.get("name") as string | null)?.trim();
+  if (!name) throw new Error(required("企業名"));
+
+  const industry = ((formData.get("industry") as string | null) || null)?.trim() || null;
+  const url = ((formData.get("url") as string | null) || null)?.trim() || null;
+  const mypage_id = ((formData.get("mypage_id") as string | null) || null)?.trim() || null;
+  const mypage_url = ((formData.get("mypage_url") as string | null) || null)?.trim() || null;
+  const stage = ((formData.get("stage") as string | null) || null)?.trim() || null;
+
+  checkLen(name, "企業名");
+  checkLen(industry, "業界");
+  checkLen(url, "企業サイトURL");
+  checkLen(mypage_id, "マイページID");
+  checkLen(mypage_url, "マイページURL");
+  checkLen(stage, "選考状況");
 
   const payload = {
-    name: parsed.name,
-    industry: parsed.industry ?? null,
-    url: parsed.url ?? null,
-    mypage_id: parsed.mypage_id ?? null,
-    mypage_url: parsed.mypage_url ?? null,
-    memo: parsed.memo ?? null,
-    stage: parsed.stage ?? null,
-    preference: parsed.preference ?? null,
-    favorite: parsed.favorite,
+    name,
+    industry,
+    url,
+    mypage_id,
+    mypage_url,
+    memo: (formData.get("memo") as string | null) || null,
+    stage,
+    preference: formData.get("preference") ? Number(formData.get("preference")) : null,
+    favorite: formData.get("favorite") === "on",
   };
 
   const { error } = await supabase.from("companies").update(payload).eq("id", id).eq("user_id", userData.user.id);

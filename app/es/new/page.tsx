@@ -3,16 +3,19 @@ import { redirect } from "next/navigation";
 import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
 
 import { createEs } from "../actions";
+import { ROUTES } from "@/lib/constants/routes";
 import { QuestionsEditor } from "../_components/questions-editor";
 import { AppLayout } from "@/app/_components/layout";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
+import { FormLengthGuard } from "@/app/_components/form-length-guard";
+import { ES_NEW_FIELDS, MAX_TEXT_LEN } from "@/app/_components/form-length-guard.config";
 
 export default async function NewEsPage() {
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect("/login");
+  if (!supabase) return redirect(ROUTES.LOGIN);
 
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect("/login");
+  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const initialQuestions = [
     { id: crypto.randomUUID(), prompt: "自己PR・強み・成果", answer_md: "" },
@@ -21,15 +24,15 @@ export default async function NewEsPage() {
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href="/" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
         <HomeIcon className="h-4 w-4" />
         MVPへ
       </Link>
-      <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href="/es" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.ES} className="mvp-button mvp-button-secondary">
         <ArrowLeftIcon className="h-4 w-4" />
         一覧へ戻る
       </Link>
@@ -49,7 +52,7 @@ export default async function NewEsPage() {
           <p className="text-sm text-slate-700">企業名や職種、提出日を入れておくと、後の提出管理が明確になります。</p>
         </div>
 
-        <form action={createEs} className="space-y-4 rounded-xl border border-slate-200 bg-white/80 p-4 shadow-inner">
+        <form id="es-form-new" action={createEs} className="space-y-4 rounded-xl border border-slate-200 bg-white/80 p-4 shadow-inner">
           <div className="space-y-2">
             <label className="block text-xs text-slate-600">企業名</label>
             <input
@@ -110,11 +113,12 @@ export default async function NewEsPage() {
             <button type="submit" className="mvp-button mvp-button-primary">
               下書きとして保存
             </button>
-            <Link href="/es" className="mvp-button mvp-button-secondary">
+            <Link href={ROUTES.ES} className="mvp-button mvp-button-secondary">
               キャンセル
             </Link>
           </div>
         </form>
+        <FormLengthGuard formId="es-form-new" maxLen={MAX_TEXT_LEN} fields={ES_NEW_FIELDS} />
       </div>
     </AppLayout>
   );
