@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { ArrowLeftIcon, ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 
 import { AppLayout } from "@/app/_components/layout";
+import { ROUTES } from "@/lib/constants/routes";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { submitWebtestAnswer } from "../actions";
 
@@ -15,9 +16,9 @@ export default async function WebtestDetailPage({
 }) {
   const { id } = await params;
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect("/login");
+  if (!supabase) return redirect(ROUTES.LOGIN);
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect("/login");
+  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const { data: question } = await supabase
     .from("webtest_questions")
@@ -26,7 +27,7 @@ export default async function WebtestDetailPage({
     .eq("user_id", userData.user.id)
     .maybeSingle();
 
-  if (!question) return redirect("/webtests");
+  if (!question) return redirect(ROUTES.WEBTESTS);
 
   const { data: attempts } = await supabase
     .from("webtest_attempts")
@@ -40,15 +41,15 @@ export default async function WebtestDetailPage({
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href="/webtests" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.WEBTESTS} className="mvp-button mvp-button-secondary">
         <ArrowLeftIcon className="h-4 w-4" />
         一覧へ戻る
       </Link>
-      <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href="/" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
         <HomeIcon className="h-4 w-4" />
         MVPホーム
       </Link>

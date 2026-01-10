@@ -4,15 +4,18 @@ import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
+import { XpBadge } from "../xp-badge";
 
 interface AppLayoutProps {
   children: React.ReactNode;
   headerTitle?: string;
   headerDescription?: string;
   headerActions?: React.ReactNode;
+  headerLeftContent?: React.ReactNode;
   showHeader?: boolean;
   showSidebar?: boolean;
   className?: string;
+  actionsPlacement?: "left" | "right";
 }
 
 export function AppLayout({
@@ -20,9 +23,11 @@ export function AppLayout({
   headerTitle,
   headerDescription,
   headerActions,
+  headerLeftContent,
   showHeader = true,
   showSidebar = true,
   className,
+  actionsPlacement,
 }: AppLayoutProps) {
   const pathname = usePathname();
 
@@ -30,6 +35,8 @@ export function AppLayout({
   if (pathname === "/login" || pathname === "/") {
     return <>{children}</>;
   }
+
+  const leftContent = headerLeftContent ?? <XpBadge />;
 
   return (
     <div className="relative min-h-screen overflow-hidden text-slate-900 dark:text-slate-100 dark:bg-black">
@@ -46,60 +53,25 @@ export function AppLayout({
         })}
       >
         {showHeader && (
-          <Header title={headerTitle} description={headerDescription} actions={headerActions} />
+          <Header
+            actions={headerActions}
+            leftContent={leftContent}
+            actionsPlacement={actionsPlacement ?? "left"}
+          />
         )}
 
         <main
           className={clsx("mx-auto max-w-7xl px-6 py-8 sm:px-10 sm:py-12", className)}
         >
+          {(headerTitle || headerDescription) && (
+            <div className="mb-6 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/80">
+              {headerTitle && <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{headerTitle}</h1>}
+              {headerDescription && <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">{headerDescription}</p>}
+            </div>
+          )}
           {children}
         </main>
       </div>
     </div>
-  );
-}
-
-// Convenience wrappers
-export function DashboardLayout({
-  children,
-  ...props
-}: Omit<AppLayoutProps, "headerTitle" | "headerDescription">) {
-  return (
-    <AppLayout headerTitle="ダッシュボード" headerDescription="就活の進捗を一覧で確認" {...props}>
-      {children}
-    </AppLayout>
-  );
-}
-
-export function ESLayout({
-  children,
-  ...props
-}: Omit<AppLayoutProps, "headerTitle" | "headerDescription">) {
-  return (
-    <AppLayout headerTitle="ES管理" headerDescription="エントリーシートの作成・管理" {...props}>
-      {children}
-    </AppLayout>
-  );
-}
-
-export function CompanyLayout({
-  children,
-  ...props
-}: Omit<AppLayoutProps, "headerTitle" | "headerDescription">) {
-  return (
-    <AppLayout headerTitle="企業管理" headerDescription="志望企業の情報管理・分析" {...props}>
-      {children}
-    </AppLayout>
-  );
-}
-
-export function ProfileLayout({
-  children,
-  ...props
-}: Omit<AppLayoutProps, "headerTitle" | "headerDescription">) {
-  return (
-    <AppLayout headerTitle="プロフィール" headerDescription="個人設定とアバター管理" {...props}>
-      {children}
-    </AppLayout>
   );
 }

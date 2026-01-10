@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { clsx } from "clsx";
-import { ThemeToggle } from "../theme-toggle";
 
 interface BreadcrumbItem {
   label: string;
@@ -15,7 +14,9 @@ interface HeaderProps {
   title?: string;
   description?: string;
   actions?: React.ReactNode;
+  leftContent?: React.ReactNode;
   breadcrumbs?: BreadcrumbItem[];
+  actionsPlacement?: "left" | "right";
 }
 
 function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
@@ -41,14 +42,23 @@ function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
       case "companies":
         label = "企業管理";
         break;
+      case "aptitude":
+        label = "適性チェック";
+        break;
+      case "self-analysis":
+        label = "自己分析";
+        break;
+      case "interviews":
+        label = "面接ログ";
+        break;
+      case "webtests":
+        label = "Webテスト対策";
+        break;
       case "profile":
         label = "プロフィール";
         break;
       case "new":
         label = "新規作成";
-        break;
-      case "settings":
-        label = "設定";
         break;
       default:
         if (segment.length > 20) {
@@ -62,7 +72,7 @@ function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
   return breadcrumbs;
 }
 
-export function Header({ title, description, actions, breadcrumbs }: HeaderProps) {
+export function Header({ title, description, actions, leftContent, breadcrumbs, actionsPlacement = "left" }: HeaderProps) {
   const pathname = usePathname();
   const generatedBreadcrumbs = breadcrumbs || generateBreadcrumbs(pathname);
 
@@ -94,57 +104,32 @@ export function Header({ title, description, actions, breadcrumbs }: HeaderProps
           </nav>
         )}
 
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            {title && (
-              <h1 className="truncate text-2xl font-semibold text-slate-900 dark:text-slate-100">{title}</h1>
-            )}
-            {description && (
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{description}</p>
-            )}
+        {actionsPlacement === "left" ? (
+          <div className="flex items-start justify-between gap-6">
+            {leftContent ? (
+              <div className="flex-shrink-0">{leftContent}</div>
+            ) : null}
+            <div className="flex-1 min-w-0">
+              {title && <h1 className="truncate text-2xl font-semibold text-slate-900 dark:text-slate-100">{title}</h1>}
+              {description && <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{description}</p>}
+            </div>
+            {actions ? (
+              <div className="flex-shrink-0 flex items-center gap-2">{actions}</div>
+            ) : null}
           </div>
+        ) : (
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              {title && <h1 className="truncate text-2xl font-semibold text-slate-900 dark:text-slate-100">{title}</h1>}
+              {description && <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{description}</p>}
+            </div>
 
-          <div className={clsx("ml-4 flex items-center gap-2")}>
-            <ThemeToggle />
-            {actions}
+            <div className={clsx("ml-4 flex items-center gap-2")}>
+              {actions}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </header>
   );
 }
-
-export const pageHeaders = {
-  dashboard: {
-    title: "ダッシュボード",
-    description: "就活の進捗を一覧で確認",
-  },
-  es: {
-    title: "ES管理",
-    description: "エントリーシートの作成・管理",
-  },
-  "es-detail": {
-    title: "ES詳細",
-    description: "エントリーシートの編集・AI添削",
-  },
-  "es-new": {
-    title: "新しいES",
-    description: "エントリーシートを作成",
-  },
-  companies: {
-    title: "企業管理",
-    description: "志望企業の管理・分析",
-  },
-  "company-detail": {
-    title: "企業詳細",
-    description: "企業情報の確認と編集",
-  },
-  "company-new": {
-    title: "新しい企業",
-    description: "企業情報を追加",
-  },
-  profile: {
-    title: "プロフィール",
-    description: "個人設定とアバター管理",
-  },
-} as const;

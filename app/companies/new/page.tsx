@@ -3,26 +3,29 @@ import { redirect } from "next/navigation";
 import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
 
 import { createCompany } from "../actions";
+import { ROUTES } from "@/lib/constants/routes";
 import { AppLayout } from "@/app/_components/layout";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
+import { FormLengthGuard } from "@/app/_components/form-length-guard";
+import { COMPANY_FIELDS, MAX_TEXT_LEN } from "@/app/_components/form-length-guard.config";
 
 export default async function NewCompanyPage() {
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect("/login");
+  if (!supabase) return redirect(ROUTES.LOGIN);
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect("/login");
+  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href="/" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
         <HomeIcon className="h-4 w-4" />
         MVPホーム
       </Link>
-      <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href="/companies" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.COMPANIES} className="mvp-button mvp-button-secondary">
         <ArrowLeftIcon className="h-4 w-4" />
         一覧へ戻る
       </Link>
@@ -37,6 +40,7 @@ export default async function NewCompanyPage() {
       className="flex flex-col gap-8"
     >
       <form
+        id="company-form-new"
         action={createCompany}
         className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80"
       >
@@ -130,11 +134,12 @@ export default async function NewCompanyPage() {
           <button type="submit" className="mvp-button mvp-button-primary">
             追加する
           </button>
-          <Link href="/companies" className="mvp-button mvp-button-secondary">
+          <Link href={ROUTES.COMPANIES} className="mvp-button mvp-button-secondary">
             キャンセル
           </Link>
         </div>
       </form>
+      <FormLengthGuard formId="company-form-new" maxLen={MAX_TEXT_LEN} fields={COMPANY_FIELDS} />
     </AppLayout>
   );
 }

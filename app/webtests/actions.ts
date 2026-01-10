@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
+import { awardXp } from "@/lib/xp/award-xp";
 
 export async function createWebtestQuestion(formData: FormData) {
   const supabase = await createSupabaseActionClient();
@@ -36,8 +37,11 @@ export async function createWebtestQuestion(formData: FormData) {
     time_limit: formData.get("time_limit") ? Number(formData.get("time_limit")) : null,
   };
 
-  const { error } = await supabase.from("webtest_questions").insert(payload);
-  if (error) throw error;
+  const { data, error } = await supabase.from("webtest_questions").insert(payload).select("id").single();
+  if (error || !data?.id) throw error || new Error("作成に失敗しました");
+
+  await awardXp(userData.user.id, "webtest_question_create", { refId: data.id, supabase });
+  revalidatePath("/dashboard");
 
   revalidatePath("/webtests");
   redirect("/webtests");
@@ -65,12 +69,16 @@ export async function submitWebtestAnswer(questionId: string, formData: FormData
   const normalize = (s: string) => s.trim().toLowerCase();
   const isCorrect = normalize(userAnswer) === normalize(question.answer);
 
-  await supabase.from("webtest_attempts").insert({
+  const { data: attempt, error } = await supabase.from("webtest_attempts").insert({
     user_id: userData.user.id,
     question_id: questionId,
     is_correct: isCorrect,
     time_spent: timeSpent,
-  });
+  }).select("id").single();
+  if (error || !attempt?.id) throw error || new Error("回答の保存に失敗しました");
+
+  await awardXp(userData.user.id, "webtest_attempt_complete", { refId: attempt.id, supabase });
+  revalidatePath("/dashboard");
 
   revalidatePath(`/webtests/${questionId}`);
   redirect(`/webtests/${questionId}?status=${isCorrect ? "correct" : "incorrect"}`);

@@ -4,6 +4,14 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
+import { MAX_TEXT_LEN, tooLong, required } from "@/app/_components/validation";
+import { awardXp } from "@/lib/xp/award-xp";
+
+const checkLen = (value: string | null, label: string) => {
+  if (value && value.length > MAX_TEXT_LEN) {
+    throw new Error(tooLong(label));
+  }
+};
 
 export async function createCompany(formData: FormData) {
   const supabase = await createSupabaseActionClient();
@@ -11,25 +19,39 @@ export async function createCompany(formData: FormData) {
   if (!userData?.user) return redirect("/login");
 
   const name = (formData.get("name") as string | null)?.trim();
-  if (!name) {
-    throw new Error("企業名は必須です");
-  }
+  if (!name) throw new Error(required("企業名"));
+
+  const industry = ((formData.get("industry") as string | null) || null)?.trim() || null;
+  const url = ((formData.get("url") as string | null) || null)?.trim() || null;
+  const mypage_id = ((formData.get("mypage_id") as string | null) || null)?.trim() || null;
+  const mypage_url = ((formData.get("mypage_url") as string | null) || null)?.trim() || null;
+  const stage = ((formData.get("stage") as string | null) || null)?.trim() || null;
+
+  checkLen(name, "企業名");
+  checkLen(industry, "業界");
+  checkLen(url, "企業サイトURL");
+  checkLen(mypage_id, "マイページID");
+  checkLen(mypage_url, "マイページURL");
+  checkLen(stage, "選考状況");
 
   const payload = {
     user_id: userData.user.id,
     name,
-    industry: (formData.get("industry") as string | null) || null,
-    url: (formData.get("url") as string | null) || null,
-    mypage_id: (formData.get("mypage_id") as string | null) || null,
-    mypage_url: (formData.get("mypage_url") as string | null) || null,
+    industry,
+    url,
+    mypage_id,
+    mypage_url,
     memo: (formData.get("memo") as string | null) || null,
-    stage: (formData.get("stage") as string | null) || null,
+    stage,
     preference: formData.get("preference") ? Number(formData.get("preference")) : null,
     favorite: formData.get("favorite") === "on",
   };
 
-  const { error } = await supabase.from("companies").insert(payload);
-  if (error) throw error;
+  const { data, error } = await supabase.from("companies").insert(payload).select("id").single();
+  if (error || !data?.id) throw error || new Error("作成に失敗しました");
+
+  await awardXp(userData.user.id, "company_new", { refId: data.id, supabase });
+  revalidatePath("/dashboard");
 
   revalidatePath("/companies");
   redirect("/companies");
@@ -41,18 +63,29 @@ export async function updateCompany(id: string, formData: FormData) {
   if (!userData?.user) return redirect("/login");
 
   const name = (formData.get("name") as string | null)?.trim();
-  if (!name) {
-    throw new Error("企業名は必須です");
-  }
+  if (!name) throw new Error(required("企業名"));
+
+  const industry = ((formData.get("industry") as string | null) || null)?.trim() || null;
+  const url = ((formData.get("url") as string | null) || null)?.trim() || null;
+  const mypage_id = ((formData.get("mypage_id") as string | null) || null)?.trim() || null;
+  const mypage_url = ((formData.get("mypage_url") as string | null) || null)?.trim() || null;
+  const stage = ((formData.get("stage") as string | null) || null)?.trim() || null;
+
+  checkLen(name, "企業名");
+  checkLen(industry, "業界");
+  checkLen(url, "企業サイトURL");
+  checkLen(mypage_id, "マイページID");
+  checkLen(mypage_url, "マイページURL");
+  checkLen(stage, "選考状況");
 
   const payload = {
     name,
-    industry: (formData.get("industry") as string | null) || null,
-    url: (formData.get("url") as string | null) || null,
-    mypage_id: (formData.get("mypage_id") as string | null) || null,
-    mypage_url: (formData.get("mypage_url") as string | null) || null,
+    industry,
+    url,
+    mypage_id,
+    mypage_url,
     memo: (formData.get("memo") as string | null) || null,
-    stage: (formData.get("stage") as string | null) || null,
+    stage,
     preference: formData.get("preference") ? Number(formData.get("preference")) : null,
     favorite: formData.get("favorite") === "on",
   };
