@@ -1,13 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
-
 import { AiPanel } from "@/app/_components/ai-panel";
 import { InterviewQA, InterviewQuestionsPayload } from "../types";
 import { MAX_TEXT_LEN, tooLong } from "@/app/_components/validation";
-
-type CompanyOption = { value: string; label: string };
+import { CompanyOption } from "./interview-fields";
+import { InterviewMetaFields } from "./InterviewMetaFields";
+import { InterviewQuestionsSection } from "./InterviewQuestionsSection";
+import { InterviewReflectionSection } from "./InterviewReflectionSection";
+import { InterviewSelfReviewSection } from "./InterviewSelfReviewSection";
 
 type Props = {
   mode: "create" | "update";
@@ -119,13 +120,6 @@ export default function InterviewForm({
     }
   };
 
-  const withMissingOption = (): CompanyOption[] => {
-    if (companyName && !companyOptions.find((o) => o.value === companyName)) {
-      return [{ value: companyName, label: `${companyName}（新規）` }, ...companyOptions];
-    }
-    return companyOptions;
-  };
-
   const ensureLength = (value: string, label: string) => {
     if (value && value.length > MAX_TEXT_LEN) {
       throw new Error(tooLong(label));
@@ -205,147 +199,30 @@ export default function InterviewForm({
     <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr]">
       <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
         <div className="mt-4 space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            {companyOptions.length > 0 ? (
-              <SelectField
-                label="企業名（必須）"
-                value={companyName}
-                onChange={setCompanyName}
-                options={withMissingOption()}
-                required
-                placeholder="企業管理から選択"
-              />
-            ) : (
-              <Field label="企業名（必須）" value={companyName} onChange={setCompanyName} required placeholder="例）Alpha株式会社" />
-            )}
-            <Field
-              label="面接形式"
-              value={format}
-              onChange={setFormat}
-              placeholder="対面 / オンライン / ハイブリッド など"
-              required
-            />
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Field
-              label="面接回数（必須）"
-              value={stage}
-              onChange={setStage}
-              placeholder="一次 / 二次 / 最終 など"
-              required={!asTemplate}
-            />
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-200">
-                <span>実施日（必須）</span>
-                <label className="inline-flex items-center gap-1 text-xs font-normal text-slate-500">
-                  <input
-                    type="checkbox"
-                    checked={asTemplate}
-                    onChange={(e) => handleTemplateToggle(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400"
-                  />
-                  準備用の雛形として保存（実施日なし）
-                </label>
-              </div>
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                required={!asTemplate}
-                disabled={asTemplate}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-              />
-            </div>
-          </div>
+          <InterviewMetaFields
+            companyName={companyName}
+            format={format}
+            stage={stage}
+            date={date}
+            asTemplate={asTemplate}
+            companyOptions={companyOptions}
+            onCompanyChange={setCompanyName}
+            onFormatChange={setFormat}
+            onStageChange={setStage}
+            onDateChange={setDate}
+            onTemplateToggle={handleTemplateToggle}
+          />
 
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">質問ログ（質問・回答・自己評価）</span>
-              <button type="button" onClick={addQA} className="mvp-button mvp-button-secondary">
-                <PlusIcon className="h-4 w-4" />
-                行を追加
-              </button>
-            </div>
-            <div className="space-y-3">
-              {questions.map((qa, idx) => (
-                <div
-                  key={`${idx}-${qa.question}-${qa.answer}`}
-                  className="space-y-3 rounded-xl border border-slate-200 bg-white/90 p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800/80"
-                >
-                  <div className="grid gap-2 md:grid-cols-2">
-                    <Field
-                      label={`質問 ${idx + 1}`}
-                      value={qa.question}
-                      onChange={(v) => handleQAChange(idx, "question", v)}
-                      placeholder="自己紹介をお願いします など"
-                    />
-                    <Field
-                      label="自分の回答（要点）"
-                      value={qa.answer}
-                      onChange={(v) => handleQAChange(idx, "answer", v)}
-                      placeholder="研究概要と志望理由を簡潔に述べた"
-                    />
-                  </div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <label className="text-xs text-slate-600 dark:text-slate-300">自己評価</label>
-                    <select
-                      value={qa.rating}
-                      onChange={(e) => handleQAChange(idx, "rating", e.target.value as InterviewQA["rating"])}
-                      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-                    >
-                      <option value="good">良い</option>
-                      <option value="average">普通</option>
-                      <option value="bad">悪い</option>
-                    </select>
-                    {questions.length > 1 ? (
-                      <button
-                        type="button"
-                        onClick={() => removeQA(idx)}
-                        className="ml-auto inline-flex items-center gap-1 text-xs text-rose-500 hover:underline"
-                      >
-                        <TrashIcon className="h-4 w-4" />
-                        削除
-                      </button>
-                    ) : null}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <InterviewQuestionsSection
+            questions={questions}
+            onChange={handleQAChange}
+            onAdd={addQA}
+            onRemove={removeQA}
+          />
 
-          <div className="grid gap-3 md:grid-cols-2">
-            <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">次回改善したい点</span>
-              <textarea
-                value={reflection.improvement}
-                onChange={(e) => setReflection((prev) => ({ ...prev, improvement: e.target.value }))}
-                rows={4}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-                placeholder="例）結論を先に述べる / プロジェクトの定量成果を追加 など"
-              />
-            </label>
-            <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">想定外だった質問・論点</span>
-              <textarea
-                value={reflection.unexpected}
-                onChange={(e) => setReflection((prev) => ({ ...prev, unexpected: e.target.value }))}
-                rows={4}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-                placeholder="例）最近の業界トレンドについて深掘りされた など"
-              />
-            </label>
-          </div>
+          <InterviewReflectionSection reflection={reflection} onChange={setReflection} />
 
-          <div className="space-y-2">
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-200">メモ（任意）</span>
-            <textarea
-              value={selfReview}
-              onChange={(e) => setSelfReview(e.target.value)}
-              rows={3}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-              placeholder="感想ではなく、次に活かすためのメモを残してください"
-            />
-          </div>
+          <InterviewSelfReviewSection value={selfReview} onChange={setSelfReview} />
 
           <div className="mt-6 flex justify-start">
             <button type="button" onClick={handleSave} disabled={saving} className="mvp-button mvp-button-primary">
@@ -370,75 +247,5 @@ export default function InterviewForm({
         />
       </div>
     </div>
-  );
-}
-
-function Field({
-  label,
-  value,
-  onChange,
-  placeholder,
-  required,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-  required?: boolean;
-}) {
-  return (
-    <label className="block space-y-2">
-      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-        {label}
-        {required ? <span className="text-rose-500"> *</span> : null}
-      </span>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        required={required}
-        placeholder={placeholder}
-        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-      />
-    </label>
-  );
-}
-
-function SelectField({
-  label,
-  value,
-  onChange,
-  options,
-  required,
-  placeholder,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  options: CompanyOption[];
-  required?: boolean;
-  placeholder?: string;
-}) {
-  return (
-    <label className="block space-y-2">
-      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-        {label}
-        {required ? <span className="text-rose-500"> *</span> : null}
-      </span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        required={required}
-        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-      >
-        <option value="" disabled className="text-slate-400">
-          {placeholder || "選択してください"}
-        </option>
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-    </label>
   );
 }
