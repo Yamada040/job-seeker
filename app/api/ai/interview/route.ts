@@ -9,13 +9,13 @@ export async function POST(request: Request) {
   if (!userData?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json().catch(() => null);
-  const parsed = idAndOptionalSummarySchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: "id and summary are required" }, { status: 400 });
+  const requestValidation = idAndOptionalSummarySchema.safeParse(body);
+  if (!requestValidation.success) return NextResponse.json({ error: "id and summary are required" }, { status: 400 });
 
   const { error } = await supabase
     .from("interview_logs")
-    .update({ ai_summary: parsed.data.summary })
-    .eq("id", parsed.data.id)
+    .update({ ai_summary: requestValidation.data.summary })
+    .eq("id", requestValidation.data.id)
     .eq("user_id", userData.user.id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

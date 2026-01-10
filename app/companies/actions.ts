@@ -19,7 +19,7 @@ export async function createCompany(formData: FormData) {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
-  const parsed = companyFormSchema.safeParse({
+  const companyValidation = companyFormSchema.safeParse({
     name: formData.get("name"),
     industry: formData.get("industry"),
     url: formData.get("url"),
@@ -30,26 +30,26 @@ export async function createCompany(formData: FormData) {
     preference: formData.get("preference"),
     favorite: formData.get("favorite"),
   });
-  if (!parsed.success) throw new Error(required("企業名"));
+  if (!companyValidation.success) throw new Error(required("企業名"));
 
-  checkLen(parsed.data.name, "企業名");
-  checkLen(parsed.data.industry ?? null, "業界");
-  checkLen(parsed.data.url ?? null, "企業サイトURL");
-  checkLen(parsed.data.mypage_id ?? null, "マイページID");
-  checkLen(parsed.data.mypage_url ?? null, "マイページURL");
-  checkLen(parsed.data.stage ?? null, "選考状況");
+  checkLen(companyValidation.data.name, "企業名");
+  checkLen(companyValidation.data.industry ?? null, "業界");
+  checkLen(companyValidation.data.url ?? null, "企業サイトURL");
+  checkLen(companyValidation.data.mypage_id ?? null, "マイページID");
+  checkLen(companyValidation.data.mypage_url ?? null, "マイページURL");
+  checkLen(companyValidation.data.stage ?? null, "選考状況");
 
   const payload = {
     user_id: userData.user.id,
-    name: parsed.data.name,
-    industry: parsed.data.industry ?? null,
-    url: parsed.data.url ?? null,
-    mypage_id: parsed.data.mypage_id ?? null,
-    mypage_url: parsed.data.mypage_url ?? null,
-    memo: parsed.data.memo ?? null,
-    stage: parsed.data.stage ?? null,
-    preference: parsed.data.preference ?? null,
-    favorite: parsed.data.favorite,
+    name: companyValidation.data.name,
+    industry: companyValidation.data.industry ?? null,
+    url: companyValidation.data.url ?? null,
+    mypage_id: companyValidation.data.mypage_id ?? null,
+    mypage_url: companyValidation.data.mypage_url ?? null,
+    memo: companyValidation.data.memo ?? null,
+    stage: companyValidation.data.stage ?? null,
+    preference: companyValidation.data.preference ?? null,
+    favorite: companyValidation.data.favorite,
   };
 
   const { data, error } = await supabase.from("companies").insert(payload).select("id").single();
@@ -67,7 +67,7 @@ export async function updateCompany(id: string, formData: FormData) {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
-  const parsed = companyFormSchema.safeParse({
+  const companyValidation = companyFormSchema.safeParse({
     name: formData.get("name"),
     industry: formData.get("industry"),
     url: formData.get("url"),
@@ -78,25 +78,25 @@ export async function updateCompany(id: string, formData: FormData) {
     preference: formData.get("preference"),
     favorite: formData.get("favorite"),
   });
-  if (!parsed.success) throw new Error(required("企業名"));
+  if (!companyValidation.success) throw new Error(required("企業名"));
 
-  checkLen(parsed.data.name, "企業名");
-  checkLen(parsed.data.industry ?? null, "業界");
-  checkLen(parsed.data.url ?? null, "企業サイトURL");
-  checkLen(parsed.data.mypage_id ?? null, "マイページID");
-  checkLen(parsed.data.mypage_url ?? null, "マイページURL");
-  checkLen(parsed.data.stage ?? null, "選考状況");
+  checkLen(companyValidation.data.name, "企業名");
+  checkLen(companyValidation.data.industry ?? null, "業界");
+  checkLen(companyValidation.data.url ?? null, "企業サイトURL");
+  checkLen(companyValidation.data.mypage_id ?? null, "マイページID");
+  checkLen(companyValidation.data.mypage_url ?? null, "マイページURL");
+  checkLen(companyValidation.data.stage ?? null, "選考状況");
 
   const payload = {
-    name: parsed.data.name,
-    industry: parsed.data.industry ?? null,
-    url: parsed.data.url ?? null,
-    mypage_id: parsed.data.mypage_id ?? null,
-    mypage_url: parsed.data.mypage_url ?? null,
-    memo: parsed.data.memo ?? null,
-    stage: parsed.data.stage ?? null,
-    preference: parsed.data.preference ?? null,
-    favorite: parsed.data.favorite,
+    name: companyValidation.data.name,
+    industry: companyValidation.data.industry ?? null,
+    url: companyValidation.data.url ?? null,
+    mypage_id: companyValidation.data.mypage_id ?? null,
+    mypage_url: companyValidation.data.mypage_url ?? null,
+    memo: companyValidation.data.memo ?? null,
+    stage: companyValidation.data.stage ?? null,
+    preference: companyValidation.data.preference ?? null,
+    favorite: companyValidation.data.favorite,
   };
 
   const { error } = await supabase.from("companies").update(payload).eq("id", id).eq("user_id", userData.user.id);

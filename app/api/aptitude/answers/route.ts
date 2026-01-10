@@ -12,14 +12,14 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json().catch(() => null);
-  const parsed = answersPayloadSchema.safeParse(body);
-  if (!parsed.success) {
+  const payloadValidation = answersPayloadSchema.safeParse(body);
+  if (!payloadValidation.success) {
     return NextResponse.json({ error: "answers is required" }, { status: 400 });
   }
 
   const { data, error } = await supabase
     .from("aptitude_results")
-    .insert({ user_id: userData.user.id, answers: parsed.data.answers })
+    .insert({ user_id: userData.user.id, answers: payloadValidation.data.answers })
     .select("id")
     .maybeSingle();
 

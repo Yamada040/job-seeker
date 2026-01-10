@@ -30,8 +30,8 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
-  const parsed = calendarEventSchema.safeParse(body);
-  if (!parsed.success) {
+  const eventValidation = calendarEventSchema.safeParse(body);
+  if (!eventValidation.success) {
     return NextResponse.json({ error: "date と title は必須です" }, { status: 400 });
   }
 
@@ -39,11 +39,11 @@ export async function POST(request: Request) {
     .from("calendar_events")
     .insert({
       user_id: userData.user.id,
-      date: parsed.data.date,
-      title: parsed.data.title,
-      company: parsed.data.company ?? null,
-      type: parsed.data.type ?? "other",
-      time: parsed.data.time ?? null,
+      date: eventValidation.data.date,
+      title: eventValidation.data.title,
+      company: eventValidation.data.company ?? null,
+      type: eventValidation.data.type ?? "other",
+      time: eventValidation.data.time ?? null,
     })
     .select()
     .maybeSingle();
