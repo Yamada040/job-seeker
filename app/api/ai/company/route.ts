@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
+import { idAndSummarySchema } from "@/lib/validation/schemas/ai";
 
 export async function POST(req: NextRequest) {
   const supabase = await createSupabaseServerActionClient();
@@ -8,18 +9,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await req.json();
-  const { id, summary } = body ?? {};
-  if (!id || !summary) {
+  const body = await req.json().catch(() => null);
+  const parsed = idAndSummarySchema.safeParse(body);
+  if (!parsed.success) {
     return NextResponse.json({ error: "id and summary are required" }, { status: 400 });
   }
 
-  const aiSummaryString = typeof summary === "string" ? summary : JSON.stringify(summary);
-
   const { error } = await supabase
     .from("companies")
-    .update({ ai_summary: aiSummaryString })
-    .eq("id", id)
+    .update({ ai_summary: parsed.data.summary })
+    .eq("id", parsed.data.id)
     .eq("user_id", userData.user.id);
 
   if (error) {

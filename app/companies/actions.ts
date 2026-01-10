@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
+import { companyFormSchema } from "@/lib/validation/schemas/forms";
 import { MAX_TEXT_LEN, tooLong, required } from "@/app/_components/validation";
 import { awardXp } from "@/lib/xp/award-xp";
 

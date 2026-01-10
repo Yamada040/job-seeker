@@ -1,8 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
+import { profileFormSchema } from "@/lib/validation/schemas/forms";
 import { MAX_TEXT_LEN, tooLong, required } from "@/app/_components/validation";
 
 export async function updateProfile(formData: FormData) {
@@ -10,7 +12,7 @@ export async function updateProfile(formData: FormData) {
   if (!supabase) throw new Error("Supabase client unavailable");
 
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) throw new Error("Not authenticated");
+  if (!userData?.user) return redirect("/login");
 
   const full_name = (formData.get("full_name") as string | null) ?? null;
   const university = (formData.get("university") as string | null) ?? null;

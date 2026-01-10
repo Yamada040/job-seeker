@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
 import { InterviewQA } from "@/app/interviews/types";
+import { interviewRequestSchema } from "@/lib/validation/schemas/interviews";
 import { MAX_TEXT_LEN, tooLong, required } from "@/app/_components/validation";
 import { awardXp } from "@/lib/xp/award-xp";
 import { revalidatePath } from "next/cache";

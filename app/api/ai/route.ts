@@ -2,18 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { createAiClient } from "@/lib/ai/client";
 import { AiPromptKind } from "@/lib/ai/types";
+import { aiRequestSchema } from "@/lib/validation/schemas/ai";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { input, kind } = body as { input?: string; kind?: AiPromptKind };
-
-    if (!input || !kind) {
+    const body = await req.json().catch(() => null);
+    const parsed = aiRequestSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json({ error: "input and kind are required" }, { status: 400 });
     }
 
     const client = createAiClient();
-    const result = await client.call(input, kind);
+    const result = await client.call(parsed.data.input, parsed.data.kind as AiPromptKind);
 
     return NextResponse.json({ provider: client.provider, ...result });
   } catch (error) {

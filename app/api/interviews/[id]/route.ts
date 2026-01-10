@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
 import { InterviewQA } from "@/app/interviews/types";
+import { interviewRequestSchema } from "@/lib/validation/schemas/interviews";
 import { MAX_TEXT_LEN, tooLong, required } from "@/app/_components/validation";
 
 type QuestionsInput =
@@ -76,7 +77,7 @@ export async function PUT(
   if (format && format.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("面接形式") }, { status: 400 });
   if (interviewTitle && interviewTitle.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("タイトル") }, { status: 400 });
 
-  const normalized = normalizeQuestions(body?.questions as QuestionsInput);
+  const normalized = normalizeQuestions(parsed.data.questions as QuestionsInput);
   if (!normalized.items.length) {
     return NextResponse.json({ error: "少なくとも1件の質問/回答を入力してください" }, { status: 400 });
   }
