@@ -69,7 +69,7 @@ export async function createEs(formData: FormData) {
     .filter(Boolean);
 
   if (nextStatus === "submitted") {
-    if (!company_name) throw new Error("提出には企業名が必要です");
+    if (!parsed.company_name) throw new Error("提出には企業名が必要です");
     // if (!selection_status) throw new Error("提出には職種/募集枠が必要です");
     // if (!deadline) throw new Error("提出日を入力してください");
   }
@@ -129,7 +129,7 @@ export async function updateEs(id: string, formData: FormData) {
     .filter(Boolean);
 
   if (nextStatus === "submitted") {
-    if (!company_name) throw new Error("提出には企業名が必要です");
+    if (!parsed.company_name) throw new Error("提出には企業名が必要です");
     // if (!selection_status) throw new Error("提出には職種/募集枠が必要です");
     // if (!deadline) throw new Error("提出日を入力してください");
   }

@@ -19,33 +19,37 @@ export async function createCompany(formData: FormData) {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
-  const name = (formData.get("name") as string | null)?.trim();
-  if (!name) throw new Error(required("企業名"));
+  const parsed = companyFormSchema.safeParse({
+    name: formData.get("name"),
+    industry: formData.get("industry"),
+    url: formData.get("url"),
+    mypage_id: formData.get("mypage_id"),
+    mypage_url: formData.get("mypage_url"),
+    memo: formData.get("memo"),
+    stage: formData.get("stage"),
+    preference: formData.get("preference"),
+    favorite: formData.get("favorite"),
+  });
+  if (!parsed.success) throw new Error(required("企業名"));
 
-  const industry = ((formData.get("industry") as string | null) || null)?.trim() || null;
-  const url = ((formData.get("url") as string | null) || null)?.trim() || null;
-  const mypage_id = ((formData.get("mypage_id") as string | null) || null)?.trim() || null;
-  const mypage_url = ((formData.get("mypage_url") as string | null) || null)?.trim() || null;
-  const stage = ((formData.get("stage") as string | null) || null)?.trim() || null;
-
-  checkLen(name, "企業名");
-  checkLen(industry, "業界");
-  checkLen(url, "企業サイトURL");
-  checkLen(mypage_id, "マイページID");
-  checkLen(mypage_url, "マイページURL");
-  checkLen(stage, "選考状況");
+  checkLen(parsed.data.name, "企業名");
+  checkLen(parsed.data.industry ?? null, "業界");
+  checkLen(parsed.data.url ?? null, "企業サイトURL");
+  checkLen(parsed.data.mypage_id ?? null, "マイページID");
+  checkLen(parsed.data.mypage_url ?? null, "マイページURL");
+  checkLen(parsed.data.stage ?? null, "選考状況");
 
   const payload = {
     user_id: userData.user.id,
-    name,
-    industry,
-    url,
-    mypage_id,
-    mypage_url,
-    memo: (formData.get("memo") as string | null) || null,
-    stage,
-    preference: formData.get("preference") ? Number(formData.get("preference")) : null,
-    favorite: formData.get("favorite") === "on",
+    name: parsed.data.name,
+    industry: parsed.data.industry ?? null,
+    url: parsed.data.url ?? null,
+    mypage_id: parsed.data.mypage_id ?? null,
+    mypage_url: parsed.data.mypage_url ?? null,
+    memo: parsed.data.memo ?? null,
+    stage: parsed.data.stage ?? null,
+    preference: parsed.data.preference ?? null,
+    favorite: parsed.data.favorite,
   };
 
   const { data, error } = await supabase.from("companies").insert(payload).select("id").single();
@@ -63,32 +67,36 @@ export async function updateCompany(id: string, formData: FormData) {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
-  const name = (formData.get("name") as string | null)?.trim();
-  if (!name) throw new Error(required("企業名"));
+  const parsed = companyFormSchema.safeParse({
+    name: formData.get("name"),
+    industry: formData.get("industry"),
+    url: formData.get("url"),
+    mypage_id: formData.get("mypage_id"),
+    mypage_url: formData.get("mypage_url"),
+    memo: formData.get("memo"),
+    stage: formData.get("stage"),
+    preference: formData.get("preference"),
+    favorite: formData.get("favorite"),
+  });
+  if (!parsed.success) throw new Error(required("企業名"));
 
-  const industry = ((formData.get("industry") as string | null) || null)?.trim() || null;
-  const url = ((formData.get("url") as string | null) || null)?.trim() || null;
-  const mypage_id = ((formData.get("mypage_id") as string | null) || null)?.trim() || null;
-  const mypage_url = ((formData.get("mypage_url") as string | null) || null)?.trim() || null;
-  const stage = ((formData.get("stage") as string | null) || null)?.trim() || null;
-
-  checkLen(name, "企業名");
-  checkLen(industry, "業界");
-  checkLen(url, "企業サイトURL");
-  checkLen(mypage_id, "マイページID");
-  checkLen(mypage_url, "マイページURL");
-  checkLen(stage, "選考状況");
+  checkLen(parsed.data.name, "企業名");
+  checkLen(parsed.data.industry ?? null, "業界");
+  checkLen(parsed.data.url ?? null, "企業サイトURL");
+  checkLen(parsed.data.mypage_id ?? null, "マイページID");
+  checkLen(parsed.data.mypage_url ?? null, "マイページURL");
+  checkLen(parsed.data.stage ?? null, "選考状況");
 
   const payload = {
-    name,
-    industry,
-    url,
-    mypage_id,
-    mypage_url,
-    memo: (formData.get("memo") as string | null) || null,
-    stage,
-    preference: formData.get("preference") ? Number(formData.get("preference")) : null,
-    favorite: formData.get("favorite") === "on",
+    name: parsed.data.name,
+    industry: parsed.data.industry ?? null,
+    url: parsed.data.url ?? null,
+    mypage_id: parsed.data.mypage_id ?? null,
+    mypage_url: parsed.data.mypage_url ?? null,
+    memo: parsed.data.memo ?? null,
+    stage: parsed.data.stage ?? null,
+    preference: parsed.data.preference ?? null,
+    favorite: parsed.data.favorite,
   };
 
   const { error } = await supabase.from("companies").update(payload).eq("id", id).eq("user_id", userData.user.id);

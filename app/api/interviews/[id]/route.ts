@@ -63,14 +63,16 @@ export async function PUT(
   }
 
   const body = await request.json().catch(() => null);
-  const companyName = (body?.companyName as string | undefined)?.trim();
+  const parsed = interviewRequestSchema.safeParse(body);
+  if (!parsed.success) return NextResponse.json({ error: required("企業名") }, { status: 400 });
+  const companyName = parsed.data.companyName.trim();
   if (!companyName) return NextResponse.json({ error: required("企業名") }, { status: 400 });
 
-  const stage = (body?.stage as string | undefined)?.trim() || null;
-  const interviewDate = (body?.interviewDate as string | undefined) ?? null;
-  const format = (body?.interviewFormat as string | undefined)?.trim() || null;
-  const interviewTitle = (body?.interviewTitle as string | undefined)?.trim() || null;
-  const template = Boolean(body?.template);
+  const stage = parsed.data.stage?.trim() || null;
+  const interviewDate = parsed.data.interviewDate ?? null;
+  const format = parsed.data.interviewFormat?.trim() || null;
+  const interviewTitle = parsed.data.interviewTitle?.trim() || null;
+  const template = Boolean(parsed.data.template);
 
   if (companyName.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("企業名") }, { status: 400 });
   if (stage && stage.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("面接回次/ステージ") }, { status: 400 });

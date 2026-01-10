@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
 import { awardXp } from "@/lib/xp/award-xp";
+import { answersPayloadSchema } from "@/lib/validation/schemas/api";
 
 export async function POST(req: NextRequest) {
   const supabase = await createSupabaseServerActionClient();

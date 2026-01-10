@@ -85,10 +85,6 @@ async function getDashboardData() {
   };
 }
 
-function computeLevel(xp: number) {
-  return Math.max(1, Math.floor(xp / 50) + 1);
-}
-
 export default async function DashboardPage() {
   const data = await getDashboardData().catch(() => null);
   if (!data?.user) return redirect(ROUTES.LOGIN);
@@ -154,12 +150,6 @@ export default async function DashboardPage() {
   ].slice(0, 2);
 
   const recentXpLogs = data.xpLogs ?? [];
-  const fallbackXp = recentXpLogs.reduce((sum, log) => sum + (log.xp ?? 0), 0);
-  const xp = data.profile?.xp ?? fallbackXp;
-  const level = data.profile?.level ?? computeLevel(xp);
-  const prevThreshold = Math.max(0, (level - 1) * 50);
-  const nextThreshold = level * 50;
-  const progress = nextThreshold > prevThreshold ? Math.min(1, (xp - prevThreshold) / (nextThreshold - prevThreshold)) : 0;
 
   const navigationActions = (
     <div className="flex flex-wrap items-center gap-3">

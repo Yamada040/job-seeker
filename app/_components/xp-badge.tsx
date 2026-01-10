@@ -17,6 +17,7 @@ export function XpBadge() {
   const [levelUp, setLevelUp] = useState<number | null>(null);
 
   useEffect(() => {
+    let timer: number | null = null;
     const fetchProfile = async () => {
       try {
         const supabase = createSupabaseBrowserClient();
@@ -29,25 +30,23 @@ export function XpBadge() {
           .eq("id", userId)
           .maybeSingle<ProfileLite>();
         setData(profile ?? null);
-      } catch (e) {
+        if (!profile) return;
+        const currentLevel = profile.level ?? computeLevel(profile.xp ?? 0);
+        const stored = Number(localStorage.getItem("lastLevel") || "0");
+        if (currentLevel > stored) {
+          setLevelUp(currentLevel);
+          localStorage.setItem("lastLevel", String(currentLevel));
+          timer = window.setTimeout(() => setLevelUp(null), 4000);
+        }
+      } catch {
         // fail silently
       }
     };
-    fetchProfile();
+    void fetchProfile();
+    return () => {
+      if (timer) window.clearTimeout(timer);
+    };
   }, []);
-
-  useEffect(() => {
-    if (!data) return;
-    const currentLevel = data.level ?? computeLevel(data.xp ?? 0);
-    const stored = Number(localStorage.getItem("lastLevel") || "0");
-    if (currentLevel > stored) {
-      setLevelUp(currentLevel);
-      localStorage.setItem("lastLevel", String(currentLevel));
-      const timer = window.setTimeout(() => setLevelUp(null), 4000);
-      return () => window.clearTimeout(timer);
-    }
-    return;
-  }, [data]);
 
   const { xp, level, progress, nextThreshold, prevThreshold } = useMemo(() => {
     const currentXp = data?.xp ?? 0;

@@ -84,7 +84,7 @@ export async function submitWebtestAnswer(questionId: string, formData: FormData
     user_id: userData.user.id,
     question_id: questionId,
     is_correct: isCorrect,
-    time_spent: timeSpent,
+    time_spent: parsed.time_spent ?? null,
   }).select("id").single();
   if (error || !attempt?.id) throw error || new Error("回答の保存に失敗しました");
 
