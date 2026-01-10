@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
 import { InterviewQA } from "@/app/interviews/types";
+import { interviewRequestSchema } from "@/lib/validation/schemas/interviews";
 
 type QuestionsInput =
   | {
@@ -52,18 +53,18 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
-  const companyName = body?.companyName as string | undefined;
-  if (!companyName) {
+  const parsed = interviewRequestSchema.safeParse(body);
+  if (!parsed.success) {
     return NextResponse.json({ error: "companyName is required" }, { status: 400 });
   }
-  const template = Boolean(body?.template);
+  const template = Boolean(parsed.data.template);
 
   // 任意入力に緩和。空でも保存可能にする。
-  const stage = (body?.stage as string | undefined)?.trim() || null;
-  const interviewDate = (body?.interviewDate as string | undefined) ?? null;
+  const stage = parsed.data.stage?.trim() || null;
+  const interviewDate = parsed.data.interviewDate ?? null;
 
-  const format = (body?.interviewFormat as string | undefined)?.trim() || null;
-  const normalized = normalizeQuestions(body?.questions as QuestionsInput);
+  const format = parsed.data.interviewFormat?.trim() || null;
+  const normalized = normalizeQuestions(parsed.data.questions as QuestionsInput);
   if (!normalized.items.length) {
     return NextResponse.json({ error: "At least one question/answer is required" }, { status: 400 });
   }
@@ -77,8 +78,8 @@ export async function POST(request: Request) {
 
   const payload = {
     user_id: userData.user.id,
-    company_name: companyName,
-    interview_title: format || body?.interviewTitle || (template ? "準備用テンプレート" : null),
+    company_name: parsed.data.companyName,
+    interview_title: format || parsed.data.interviewTitle || (template ? "準備用テンプレート" : null),
     interview_date: template ? null : interviewDate,
     stage: template ? "template" : stage,
     questions: { items: normalized.items, reflection: normalized.reflection },

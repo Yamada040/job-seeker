@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
+import { idAndOptionalSummarySchema } from "@/lib/validation/schemas/ai";
 
 export async function POST(request: Request) {
   const supabase = await createSupabaseServerActionClient();
@@ -8,14 +9,13 @@ export async function POST(request: Request) {
   if (!userData?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json().catch(() => null);
-  const id = body?.id as string | undefined;
-  const summary = body?.summary ?? null;
-  if (!id) return NextResponse.json({ error: "id is required" }, { status: 400 });
+  const parsed = idAndOptionalSummarySchema.safeParse(body);
+  if (!parsed.success) return NextResponse.json({ error: "id and summary are required" }, { status: 400 });
 
   const { error } = await supabase
     .from("interview_logs")
-    .update({ ai_summary: summary })
-    .eq("id", id)
+    .update({ ai_summary: parsed.data.summary })
+    .eq("id", parsed.data.id)
     .eq("user_id", userData.user.id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

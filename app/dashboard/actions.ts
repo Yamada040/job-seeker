@@ -1,8 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
+import { dashboardCompanySchema, dashboardEsEntrySchema } from "@/lib/validation/schemas/forms";
 
 export async function createEsEntryAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
@@ -10,19 +12,19 @@ export async function createEsEntryAction(formData: FormData) {
 
   const { data: userData } = await supabase.auth.getUser();
   const user = userData?.user;
-  if (!user) throw new Error("Not authenticated");
+  if (!user) return redirect("/login");
 
-  const title = (formData.get("title") as string) ?? "";
-  const status = (formData.get("status") as string) ?? "下書き";
-  const content_md = (formData.get("content_md") as string) ?? "";
-
-  if (!title.trim()) throw new Error("タイトルは必須です");
+  const parsed = dashboardEsEntrySchema.parse({
+    title: formData.get("title"),
+    status: formData.get("status"),
+    content_md: formData.get("content_md"),
+  });
 
   const { error } = await supabase.from("es_entries").insert({
     user_id: user.id,
-    title,
-    status,
-    content_md,
+    title: parsed.title,
+    status: parsed.status,
+    content_md: parsed.content_md,
   });
 
   if (error) throw error;
@@ -36,19 +38,19 @@ export async function createCompanyAction(formData: FormData) {
 
   const { data: userData } = await supabase.auth.getUser();
   const user = userData?.user;
-  if (!user) throw new Error("Not authenticated");
+  if (!user) return redirect("/login");
 
-  const name = (formData.get("name") as string) ?? "";
-  const url = (formData.get("url") as string) ?? "";
-  const stage = (formData.get("stage") as string) ?? "未エントリー";
-
-  if (!name.trim()) throw new Error("企業名は必須です");
+  const parsed = dashboardCompanySchema.parse({
+    name: formData.get("name"),
+    url: formData.get("url"),
+    stage: formData.get("stage"),
+  });
 
   const { error } = await supabase.from("companies").insert({
     user_id: user.id,
-    name,
-    url,
-    stage,
+    name: parsed.name,
+    url: parsed.url,
+    stage: parsed.stage,
   });
 
   if (error) throw error;
