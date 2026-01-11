@@ -24,15 +24,15 @@ export default async function NewEsPage() {
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.HOME} className="dq-button-secondary">
         <HomeIcon className="h-4 w-4" />
         MVPへ
       </Link>
-      <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="dq-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href={ROUTES.ES} className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.ES} className="dq-button-secondary">
         <ArrowLeftIcon className="h-4 w-4" />
         一覧へ戻る
       </Link>
@@ -49,60 +49,60 @@ export default async function NewEsPage() {
       <div className="dq-card p-6 text-sm text-white">
         <div className="space-y-2">
           <h2 className="text-lg font-semibold">ES入力</h2>
-          <p className="text-sm text-slate-700">企業名や職種、提出日を入れておくと、後の提出管理が明確になります。</p>
+          <p className="text-sm text-white/70">企業名や職種、提出日を入れておくと、後の提出管理が明確になります。</p>
         </div>
 
-        <form id="es-form-new" action={createEs} className="space-y-4 rounded-xl border border-white/20 bg-white/10 p-4">
+        <form id="es-form-new" action={createEs} className="dq-panel space-y-4 p-4">
           <div className="space-y-2">
-            <label className="block text-xs text-slate-600">企業名</label>
+            <label className="block text-xs text-white/70">企業名</label>
             <input
               name="company_name"
-              className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm text-white outline-none focus:border-yellow-400"
+              className="dq-input text-sm"
               placeholder="例）Alpha SaaS"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-xs text-slate-600">タイトル*</label>
+            <label className="block text-xs text-white/70">タイトル*</label>
             <input
               name="title"
               required
-              className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm text-white outline-none focus:border-yellow-400"
+              className="dq-input text-sm"
               placeholder="例）Alpha SaaS 新卒向けES"
             />
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
-            <label className="block space-y-1 text-xs text-slate-600">
+            <label className="block space-y-1 text-xs text-white/70">
               職種 / 募集枠
               <input
                 name="selection_status"
-                className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-yellow-400"
+                className="dq-input text-sm"
                 placeholder="書類選考用エンジニア枠 など"
               />
             </label>
-            <label className="block space-y-1 text-xs text-slate-600">
+            <label className="block space-y-1 text-xs text-white/70">
               企業ホームページURL
               <input
                 name="company_url"
-                className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-yellow-400"
+                className="dq-input text-sm"
                 placeholder="https://example.com"
               />
             </label>
-            <label className="block space-y-1 text-xs text-slate-600">
+            <label className="block space-y-1 text-xs text-white/70">
               メモ
               <input
                 name="memo"
-                className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-yellow-400"
+                className="dq-input text-sm"
                 placeholder="選考メモや提出状況など"
               />
             </label>
-            <label className="block space-y-1 text-xs text-slate-600">
+            <label className="block space-y-1 text-xs text-white/70">
               締切日（任意）
               <input
                 type="date"
                 name="deadline"
-                className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-yellow-400"
+                className="dq-input text-sm"
               />
             </label>
           </div>
@@ -110,10 +110,10 @@ export default async function NewEsPage() {
           <QuestionsEditor initialQuestions={initialQuestions} />
 
           <div className="flex justify-wrap gap-3">
-            <button type="submit" className="mvp-button mvp-button-primary">
+            <button type="submit" className="dq-button">
               下書きとして保存
             </button>
-            <Link href={ROUTES.ES} className="mvp-button mvp-button-secondary">
+            <Link href={ROUTES.ES} className="dq-button-secondary">
               キャンセル
             </Link>
           </div>

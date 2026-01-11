@@ -17,12 +17,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label="テーマ切り替え"
-      className={clsx(
-        "flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold transition",
-        isDark
-          ? "border-slate-600 bg-slate-800 text-slate-100 hover:bg-slate-700"
-          : "border-slate-200 bg-white text-slate-800 hover:bg-slate-50",
-      )}
+      className={clsx("dq-button-secondary text-xs", isDark && "border-white/70")}
     >
       {isDark ? <MoonIcon className="h-4 w-4" /> : <SunIcon className="h-4 w-4" />}
       <span>{label}</span>

@@ -243,7 +243,7 @@ export default function InterviewForm({
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr]">
-      <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+      <div className="dq-card p-6">
         <div className="mt-4 space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             {companyOptions.length > 0 ? (
@@ -281,9 +281,9 @@ export default function InterviewForm({
               required={!asTemplate}
             />
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-200">
+              <div className="flex items-center gap-2 text-sm font-medium text-white dark:text-white">
                 <span>実施日（必須）</span>
-                <label className="inline-flex items-center gap-1 text-xs font-normal text-slate-500">
+                <label className="inline-flex items-center gap-1 text-xs font-normal text-white">
                   <input
                     type="checkbox"
                     checked={asTemplate}
@@ -299,20 +299,20 @@ export default function InterviewForm({
                 onChange={(e) => setDate(e.target.value)}
                 required={!asTemplate}
                 disabled={asTemplate}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="dq-input text-sm"
               />
             </div>
           </div>
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+              <span className="text-sm font-semibold text-white dark:text-white">
                 質問ログ（質問・回答・自己評価）
               </span>
               <button
                 type="button"
                 onClick={addQA}
-                className="mvp-button mvp-button-secondary"
+                className="dq-button-secondary"
               >
                 <PlusIcon className="h-4 w-4" />
                 行を追加
@@ -322,7 +322,7 @@ export default function InterviewForm({
               {questions.map((qa, idx) => (
                 <div
                   key={`${idx}-${qa.question}-${qa.answer}`}
-                  className="space-y-3 rounded-xl border border-slate-200 bg-white/90 p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800/80"
+                  className="dq-panel space-y-3 p-3"
                 >
                   <div className="grid gap-2 md:grid-cols-2">
                     <Field
@@ -339,7 +339,7 @@ export default function InterviewForm({
                     />
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <label className="text-xs text-slate-600 dark:text-slate-300">
+                    <label className="text-xs text-white dark:text-white">
                       自己評価
                     </label>
                     <select
@@ -351,7 +351,7 @@ export default function InterviewForm({
                           e.target.value as InterviewQA["rating"]
                         )
                       }
-                      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                      className="dq-input text-sm"
                     >
                       <option value="good">良い</option>
                       <option value="average">普通</option>
@@ -375,7 +375,7 @@ export default function InterviewForm({
 
           <div className="grid gap-3 md:grid-cols-2">
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+              <span className="text-sm font-medium text-white dark:text-white">
                 次回改善したい点
               </span>
               <textarea
@@ -387,12 +387,12 @@ export default function InterviewForm({
                   }))
                 }
                 rows={4}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="dq-input text-sm"
                 placeholder="例）結論を先に述べる / プロジェクトの定量成果を追加 など"
               />
             </label>
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+              <span className="text-sm font-medium text-white dark:text-white">
                 想定外だった質問・論点
               </span>
               <textarea
@@ -404,21 +404,21 @@ export default function InterviewForm({
                   }))
                 }
                 rows={4}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="dq-input text-sm"
                 placeholder="例）最近の業界トレンドについて深掘りされた など"
               />
             </label>
           </div>
 
           <div className="space-y-2">
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+            <span className="text-sm font-medium text-white dark:text-white">
               メモ（任意）
             </span>
             <textarea
               value={selfReview}
               onChange={(e) => setSelfReview(e.target.value)}
               rows={3}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="dq-input text-sm"
               placeholder="感想ではなく、次に活かすためのメモを残してください"
             />
           </div>
@@ -428,7 +428,7 @@ export default function InterviewForm({
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="mvp-button mvp-button-primary"
+              className="dq-button"
             >
               {saving ? "保存中..." : "保存する"}
             </button>
@@ -436,7 +436,7 @@ export default function InterviewForm({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-5 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+      <div className="dq-card p-5">
         <AiPanel
           kind="interview_review"
           defaultInput={prompt}
@@ -469,7 +469,7 @@ function Field({
 }) {
   return (
     <label className="block space-y-2">
-      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+      <span className="text-sm font-medium text-white dark:text-white">
         {label}
         {required ? <span className="text-rose-500"> *</span> : null}
       </span>
@@ -478,7 +478,7 @@ function Field({
         onChange={(e) => onChange(e.target.value)}
         required={required}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+        className="dq-input text-sm"
       />
     </label>
   );
@@ -501,7 +501,7 @@ function SelectField({
 }) {
   return (
     <label className="block space-y-2">
-      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+      <span className="text-sm font-medium text-white dark:text-white">
         {label}
         {required ? <span className="text-rose-500"> *</span> : null}
       </span>
@@ -509,9 +509,9 @@ function SelectField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         required={required}
-        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+        className="dq-input text-sm"
       >
-        <option value="" disabled className="text-slate-400">
+        <option value="" disabled className="text-white">
           {placeholder || "選択してください"}
         </option>
         {options.map((opt) => (

@@ -27,17 +27,17 @@ export default async function InterviewsListPage() {
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="dq-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.HOME} className="dq-button-secondary">
         <HomeIcon className="h-4 w-4" />
         MVPホーム
       </Link>
       <Link
         href={ROUTES.INTERVIEWS_NEW}
-        className="mvp-button mvp-button-primary"
+        className="dq-button"
       >
         <PlusIcon className="h-4 w-4" />
         面接終了後のログを追加
@@ -54,7 +54,7 @@ export default async function InterviewsListPage() {
     >
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {items.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6 text-sm text-slate-600 shadow-sm">
+          <div className="dq-card p-6 text-sm text-white">
             まだ面接ログがありません。右上の「面接終了後のログを追加」から記録を始めてください。
           </div>
         ) : (
@@ -62,7 +62,7 @@ export default async function InterviewsListPage() {
             <Link
               key={item.id}
               href={ROUTES.INTERVIEW_DETAIL(item.id)}
-              className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white/85 p-4 text-sm text-slate-900 shadow-md backdrop-blur transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100"
+              className="dq-card flex flex-col gap-2 p-4 text-sm text-white transition hover:-translate-y-0.5"
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs rounded-full bg-amber-50 px-2 py-1 text-amber-700 dark:bg-amber-900/30 dark:text-amber-200">
@@ -70,7 +70,7 @@ export default async function InterviewsListPage() {
                     ? "雛形"
                     : item.stage || "面接回数未設定"}
                 </span>
-                <span className="text-xs text-slate-500 dark:text-slate-400">
+                <span className="text-xs text-white dark:text-white">
                   {item.stage === "template"
                     ? "-"
                     : item.interview_date
@@ -79,7 +79,7 @@ export default async function InterviewsListPage() {
                 </span>
               </div>
               <div className="text-base font-semibold">{item.company_name}</div>
-              <div className="text-xs text-slate-600 dark:text-slate-300">
+              <div className="text-xs text-white dark:text-white">
                 {item.stage === "template"
                   ? "準備用雛形"
                   : item.interview_title || "面接形式未設定"}
@@ -89,7 +89,7 @@ export default async function InterviewsListPage() {
                   AI改善サマリー保存済み
                 </div>
               ) : null}
-              <div className="truncate text-xs text-slate-500 dark:text-slate-400">
+              <div className="truncate text-xs text-white dark:text-white">
                 {item.self_review ? item.self_review : "振り返りは未入力です"}
               </div>
             </Link>

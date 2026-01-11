@@ -17,11 +17,11 @@ export default async function WebtestNewPage() {
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href={ROUTES.WEBTESTS} className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.WEBTESTS} className="dq-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         一覧へ戻る
       </Link>
-      <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="dq-button-secondary">
         <HomeIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
@@ -33,7 +33,7 @@ export default async function WebtestNewPage() {
       <form
         id="webtest-form-new"
         action={createWebtestQuestion}
-        className="space-y-4 rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-md dark:border-slate-700 dark:bg-slate-900/80"
+        className="dq-card space-y-4 p-6"
       >
         <div className="grid gap-4 md:grid-cols-2">
           <Field name="title" label="タイトル" required placeholder="例）表の読み取り（売上推移）" />
@@ -53,7 +53,7 @@ export default async function WebtestNewPage() {
             name="body"
             required
             rows={6}
-            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="dq-input text-sm"
             placeholder="表や文章の内容を記載"
           />
         </div>
@@ -63,7 +63,7 @@ export default async function WebtestNewPage() {
             <textarea
               name="choices"
               rows={4}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="dq-input text-sm"
               placeholder="A)\nB)\nC)\nD)"
             />
           </div>
@@ -74,12 +74,12 @@ export default async function WebtestNewPage() {
           <textarea
             name="explanation"
             rows={4}
-            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="dq-input text-sm"
             placeholder="解答の考え方や計算手順を記載"
           />
         </div>
         <div className="pt-2 flex justify-start">
-          <button type="submit" className="mvp-button mvp-button-primary">
+          <button type="submit" className="dq-button">
             保存する
           </button>
         </div>
@@ -113,7 +113,7 @@ function Field({
         type={type}
         required={required}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+        className="dq-input text-sm"
       />
     </label>
   );

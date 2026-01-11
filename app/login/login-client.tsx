@@ -32,7 +32,7 @@ export function LoginClient() {
         type="button"
         onClick={handleGoogle}
         disabled={loading}
-        className="w-full rounded-full border border-slate-200 bg-white/80 px-5 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+        className="dq-button w-full text-sm disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? "リダイレクト中..." : "Googleでログイン"}
       </button>

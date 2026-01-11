@@ -169,13 +169,13 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr]">
-      <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+      <div className="dq-card p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">適性チェック</h2>
-            <p className="text-sm text-slate-600 dark:text-slate-300">興味・強み・価値観を整理してAI診断へ送信</p>
+            <h2 className="text-lg font-semibold text-white">適性チェック</h2>
+            <p className="text-sm text-white">興味・強み・価値観を整理してAI診断へ送信</p>
           </div>
-          <Link href={ROUTES.COMPANIES} className="mvp-button mvp-button-secondary">
+          <Link href={ROUTES.COMPANIES} className="dq-button-secondary">
             企業一覧へ
           </Link>
         </div>
@@ -215,14 +215,14 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
           />
           <TextArea label="補足メモ" value={answers.otherNotes} onChange={(v) => handleChange("otherNotes", v)} />
           <div className="flex flex-wrap gap-3">
-            <button onClick={handleSaveAnswers} disabled={saving} className="mvp-button mvp-button-primary">
+            <button onClick={handleSaveAnswers} disabled={saving} className="dq-button">
               {saving ? "保存中..." : "保存する"}
             </button>
           </div>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-5 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+      <div className="dq-card p-5">
         <AiPanel
           kind="aptitude_analysis"
           defaultInput={prompt}
@@ -253,12 +253,12 @@ function CheckboxGroup({
 }) {
   return (
     <div className="space-y-2">
-      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{label}</p>
+      <p className="text-sm font-semibold text-white">{label}</p>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         {options.map((opt) => (
           <label
             key={opt}
-            className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition hover:border-amber-200 hover:bg-amber-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="dq-panel flex cursor-pointer items-center gap-2 px-3 py-2 text-sm text-white transition hover:text-yellow-400"
           >
             <input
               type="checkbox"
@@ -285,12 +285,12 @@ function TextArea({
 }) {
   return (
     <label className="block space-y-2">
-      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{label}</span>
+      <span className="text-sm font-medium text-white">{label}</span>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={3}
-        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+        className="dq-input text-sm"
       />
     </label>
   );
@@ -311,11 +311,11 @@ function SelectBox({
 }) {
   return (
     <label className="block space-y-2">
-      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{label}</span>
+      <span className="text-sm font-medium text-white">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+        className="dq-input text-sm"
       >
         <option value="">{placeholder || "選択してください"}</option>
         {options.map((opt) => (

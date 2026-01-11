@@ -23,11 +23,11 @@ export default async function SelfAnalysisPage() {
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="dq-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.HOME} className="dq-button-secondary">
         <HomeIcon className="h-4 w-4" />
         MVPホーム
       </Link>

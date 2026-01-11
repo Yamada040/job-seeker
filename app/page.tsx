@@ -83,20 +83,18 @@ export default function Home() {
   }, [setTheme]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden text-slate-900 dark:text-slate-100 dark:bg-black">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_25%_20%,rgba(255,196,38,0.12),transparent_40%),radial-gradient(circle_at_80%_10%,rgba(56,189,248,0.1),transparent_45%),linear-gradient(135deg,#ffedd5_0%,#e0f2fe_45%,#e9d5ff_100%)] dark:bg-none" />
-      <div className="pointer-events-none absolute inset-0 -z-20 bg-[url('/bg-abstract.svg')] bg-cover bg-center opacity-80 dark:opacity-10" />
+    <div className="relative min-h-screen overflow-hidden text-white">
 
       <main className="mx-auto flex max-w-6xl flex-col gap-16 px-6 py-10 sm:px-10 sm:py-14">
         {/* ヘッダー */}
-        <motion.header 
+        <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="flex items-center justify-between gap-4"
         >
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-300 to-orange-500 text-sm font-bold text-slate-900 shadow-md shadow-amber-300/40">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg border-2 border-white bg-black text-sm font-bold text-white shadow-[0_0_0_2px_black,0_0_0_4px_white]">
               就
             </span>
             <span>就活Copilot</span>
@@ -104,13 +102,13 @@ export default function Home() {
           <div className="flex items-center gap-3 text-sm">
             <Link
               href={ROUTES.LOGIN}
-              className="rounded-full border border-white/70 bg-white/80 px-4 py-2 font-semibold text-slate-800 shadow-sm transition hover:bg-white hover:scale-105"
+              className="dq-button-secondary"
             >
               ログイン
             </Link>
             <Link
               href={`${ROUTES.LOGIN}?mode=signup`}
-              className="rounded-full bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 px-5 py-2 font-semibold text-slate-900 shadow-lg shadow-amber-300/40 transition hover:scale-105 hover:shadow-xl"
+              className="dq-button"
             >
               無料で始める
             </Link>
@@ -118,49 +116,46 @@ export default function Home() {
         </motion.header>
 
         {/* ヒーロー */}
-        <section className="relative overflow-hidden rounded-3xl border border-white/70 bg-white/80 p-12 shadow-2xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-          <div className="absolute -right-32 -top-24 h-64 w-64 rotate-6 rounded-3xl bg-gradient-to-br from-amber-300/50 via-orange-500/40 to-rose-500/40 blur-3xl" />
-          <div className="absolute -left-28 bottom-[-90px] h-64 w-64 rounded-3xl bg-gradient-to-br from-cyan-300/40 via-emerald-300/30 to-white/0 blur-3xl" />
-
+        <section className="dq-window relative overflow-hidden p-10">
           <div className="grid gap-12 lg:grid-cols-[1.2fr,0.8fr] lg:items-center">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               className="space-y-6"
             >
-              <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-amber-700">
-                <span className="inline-flex items-center gap-2 rounded-full border border-amber-200/80 bg-amber-50/80 px-3 py-1">
+              <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-yellow-200">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-black/60 px-3 py-1">
                   AI活用
-                  <SparklesIcon className="h-3 w-3" />
+                  <SparklesIcon className="h-3 w-3 text-yellow-200" />
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200/80 bg-emerald-50/80 px-3 py-1 text-emerald-700">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-black/60 px-3 py-1 text-emerald-200">
                   無料で始められる
-                  <CheckCircleIcon className="h-3 w-3" />
+                  <CheckCircleIcon className="h-3 w-3 text-emerald-200" />
                 </span>
               </div>
               
-              <motion.h1 
+              <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
                 className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl"
               >
-                就活を<span className="text-amber-500">効率化</span>して
-                <span className="block text-slate-700">内定獲得率を上げる</span>
+                就活を<span className="text-yellow-300">効率化</span>して
+                <span className="block text-white/80">内定獲得率を上げる</span>
               </motion.h1>
               
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
-                className="max-w-2xl text-lg leading-7 text-slate-600"
+                className="max-w-2xl text-lg leading-7 text-white/70"
               >
                 AI添削でエントリーシートの質を向上させ、企業管理で選考状況を見える化。<br />
                 ゲーム感覚で継続できる就活管理プラットフォーム。
               </motion.p>
               
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.8 }}
@@ -168,29 +163,29 @@ export default function Home() {
               >
                 <Link
                   href={`${ROUTES.LOGIN}?mode=signup`}
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-amber-300/40 transition hover:scale-105 hover:shadow-xl"
+                  className="dq-button"
                 >
                   無料で始める
                   <ArrowRightIcon className="h-4 w-4" />
                 </Link>
                 <Link
                   href="#features"
-                  className="inline-flex items-center gap-2 rounded-full border border-slate-300/80 bg-white/80 px-6 py-3 text-sm font-semibold text-slate-800 transition hover:bg-white hover:scale-105"
+                  className="dq-button-secondary"
                 >
                   機能を見る
                 </Link>
               </motion.div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
               className="grid gap-4"
             >
-              <div className="rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50 via-white to-rose-50 p-6 shadow-inner shadow-amber-200/40">
-                <p className="text-sm text-amber-600 font-semibold">成功実績</p>
-                <motion.div 
+              <div className="dq-panel p-6">
+                <p className="text-sm font-semibold text-yellow-200">成功実績</p>
+                <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.6, delay: 1.2 }}
@@ -204,8 +199,8 @@ export default function Home() {
                       transition={{ duration: 0.4, delay: 1.4 + index * 0.1 }}
                       className="space-y-1"
                     >
-                      <div className="text-2xl font-bold text-amber-600">{stat.value}</div>
-                      <div className="text-xs text-slate-600">{stat.label}</div>
+                      <div className="text-2xl font-bold text-yellow-300">{stat.value}</div>
+                      <div className="text-xs text-white/70">{stat.label}</div>
                     </motion.div>
                   ))}
                 </motion.div>
@@ -216,17 +211,17 @@ export default function Home() {
 
         {/* 機能セクション */}
         <section id="features" className="space-y-8">
-          <motion.div 
+          <motion.div
             {...fadeInUp}
             className="text-center space-y-3"
           >
-            <h2 className="text-3xl font-bold text-slate-900">就活を変える3つの機能</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold text-white">就活を変える3つの機能</h2>
+            <p className="text-lg text-white/70 max-w-2xl mx-auto">
               AI技術と効率的な管理機能で、就活の成功確率を大幅に向上させます
             </p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             variants={staggerChildren}
             initial="initial"
             whileInView="animate"
@@ -238,15 +233,15 @@ export default function Home() {
                 key={feature.title}
                 variants={fadeInUp}
                 whileHover={{ scale: 1.02, y: -5 }}
-                className="rounded-2xl border border-slate-200/80 bg-white/90 p-8 shadow-lg backdrop-blur transition-all duration-300"
+                className="dq-card p-8 transition-all duration-300"
               >
-                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-lg">
+                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-white bg-black text-white shadow-[0_0_0_2px_black,0_0_0_4px_white]">
                   <feature.icon className="h-6 w-6" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">{feature.title}</h3>
-                <p className="text-slate-600 mb-4 leading-6">{feature.description}</p>
-                <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700">
-                  <CheckCircleIcon className="h-4 w-4" />
+                <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+                <p className="text-white/70 mb-4 leading-6">{feature.description}</p>
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-black/60 px-3 py-1 text-sm font-medium text-emerald-200">
+                  <CheckCircleIcon className="h-4 w-4 text-emerald-200" />
                   {feature.benefit}
                 </div>
               </motion.div>
@@ -256,17 +251,17 @@ export default function Home() {
 
         {/* 始め方セクション */}
         <section className="space-y-8">
-          <motion.div 
+          <motion.div
             {...fadeInUp}
             className="text-center space-y-3"
           >
-            <h2 className="text-3xl font-bold text-slate-900">簡単3ステップで始める</h2>
-            <p className="text-lg text-slate-600">
+            <h2 className="text-3xl font-bold text-white">簡単3ステップで始める</h2>
+            <p className="text-lg text-white/70">
               面倒な設定は一切不要。今すぐ就活効率化を体験してください
             </p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             variants={staggerChildren}
             initial="initial"
             whileInView="animate"
@@ -277,17 +272,17 @@ export default function Home() {
               <motion.div
                 key={step.step}
                 variants={fadeInUp}
-                className="relative rounded-2xl border border-slate-200/80 bg-white/90 p-6 text-center shadow-lg"
+                className="dq-card relative p-6 text-center"
               >
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-lg font-bold text-white shadow-lg">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-black text-lg font-bold text-white shadow-[0_0_0_2px_black,0_0_0_4px_white]">
                   {step.step}
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">{step.title}</h3>
-                <p className="text-slate-600 text-sm">{step.description}</p>
+                <h3 className="text-lg font-semibold text-white mb-2">{step.title}</h3>
+                <p className="text-white/70 text-sm">{step.description}</p>
                 
                 {index < steps.length - 1 && (
                   <div className="absolute -right-3 top-1/2 hidden md:block">
-                    <ArrowRightIcon className="h-6 w-6 text-amber-400" />
+                    <ArrowRightIcon className="h-6 w-6 text-yellow-300" />
                   </div>
                 )}
               </motion.div>
@@ -296,22 +291,22 @@ export default function Home() {
         </section>
 
         {/* CTA */}
-        <motion.section 
+        <motion.section
           {...fadeInUp}
-          className="rounded-3xl border border-amber-200/60 bg-gradient-to-br from-amber-100/80 via-amber-50/90 to-white p-12 text-center shadow-xl"
+          className="dq-window p-10 text-center"
         >
           <div className="mx-auto max-w-2xl space-y-6">
-            <h2 className="text-3xl font-bold text-slate-900">
+            <h2 className="text-3xl font-bold text-white">
               今すぐ就活を効率化しませんか？
             </h2>
-            <p className="text-lg text-slate-700">
+            <p className="text-lg text-white/70">
               無料で始められます。面倒な設定は不要で、登録後すぐに利用可能です。
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link
                   href={`${ROUTES.LOGIN}?mode=signup`}
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 px-8 py-4 text-lg font-semibold text-slate-900 shadow-lg shadow-amber-300/40 transition hover:shadow-xl"
+                  className="dq-button"
                 >
                   無料で始める
                   <ArrowRightIcon className="h-5 w-5" />
@@ -320,7 +315,7 @@ export default function Home() {
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link
                   href={ROUTES.LOGIN}
-                  className="inline-flex items-center gap-2 rounded-full border border-slate-300/80 bg-white/80 px-8 py-4 text-lg font-semibold text-slate-800 transition hover:bg-white"
+                  className="dq-button-secondary"
                 >
                   ログイン
                 </Link>
@@ -330,25 +325,25 @@ export default function Home() {
         </motion.section>
 
         {/* セキュリティ */}
-        <motion.section 
+        <motion.section
           {...fadeInUp}
-          className="rounded-2xl border border-white/70 bg-white/80 p-8 shadow-lg backdrop-blur"
+          className="dq-window p-8"
         >
-          <div className="flex items-center justify-center gap-3 text-emerald-700">
+          <div className="flex items-center justify-center gap-3 text-emerald-200">
             <ShieldCheckIcon className="h-6 w-6" />
             <p className="font-semibold">安全・安心なデータ管理</p>
           </div>
-          <div className="mt-4 grid gap-3 text-center text-sm text-slate-600 md:grid-cols-3">
+          <div className="mt-4 grid gap-3 text-center text-sm text-white/70 md:grid-cols-3">
             <div>
-              <strong className="text-slate-900">暗号化通信</strong>
+              <strong className="text-white">暗号化通信</strong>
               <br />全ての通信はSSLで保護
             </div>
             <div>
-              <strong className="text-slate-900">データ保護</strong>
+              <strong className="text-white">データ保護</strong>
               <br />個人情報は厳格に管理
             </div>
             <div>
-              <strong className="text-slate-900">セキュア認証</strong>
+              <strong className="text-white">セキュア認証</strong>
               <br />メール認証で安全ログイン
             </div>
           </div>

@@ -229,7 +229,7 @@ export default async function DashboardPage() {
       <section className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
         <div className="dq-window">
           <span className="dq-title">クエストカレンダー</span>
-          <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-300">
+          <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">
             ES / 面接 / インターン
           </div>
           <div className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-3 shadow-inner">
@@ -254,7 +254,7 @@ export default async function DashboardPage() {
                     </div>
                   ))}
                   {urgentEvents.length === 0 && (
-                    <div className="py-2 text-center text-xs text-gray-400">
+                    <div className="py-2 text-center text-xs text-white/60">
                       直近の 締切は ないようだ。
                     </div>
                   )}
@@ -282,7 +282,7 @@ export default async function DashboardPage() {
                     </Link>
                   ))}
                   {nextActions.length === 0 && (
-                    <div className="py-2 text-center text-xs text-gray-400">
+                    <div className="py-2 text-center text-xs text-white/60">
                       なすべきことは すべて おわった。
                     </div>
                   )}
@@ -318,7 +318,7 @@ export default async function DashboardPage() {
                     </div>
                   ))}
                   {recentXpLogs.length === 0 && (
-                    <div className="py-2 text-center text-xs text-gray-400">
+                    <div className="py-2 text-center text-xs text-white/60">
                       まだXPはありません。ES提出や面接ログでXPを獲得できます。
                     </div>
                   )}

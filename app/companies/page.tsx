@@ -30,20 +30,20 @@ export default async function CompaniesPage() {
       headerDescription="業界・ステータス・志望度を一覧で把握し、編集ページへ遷移できます"
       headerActions={
         <div className="flex flex-wrap gap-3">
-          <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
+          <Link href={ROUTES.HOME} className="dq-button-secondary">
             <HomeIcon className="h-4 w-4" />
             MVPホーム
           </Link>
           <Link
             href={ROUTES.DASHBOARD}
-            className="mvp-button mvp-button-secondary"
+            className="dq-button-secondary"
           >
             <ArrowUturnLeftIcon className="h-4 w-4" />
             ダッシュボードへ
           </Link>
           <Link
             href={ROUTES.COMPANIES_NEW}
-            className="mvp-button mvp-button-primary"
+            className="dq-button"
           >
             <PlusIcon className="h-4 w-4" />
             企業を追加
