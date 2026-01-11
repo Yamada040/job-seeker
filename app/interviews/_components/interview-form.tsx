@@ -36,7 +36,10 @@ function normalizeInitialQuestions(input?: InterviewQuestionsPayload | null): {
   if (!input) return { items: [{ ...emptyQA }, { ...emptyQA }], reflection: baseReflection };
   if (Array.isArray(input)) {
     const items = input.length ? input : [{ ...emptyQA }];
-    return { items: items.map((q) => ({ question: q.question, answer: q.answer, rating: q.rating ?? "average" })), reflection: baseReflection };
+    return {
+      items: items.map((q) => ({ question: q.question, answer: q.answer, rating: q.rating ?? "average" })),
+      reflection: baseReflection,
+    };
   }
   const items = (input.items?.length ? input.items : [{ ...emptyQA }]).map((q) => ({
     question: q.question,
@@ -91,7 +94,7 @@ export default function InterviewForm({
         (qa, idx) =>
           `${idx + 1}. Q: ${qa.question || "未入力"} / A: ${qa.answer || "未入力"} / 評価: ${
             qa.rating === "good" ? "良い" : qa.rating === "bad" ? "悪い" : "普通"
-          }`
+          }`,
       ),
       "",
       `改善したい点: ${reflection.improvement || "未入力"}`,

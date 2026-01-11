@@ -46,10 +46,7 @@ function normalizeQuestions(input: QuestionsInput): {
   };
 }
 
-export async function PUT(
-  request: Request,
-  ctx: { params: { id: string } | Promise<{ id: string }> }
-) {
+export async function PUT(request: Request, ctx: { params: { id: string } | Promise<{ id: string }> }) {
   const resolvedParams = await Promise.resolve(ctx.params);
   const id = (resolvedParams as { id?: string })?.id;
   if (!id) {
@@ -75,9 +72,11 @@ export async function PUT(
   const template = Boolean(requestValidation.data.template);
 
   if (companyName.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("企業名") }, { status: 400 });
-  if (stage && stage.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("面接回次/ステージ") }, { status: 400 });
+  if (stage && stage.length > MAX_TEXT_LEN)
+    return NextResponse.json({ error: tooLong("面接回次/ステージ") }, { status: 400 });
   if (format && format.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("面接形式") }, { status: 400 });
-  if (interviewTitle && interviewTitle.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("タイトル") }, { status: 400 });
+  if (interviewTitle && interviewTitle.length > MAX_TEXT_LEN)
+    return NextResponse.json({ error: tooLong("タイトル") }, { status: 400 });
 
   const normalized = normalizeQuestions(requestValidation.data.questions as QuestionsInput);
   if (!normalized.items.length) {

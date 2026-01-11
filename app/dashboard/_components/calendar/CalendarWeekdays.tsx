@@ -11,7 +11,7 @@ export function CalendarWeekdays() {
           className={clsx(
             "rounded-lg bg-white/60 py-2 shadow-sm backdrop-blur dark:bg-slate-900/70",
             idx === 0 && "text-rose-500",
-            idx === 6 && "text-sky-500"
+            idx === 6 && "text-sky-500",
           )}
         >
           {day}

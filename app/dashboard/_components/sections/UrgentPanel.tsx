@@ -30,7 +30,9 @@ export function UrgentPanel({ events, today }: Props) {
                   <span className="font-semibold">{evt.type === "es" ? "ES締切" : "面接"}</span>
                   <span>{evt.date}</span>
                 </div>
-                <p className="mt-1 text-sm font-semibold text-amber-900 dark:text-amber-50">{evt.company || evt.title}</p>
+                <p className="mt-1 text-sm font-semibold text-amber-900 dark:text-amber-50">
+                  {evt.company || evt.title}
+                </p>
                 <p className="text-xs text-amber-800/80 dark:text-amber-100/80">{evt.title}</p>
               </div>
             ))}

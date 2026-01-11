@@ -14,7 +14,9 @@ export function InterviewQuestionsSection({ questions, onChange, onAdd, onRemove
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">質問ログ（質問・回答・自己評価）</span>
+        <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+          質問ログ（質問・回答・自己評価）
+        </span>
         <button type="button" onClick={onAdd} className="mvp-button mvp-button-secondary">
           <PlusIcon className="h-4 w-4" />
           行を追加

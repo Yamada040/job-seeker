@@ -12,15 +12,10 @@ export function AiPanelHeader({ title, hint, cacheKey, response }: Props) {
     <div className="flex items-center justify-between">
       <div>
         <p className="text-xs font-semibold text-amber-700">{title}</p>
-        {hint ? (
-          <p className="text-[11px] text-slate-500 dark:text-slate-300">
-            {hint}
-          </p>
-        ) : null}
+        {hint ? <p className="text-[11px] text-slate-500 dark:text-slate-300">{hint}</p> : null}
         {cacheKey ? (
           <p className="text-[11px] text-slate-400 dark:text-slate-500">
-            ※
-            1回保存すると再実行はできません。入力を確認してから送信してください。
+            ※ 1回保存すると再実行はできません。入力を確認してから送信してください。
           </p>
         ) : null}
       </div>

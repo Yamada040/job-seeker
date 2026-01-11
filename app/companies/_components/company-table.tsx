@@ -89,8 +89,8 @@ export function CompanyTable({ items }: { items: Company[] }) {
               filtered.map((c) => (
                 <tr key={c.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/60">
                   <Td className="truncate">
-                    <Link 
-                      href={ROUTES.COMPANY_DETAIL(c.id)} 
+                    <Link
+                      href={ROUTES.COMPANY_DETAIL(c.id)}
                       className="font-semibold text-amber-700 hover:underline dark:text-amber-300 block truncate"
                       title={c.name}
                     >
@@ -123,6 +123,12 @@ export function CompanyTable({ items }: { items: Company[] }) {
 }
 
 const Th = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-  <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300 ${className}`}>{children}</th>
+  <th
+    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300 ${className}`}
+  >
+    {children}
+  </th>
 );
-const Td = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => <td className={`px-4 py-3 align-top ${className}`}>{children}</td>;
+const Td = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
+  <td className={`px-4 py-3 align-top ${className}`}>{children}</td>
+);

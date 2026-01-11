@@ -21,12 +21,15 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3 text-sm text-slate-700">
           <span
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${entry.status === "submitted" ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-700"
-              }`}
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              entry.status === "submitted" ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-700"
+            }`}
           >
             {entry.status === "submitted" ? "提出済み" : "下書き"}
           </span>
-          {entry.status === "submitted" && !editing && <span className="text-xs text-slate-500">提出済みをプレビュー表示中</span>}
+          {entry.status === "submitted" && !editing && (
+            <span className="text-xs text-slate-500">提出済みをプレビュー表示中</span>
+          )}
         </div>
       </div>
 
@@ -40,11 +43,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
           onCancel={() => setEditing(false)}
         />
       ) : (
-        <EsPreviewSection
-          entry={entry}
-          combinedContent={combinedContent}
-          onEdit={() => setEditing(true)}
-        />
+        <EsPreviewSection entry={entry} combinedContent={combinedContent} onEdit={() => setEditing(true)} />
       )}
     </div>
   );

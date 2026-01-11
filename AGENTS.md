@@ -4,23 +4,27 @@
 日本語で返答してください。
 
 ## 技術スタック
+
 - Next.js (App Router) + TypeScript + React + Tailwind CSS v4
 - Supabase (Auth/DB/Storage)
 - AI: `lib/ai/` のラッパー経由で呼び出し
 
 ## 開発原則（必須）
+
 - **TypeScript/React の原則を尊重**: 型安全・明確な責務分離・コンポーネントの単一責任を守る。
 - **YAGNI**: 今必要な機能のみ実装し、将来のための拡張は入れない。
 - **KISS**: まずはシンプルな解決策を選び、複雑化を避ける。
 - **DRY**: 重複を避け、共通処理は適切に抽象化する。
 
 ## コード品質チェック（推奨）
+
 - 本当に今必要な機能か（YAGNI）
 - シンプルで読みやすいか（KISS）
 - 重複がないか（DRY）
 - 1つの責務に集中しているか
 
 ## 実装ルール
+
 - 既存のコード構造と命名規則に従う。
 - App Router の基本に従い、Server/Client の責務を混同しない。
 - 認証が必要なデータ取得は `user_id` でスコープし、未ログインはリダイレクト。
@@ -32,6 +36,7 @@
 - **命名規則**: `parsed` のような曖昧な名前は避け、用途が分かる名称を使う（例: `*Validation`, `*Data`, `*Value`）。
 
 ## コマンド
+
 ```bash
 npm run dev        # 開発サーバー
 npm run lint       # ESLint

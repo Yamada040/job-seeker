@@ -33,7 +33,9 @@ export function EsPreviewSection({ entry, combinedContent, onEdit }: Props) {
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <p className="text-xs text-slate-600">企業URL</p>
-              <p className="break-all rounded-lg border border-slate-200 bg-white px-3 py-2">{entry.company_url || "-"}</p>
+              <p className="break-all rounded-lg border border-slate-200 bg-white px-3 py-2">
+                {entry.company_url || "-"}
+              </p>
             </div>
             <div>
               <p className="text-xs text-slate-600">メモ</p>

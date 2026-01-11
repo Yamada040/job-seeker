@@ -7,13 +7,7 @@ import { AiPanel } from "@/app/_components/ai-panel";
 import { ROUTES } from "@/lib/constants/routes";
 import { Answers } from "../types";
 import { CheckboxGroup, SelectBox, TextArea } from "./aptitude-fields";
-import {
-  defaultAnswers,
-  interestOptions,
-  mbtiOptions,
-  strengthOptions,
-  valueOptions,
-} from "./aptitude-constants";
+import { defaultAnswers, interestOptions, mbtiOptions, strengthOptions, valueOptions } from "./aptitude-constants";
 import { buildPrompt } from "./aptitude-utils";
 
 type Props = {
@@ -21,7 +15,6 @@ type Props = {
   initialSummary: string | null;
   initialResultId: string | null;
 };
-
 
 export default function AptitudeForm({ initialAnswers, initialSummary, initialResultId }: Props) {
   const [answers, setAnswers] = useState<Answers>(() => {
@@ -103,12 +96,28 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
             selected={answers.values}
             onToggle={(v) => toggle("values", v)}
           />
-          <TextArea label="好きな業務/没頭できること" value={answers.enjoy} onChange={(v) => handleChange("enjoy", v)} />
-          <TextArea label="誇りに思う達成" value={answers.achievements} onChange={(v) => handleChange("achievements", v)} />
+          <TextArea
+            label="好きな業務/没頭できること"
+            value={answers.enjoy}
+            onChange={(v) => handleChange("enjoy", v)}
+          />
+          <TextArea
+            label="誇りに思う達成"
+            value={answers.achievements}
+            onChange={(v) => handleChange("achievements", v)}
+          />
           <TextArea label="苦手・避けたいこと" value={answers.dislike} onChange={(v) => handleChange("dislike", v)} />
-          <TextArea label="働き方の希望（例: リモート中心、出社多め）" value={answers.workStyle} onChange={(v) => handleChange("workStyle", v)} />
+          <TextArea
+            label="働き方の希望（例: リモート中心、出社多め）"
+            value={answers.workStyle}
+            onChange={(v) => handleChange("workStyle", v)}
+          />
           <TextArea label="希望勤務地/働き方" value={answers.location} onChange={(v) => handleChange("location", v)} />
-          <TextArea label="興味のある業界" value={answers.industryWish} onChange={(v) => handleChange("industryWish", v)} />
+          <TextArea
+            label="興味のある業界"
+            value={answers.industryWish}
+            onChange={(v) => handleChange("industryWish", v)}
+          />
           <TextArea label="興味のある職種" value={answers.roleWish} onChange={(v) => handleChange("roleWish", v)} />
           <SelectBox
             label="MBTIタイプ（任意）"

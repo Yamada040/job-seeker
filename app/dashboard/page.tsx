@@ -28,12 +28,7 @@ async function getDashboardData() {
   if (!userId) throw new Error("No user");
 
   const [esRes, profileRes, calendarRes, interviewsRes, xpLogsRes] = await Promise.all([
-    supabase
-      .from("es_entries")
-      .select("*")
-      .eq("user_id", userId)
-      .order("updated_at", { ascending: false })
-      .limit(12),
+    supabase.from("es_entries").select("*").eq("user_id", userId).order("updated_at", { ascending: false }).limit(12),
     supabase
       .from("profiles")
       .select("full_name,avatar_id,university,faculty,target_industry,career_axis,goal_state,xp,level")
@@ -41,14 +36,18 @@ async function getDashboardData() {
       .maybeSingle<
         Pick<
           ProfileRow,
-          "full_name" | "avatar_id" | "university" | "faculty" | "target_industry" | "career_axis" | "goal_state" | "xp" | "level"
+          | "full_name"
+          | "avatar_id"
+          | "university"
+          | "faculty"
+          | "target_industry"
+          | "career_axis"
+          | "goal_state"
+          | "xp"
+          | "level"
         >
       >(),
-    supabase
-      .from("calendar_events")
-      .select("*")
-      .eq("user_id", userId)
-      .order("date", { ascending: true }),
+    supabase.from("calendar_events").select("*").eq("user_id", userId).order("date", { ascending: true }),
     supabase
       .from("interview_logs")
       .select("id, company_name, interview_date, self_review, questions")
@@ -67,12 +66,18 @@ async function getDashboardData() {
   return {
     esEntries,
     user: userData?.user ?? null,
-    profile: profileRes.data as
-      | Pick<
-          ProfileRow,
-          "full_name" | "avatar_id" | "university" | "faculty" | "target_industry" | "career_axis" | "goal_state" | "xp" | "level"
-        >
-      | null,
+    profile: profileRes.data as Pick<
+      ProfileRow,
+      | "full_name"
+      | "avatar_id"
+      | "university"
+      | "faculty"
+      | "target_industry"
+      | "career_axis"
+      | "goal_state"
+      | "xp"
+      | "level"
+    > | null,
     calendarEvents: (calendarRes.data as CalendarRow[] | null) ?? [],
     interviewLogs,
     xpLogs: (xpLogsRes.data as XpLogRow[] | null) ?? [],

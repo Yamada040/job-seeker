@@ -36,10 +36,7 @@ export default async function AptitudePage() {
   );
 
   return (
-    <AppLayout
-      headerActions={headerActions}
-      className="space-y-6"
-    >
+    <AppLayout headerActions={headerActions} className="space-y-6">
       <AptitudeForm
         initialAnswers={(data?.answers as AptitudeAnswers) ?? null}
         initialSummary={data?.ai_summary ?? null}

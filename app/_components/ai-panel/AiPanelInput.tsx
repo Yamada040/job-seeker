@@ -9,16 +9,7 @@ type Props = {
   onRun: () => void;
 };
 
-export function AiPanelInput({
-  input,
-  onChange,
-  wordCount,
-  hint,
-  loading,
-  saved,
-  saveUrl,
-  onRun,
-}: Props) {
+export function AiPanelInput({ input, onChange, wordCount, hint, loading, saved, saveUrl, onRun }: Props) {
   return (
     <>
       <textarea

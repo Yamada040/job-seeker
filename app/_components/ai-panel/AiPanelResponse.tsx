@@ -14,20 +14,13 @@ type Props = {
   onCopy: () => void;
 };
 
-export function AiPanelResponse({
-  response,
-  saveUrl,
-  saveId,
-  saved,
-  saving,
-  copied,
-  onSave,
-  onCopy,
-}: Props) {
+export function AiPanelResponse({ response, saveUrl, saveId, saved, saving, copied, onSave, onCopy }: Props) {
   return (
     <div className="mt-3 space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold text-amber-700">AI回答 {response?.provider === "saved" ? "（保存済み）" : ""}</p>
+        <p className="text-xs font-semibold text-amber-700">
+          AI回答 {response?.provider === "saved" ? "（保存済み）" : ""}
+        </p>
         <div className="flex gap-2">
           {saveUrl && saveId && !saved && (
             <button

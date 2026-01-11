@@ -128,7 +128,10 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
                 items.map((q) => (
                   <tr key={q.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/60">
                     <Td>
-                      <Link href={ROUTES.WEBTEST_DETAIL(q.id)} className="font-semibold text-amber-700 hover:underline dark:text-amber-300">
+                      <Link
+                        href={ROUTES.WEBTEST_DETAIL(q.id)}
+                        className="font-semibold text-amber-700 hover:underline dark:text-amber-300"
+                      >
                         {q.title}
                       </Link>
                     </Td>
@@ -150,6 +153,8 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
 }
 
 const Th = ({ children }: { children: React.ReactNode }) => (
-  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">{children}</th>
+  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
+    {children}
+  </th>
 );
 const Td = ({ children }: { children: React.ReactNode }) => <td className="px-4 py-3 align-top">{children}</td>;

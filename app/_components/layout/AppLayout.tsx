@@ -53,20 +53,18 @@ export function AppLayout({
         })}
       >
         {showHeader && (
-          <Header
-            actions={headerActions}
-            leftContent={leftContent}
-            actionsPlacement={actionsPlacement ?? "left"}
-          />
+          <Header actions={headerActions} leftContent={leftContent} actionsPlacement={actionsPlacement ?? "left"} />
         )}
 
-        <main
-          className={clsx("mx-auto max-w-7xl px-6 py-8 sm:px-10 sm:py-12", className)}
-        >
+        <main className={clsx("mx-auto max-w-7xl px-6 py-8 sm:px-10 sm:py-12", className)}>
           {(headerTitle || headerDescription) && (
             <div className="mb-6 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/80">
-              {headerTitle && <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{headerTitle}</h1>}
-              {headerDescription && <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">{headerDescription}</p>}
+              {headerTitle && (
+                <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{headerTitle}</h1>
+              )}
+              {headerDescription && (
+                <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">{headerDescription}</p>
+              )}
             </div>
           )}
           {children}

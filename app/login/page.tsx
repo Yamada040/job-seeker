@@ -46,7 +46,10 @@ export default async function LoginPage() {
               <p className="text-xs text-amber-700">ご利用前に</p>
               <p className="text-sm text-slate-700">サインイン後は、アカウントに紐づくデータが自動で読み込まれます。</p>
             </div>
-            <Link href={ROUTES.DASHBOARD} className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-800 transition hover:bg-white">
+            <Link
+              href={ROUTES.DASHBOARD}
+              className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-800 transition hover:bg-white"
+            >
               ダッシュボードを見る
             </Link>
           </div>

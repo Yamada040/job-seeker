@@ -55,7 +55,9 @@ export function EsListClient({ initialItems }: Props) {
               type="button"
               onClick={() => setTab(t.value)}
               className={`rounded-full border px-3 py-1 ${
-                tab === t.value ? "border-amber-300 bg-amber-50 text-amber-700" : "border-slate-200 bg-white text-slate-700"
+                tab === t.value
+                  ? "border-amber-300 bg-amber-50 text-amber-700"
+                  : "border-slate-200 bg-white text-slate-700"
               }`}
             >
               {t.label}
@@ -80,7 +82,9 @@ export function EsListClient({ initialItems }: Props) {
           >
             <p className="text-sm font-semibold">{es.title}</p>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-slate-700">
-              <span className="rounded-full bg-slate-100 px-2 py-1">{STATUS_LABEL_MAP[es.status ?? ""] ?? "未設定"}</span>
+              <span className="rounded-full bg-slate-100 px-2 py-1">
+                {STATUS_LABEL_MAP[es.status ?? ""] ?? "未設定"}
+              </span>
               {es.tags?.length ? (
                 es.tags.map((tag) => (
                   <span key={tag} className="rounded-full bg-amber-50 px-2 py-1 text-amber-700">
@@ -91,7 +95,9 @@ export function EsListClient({ initialItems }: Props) {
                 <span className="text-slate-400">タグなし</span>
               )}
             </div>
-            <p className="mt-1 text-xs text-slate-600">更新日: {es.updated_at ? new Date(es.updated_at).toLocaleDateString() : "-"}</p>
+            <p className="mt-1 text-xs text-slate-600">
+              更新日: {es.updated_at ? new Date(es.updated_at).toLocaleDateString() : "-"}
+            </p>
           </Link>
         ))}
         {filtered.length === 0 ? (

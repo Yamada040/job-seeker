@@ -140,15 +140,7 @@ export default function SelfAnalysisForm({
   );
 }
 
-function TextArea({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
+function TextArea({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <label className="block space-y-2">
       <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{label}</span>

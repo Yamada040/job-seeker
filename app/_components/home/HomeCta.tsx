@@ -13,9 +13,7 @@ export function HomeCta() {
     >
       <div className="mx-auto max-w-2xl space-y-6">
         <h2 className="text-3xl font-bold text-slate-900">今すぐ就活を効率化しませんか？</h2>
-        <p className="text-lg text-slate-700">
-          無料で始められます。面倒な設定は不要で、登録後すぐに利用可能です。
-        </p>
+        <p className="text-lg text-slate-700">無料で始められます。面倒な設定は不要で、登録後すぐに利用可能です。</p>
         <div className="flex flex-wrap justify-center gap-4">
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link

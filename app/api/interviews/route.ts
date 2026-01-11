@@ -68,9 +68,11 @@ export async function POST(request: Request) {
   const template = Boolean(requestValidation.data.template);
 
   if (companyName.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("企業名") }, { status: 400 });
-  if (stage && stage.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("面接回次/ステージ") }, { status: 400 });
+  if (stage && stage.length > MAX_TEXT_LEN)
+    return NextResponse.json({ error: tooLong("面接回次/ステージ") }, { status: 400 });
   if (format && format.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("面接形式") }, { status: 400 });
-  if (interviewTitle && interviewTitle.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("タイトル") }, { status: 400 });
+  if (interviewTitle && interviewTitle.length > MAX_TEXT_LEN)
+    return NextResponse.json({ error: tooLong("タイトル") }, { status: 400 });
 
   const normalized = normalizeQuestions(requestValidation.data.questions as QuestionsInput);
   if (!normalized.items.length) {

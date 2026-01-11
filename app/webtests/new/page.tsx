@@ -29,7 +29,11 @@ export default async function WebtestNewPage() {
   );
 
   return (
-    <AppLayout headerTitle="Webテスト問題を追加" headerDescription="オリジナル問題を登録し、演習に使います" headerActions={headerActions}>
+    <AppLayout
+      headerTitle="Webテスト問題を追加"
+      headerDescription="オリジナル問題を登録し、演習に使います"
+      headerActions={headerActions}
+    >
       <form
         id="webtest-form-new"
         action={createWebtestQuestion}

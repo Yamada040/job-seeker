@@ -80,12 +80,16 @@ export async function submitWebtestAnswer(questionId: string, formData: FormData
   const normalize = (s: string) => s.trim().toLowerCase();
   const isCorrect = normalize(answerData.answer) === normalize(question.answer);
 
-  const { data: attempt, error } = await supabase.from("webtest_attempts").insert({
-    user_id: userData.user.id,
-    question_id: questionId,
-    is_correct: isCorrect,
-    time_spent: answerData.time_spent ?? null,
-  }).select("id").single();
+  const { data: attempt, error } = await supabase
+    .from("webtest_attempts")
+    .insert({
+      user_id: userData.user.id,
+      question_id: questionId,
+      is_correct: isCorrect,
+      time_spent: answerData.time_spent ?? null,
+    })
+    .select("id")
+    .single();
   if (error || !attempt?.id) throw error || new Error("回答の保存に失敗しました");
 
   await awardXp(userData.user.id, "webtest_attempt_complete", { refId: attempt.id, supabase });

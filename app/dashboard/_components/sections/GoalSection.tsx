@@ -13,7 +13,9 @@ export function GoalSection({ targetIndustry, careerAxis, goalState }: Props) {
     <section className="rounded-3xl border border-white/70 bg-white/90 p-8 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
       <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-600">My Goal</p>
       <div className="mt-3 space-y-3">
-        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">あなたの就活目標をいつでも思い出そう</h1>
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">
+          あなたの就活目標をいつでも思い出そう
+        </h1>
         <p className="text-sm text-slate-700 dark:text-slate-300">
           志望業界・職種や大切にしたい軸を短く書き留めておくと、日々の行動が目標に結びつきます。
         </p>

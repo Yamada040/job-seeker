@@ -55,7 +55,11 @@ export const stats = [
 
 export const badges = [
   { icon: SparklesIcon, label: "AI活用", className: "border-amber-200/80 bg-amber-50/80" },
-  { icon: CheckCircleIcon, label: "無料で始められる", className: "border-emerald-200/80 bg-emerald-50/80 text-emerald-700" },
+  {
+    icon: CheckCircleIcon,
+    label: "無料で始められる",
+    className: "border-emerald-200/80 bg-emerald-50/80 text-emerald-700",
+  },
 ];
 
 export { ArrowRightIcon, CheckCircleIcon };

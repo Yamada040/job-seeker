@@ -2,10 +2,7 @@
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
 import { calendarEventSchema } from "@/lib/validation/schemas/api";
 
-export async function PUT(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> },
-) {
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
   const supabase = await createSupabaseServerActionClient();
   const { data: userData, error: userError } = await supabase.auth.getUser();

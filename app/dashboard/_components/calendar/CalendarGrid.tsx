@@ -28,7 +28,7 @@ export function CalendarGrid({ monthDays, eventsByDate, onSelectDate }: Props) {
               "dark:bg-slate-900/80 dark:hover:bg-slate-900",
               inCurrentMonth
                 ? "border-slate-200 dark:border-slate-700"
-                : "border-dashed border-slate-200/70 text-slate-400 dark:border-slate-700/70 opacity-60"
+                : "border-dashed border-slate-200/70 text-slate-400 dark:border-slate-700/70 opacity-60",
             )}
           >
             <div className="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-300">
@@ -36,7 +36,7 @@ export function CalendarGrid({ monthDays, eventsByDate, onSelectDate }: Props) {
                 className={clsx(
                   inCurrentMonth ? "" : "opacity-60",
                   weekday === 0 && "text-rose-500",
-                  weekday === 6 && "text-sky-500"
+                  weekday === 6 && "text-sky-500",
                 )}
               >
                 {day}
@@ -44,7 +44,7 @@ export function CalendarGrid({ monthDays, eventsByDate, onSelectDate }: Props) {
               <span
                 className={clsx(
                   "text-[10px] rounded-full border px-2 py-0.5",
-                  "border-slate-200 text-amber-700 dark:border-slate-700 dark:text-amber-200"
+                  "border-slate-200 text-amber-700 dark:border-slate-700 dark:text-amber-200",
                 )}
               >
                 ＋
@@ -59,7 +59,7 @@ export function CalendarGrid({ monthDays, eventsByDate, onSelectDate }: Props) {
                     evt.type === "es" && "bg-rose-50 text-rose-700",
                     evt.type === "interview" && "bg-indigo-50 text-indigo-700",
                     evt.type === "intern" && "bg-emerald-50 text-emerald-700",
-                    evt.type === "other" && "bg-slate-100 text-slate-700"
+                    evt.type === "other" && "bg-slate-100 text-slate-700",
                   )}
                 >
                   <p className="font-semibold">{evt.company || evt.title}</p>

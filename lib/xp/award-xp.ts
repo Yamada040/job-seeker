@@ -31,11 +31,7 @@ function startOfToday() {
   return d;
 }
 
-export async function awardXp(
-  userId: string,
-  action: XpAction,
-  opts?: { refId?: string | null; supabase?: Client }
-) {
+export async function awardXp(userId: string, action: XpAction, opts?: { refId?: string | null; supabase?: Client }) {
   const rule = XP_CONFIG[action];
   if (!rule) return;
 
