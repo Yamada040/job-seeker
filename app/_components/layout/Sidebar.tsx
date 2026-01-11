@@ -34,18 +34,20 @@ const navigationItems: NavItem[] = [
   { label: "プロフィール", href: "/profile", icon: UserIcon, description: "ユーザー設定とアバター" },
 ];
 
-const bottomItems: NavItem[] = [
-  { label: "ログアウト", href: "/login", icon: ArrowRightOnRectangleIcon },
-];
+const bottomItems: NavItem[] = [{ label: "ログアウト", href: "/login", icon: ArrowRightOnRectangleIcon }];
 
-export function Sidebar() {
+type Props = {
+  onToggle: () => void;
+};
+
+export function Sidebar({ onToggle }: Props) {
   const pathname = usePathname();
 
   const NavLink = ({ item, isActive }: { item: NavItem; isActive: boolean }) => (
     <Link
       href={item.href}
       className={clsx(
-        "group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
+        "group flex items-center gap-2.5 rounded-xl px-4 py-2.5 text-xs font-semibold transition-all duration-200",
         {
           "bg-white/90 text-amber-700 shadow-md shadow-amber-200/50 border border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30 dark:shadow-none":
             isActive,
@@ -55,64 +57,58 @@ export function Sidebar() {
       )}
     >
       <item.icon
-        className={clsx("h-5 w-5 shrink-0 transition-colors", {
+        className={clsx("h-4 w-4 shrink-0 transition-colors", {
           "text-amber-600 dark:text-amber-400": isActive,
           "text-slate-500 group-hover:text-slate-800 dark:text-slate-500 dark:group-hover:text-slate-300": !isActive,
         })}
       />
-      <div className="min-w-0 flex-1">
-        <div className="truncate">{item.label}</div>
-        {item.description && (
-          <div className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">{item.description}</div>
-        )}
-      </div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-xs">{item.label}</div>
+          {item.description && (
+          <div className="mt-0.5 truncate text-[0.65rem] font-normal text-slate-500 dark:text-slate-400">
+            {item.description}
+          </div>
+          )}
+        </div>
     </Link>
   );
 
   return (
-    <div className="fixed left-0 top-0 z-50 h-full w-60 border-r border-white/50 bg-white/70 backdrop-blur dark:border-gray-800 dark:bg-black">
-      <div className="flex items-center gap-2 border-b border-white/60 p-6 dark:border-gray-800">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-amber-300 to-orange-500 text-sm font-bold text-slate-900 shadow-md shadow-amber-300/40">
-          就
-        </div>
-        <span className="font-semibold text-slate-900 dark:text-slate-100">就活Copilot</span>
-      </div>
-
-      <nav className="flex-1 p-4">
-        <div className="space-y-2">
-          {navigationItems.map((item) => (
-            <NavLink
-              key={item.href}
-              item={item}
-              isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
-            />
-          ))}
-        </div>
-      </nav>
-
-      <div className="border-t border-white/60 p-4 dark:border-gray-800">
-        <div className="space-y-3">
-          <div className="space-y-2">
-            {bottomItems.map((item) => (
-              <NavLink key={item.href} item={item} isActive={pathname === item.href} />
+    <div className="fixed left-0 top-20 z-40 h-[calc(100vh-5rem)] w-60 border-r border-white/50 bg-white/70 backdrop-blur dark:border-gray-800 dark:bg-black">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="absolute -right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-md transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+        aria-label="サイドバーを閉じる"
+      >
+        {"<"}
+      </button>
+      <div className="flex h-full flex-col gap-6 overflow-y-auto px-5 py-7">
+        <nav className="flex-1">
+          <div className="space-y-3">
+            {navigationItems.map((item) => (
+              <NavLink
+                key={item.href}
+                item={item}
+                isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
+              />
             ))}
           </div>
-        </div>
-      </div>
+        </nav>
 
-      <div className="border-t border-white/60 p-4 dark:border-gray-800">
-        <div className="flex items-center gap-3 rounded-xl border border-white/70 bg-white/90 p-3 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-amber-300 to-orange-500 text-sm font-bold text-slate-900 shadow-md">
-            U
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">ユーザー</div>
-            <div className="truncate text-xs text-slate-600 dark:text-slate-400">レベル 3 | 150 XP</div>
+        <div className="border-t border-white/60 pt-5 dark:border-gray-800">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              {bottomItems.map((item) => (
+                <NavLink key={item.href} item={item} isActive={pathname === item.href} />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-      <div className="flex justify-center">
-        <ThemeToggle />
+
+        <div className="flex justify-center pb-2">
+          <ThemeToggle />
+        </div>
       </div>
     </div>
   );

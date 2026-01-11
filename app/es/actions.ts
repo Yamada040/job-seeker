@@ -13,8 +13,8 @@ type Question = { id: string; prompt: string; answer_md: string };
 function parseQuestions(questionsJson: string | null): Question[] {
   if (!questionsJson) return [];
   try {
-    const parsed = JSON.parse(questionsJson);
-    const validated = esQuestionsSchema.parse(parsed);
+    const questionsValue = JSON.parse(questionsJson);
+    const validated = esQuestionsSchema.parse(questionsValue);
     return validated
       .map((q) => ({
         id: typeof q?.id === "string" ? q.id : randomUUID(),
@@ -48,7 +48,7 @@ export async function createEs(formData: FormData) {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
-  const parsed = esFormSchema.parse({
+  const esData = esFormSchema.parse({
     company_name: formData.get("company_name"),
     selection_status: formData.get("selection_status"),
     company_url: formData.get("company_url"),
@@ -60,30 +60,30 @@ export async function createEs(formData: FormData) {
     questions_json: formData.get("questions_json"),
     intent: formData.get("intent"),
   });
-  const questions = parseQuestions(parsed.questions_json ?? null);
-  const nextStatus = parsed.intent === "submit" ? "submitted" : "draft";
+  const questions = parseQuestions(esData.questions_json ?? null);
+  const nextStatus = esData.intent === "submit" ? "submitted" : "draft";
 
-  const tags = parsed.tags
+  const tags = esData.tags
     .split(",")
     .map((t) => t.trim())
     .filter(Boolean);
 
   if (nextStatus === "submitted") {
-    if (!company_name) throw new Error("提出には企業名が必要です");
+    if (!esData.company_name) throw new Error("提出には企業名が必要です");
     // if (!selection_status) throw new Error("提出には職種/募集枠が必要です");
     // if (!deadline) throw new Error("提出日を入力してください");
   }
 
-  const combinedContent = combineContent(questions, parsed.content_md);
+  const combinedContent = combineContent(questions, esData.content_md);
 
   const payload = {
     user_id: userData.user.id,
-    company_name: parsed.company_name ?? null,
-    selection_status: parsed.selection_status ?? null,
-    company_url: parsed.company_url ?? null,
-    memo: parsed.memo ?? null,
-    deadline: parsed.deadline ?? null,
-    title: parsed.title,
+    company_name: esData.company_name ?? null,
+    selection_status: esData.selection_status ?? null,
+    company_url: esData.company_url ?? null,
+    memo: esData.memo ?? null,
+    deadline: esData.deadline ?? null,
+    title: esData.title,
     status: nextStatus,
     content_md: combinedContent,
     questions,
@@ -108,7 +108,7 @@ export async function updateEs(id: string, formData: FormData) {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
-  const parsed = esFormSchema.parse({
+  const esData = esFormSchema.parse({
     company_name: formData.get("company_name"),
     selection_status: formData.get("selection_status"),
     company_url: formData.get("company_url"),
@@ -120,31 +120,31 @@ export async function updateEs(id: string, formData: FormData) {
     questions_json: formData.get("questions_json"),
     intent: formData.get("intent"),
   });
-  const questions = parseQuestions(parsed.questions_json ?? null);
-  const nextStatus = parsed.intent === "submit" ? "submitted" : "draft";
+  const questions = parseQuestions(esData.questions_json ?? null);
+  const nextStatus = esData.intent === "submit" ? "submitted" : "draft";
 
-  const tags = parsed.tags
+  const tags = esData.tags
     .split(",")
     .map((t) => t.trim())
     .filter(Boolean);
 
   if (nextStatus === "submitted") {
-    if (!company_name) throw new Error("提出には企業名が必要です");
+    if (!esData.company_name) throw new Error("提出には企業名が必要です");
     // if (!selection_status) throw new Error("提出には職種/募集枠が必要です");
     // if (!deadline) throw new Error("提出日を入力してください");
   }
 
-  const combinedContent = combineContent(questions, parsed.content_md);
+  const combinedContent = combineContent(questions, esData.content_md);
 
   const { error } = await supabase
     .from("es_entries")
     .update({
-      company_name: parsed.company_name ?? null,
-      selection_status: parsed.selection_status ?? null,
-      company_url: parsed.company_url ?? null,
-      memo: parsed.memo ?? null,
-      deadline: parsed.deadline ?? null,
-      title: parsed.title,
+      company_name: esData.company_name ?? null,
+      selection_status: esData.selection_status ?? null,
+      company_url: esData.company_url ?? null,
+      memo: esData.memo ?? null,
+      deadline: esData.deadline ?? null,
+      title: esData.title,
       status: nextStatus,
       content_md: combinedContent,
       tags: tags.length ? tags : null,

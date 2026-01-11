@@ -17,6 +17,7 @@ interface HeaderProps {
   leftContent?: React.ReactNode;
   breadcrumbs?: BreadcrumbItem[];
   actionsPlacement?: "left" | "right";
+  showBrand?: boolean;
 }
 
 function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
@@ -72,12 +73,20 @@ function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
   return breadcrumbs;
 }
 
-export function Header({ title, description, actions, leftContent, breadcrumbs, actionsPlacement = "left" }: HeaderProps) {
+export function Header({
+  title,
+  description,
+  actions,
+  leftContent,
+  breadcrumbs,
+  actionsPlacement = "left",
+  showBrand,
+}: HeaderProps) {
   const pathname = usePathname();
   const generatedBreadcrumbs = breadcrumbs || generateBreadcrumbs(pathname);
 
   return (
-    <header className="border-b border-white/40 bg-white/70 px-6 py-4 backdrop-blur dark:border-gray-800 dark:bg-black">
+    <header className="fixed left-0 top-0 z-50 w-full border-b border-white/40 bg-white/80 px-6 py-4 backdrop-blur dark:border-gray-800 dark:bg-black">
       <div className="flex flex-col gap-3">
         {generatedBreadcrumbs.length > 1 && (
           <nav className="flex items-center space-x-1 text-sm">
@@ -106,9 +115,17 @@ export function Header({ title, description, actions, leftContent, breadcrumbs, 
 
         {actionsPlacement === "left" ? (
           <div className="flex items-start justify-between gap-6">
-            {leftContent ? (
-              <div className="flex-shrink-0">{leftContent}</div>
-            ) : null}
+            <div className="flex items-center gap-3">
+              {showBrand ? (
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-linear-to-br from-amber-300 to-orange-500 text-xs font-bold text-slate-900 shadow-md shadow-amber-300/40">
+                    就
+                  </span>
+                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">就活Copilot</span>
+                </div>
+              ) : null}
+              {leftContent ? <div className="flex-shrink-0">{leftContent}</div> : null}
+            </div>
             <div className="flex-1 min-w-0">
               {title && <h1 className="truncate text-2xl font-semibold text-slate-900 dark:text-slate-100">{title}</h1>}
               {description && <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{description}</p>}
@@ -124,9 +141,7 @@ export function Header({ title, description, actions, leftContent, breadcrumbs, 
               {description && <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{description}</p>}
             </div>
 
-            <div className={clsx("ml-4 flex items-center gap-2")}>
-              {actions}
-            </div>
+            <div className={clsx("ml-4 flex items-center gap-2")}>{actions}</div>
           </div>
         )}
       </div>

@@ -14,7 +14,7 @@ export async function createEsEntryAction(formData: FormData) {
   const user = userData?.user;
   if (!user) return redirect("/login");
 
-  const parsed = dashboardEsEntrySchema.parse({
+  const esEntryData = dashboardEsEntrySchema.parse({
     title: formData.get("title"),
     status: formData.get("status"),
     content_md: formData.get("content_md"),
@@ -22,9 +22,9 @@ export async function createEsEntryAction(formData: FormData) {
 
   const { error } = await supabase.from("es_entries").insert({
     user_id: user.id,
-    title: parsed.title,
-    status: parsed.status,
-    content_md: parsed.content_md,
+    title: esEntryData.title,
+    status: esEntryData.status,
+    content_md: esEntryData.content_md,
   });
 
   if (error) throw error;
@@ -40,7 +40,7 @@ export async function createCompanyAction(formData: FormData) {
   const user = userData?.user;
   if (!user) return redirect("/login");
 
-  const parsed = dashboardCompanySchema.parse({
+  const companyData = dashboardCompanySchema.parse({
     name: formData.get("name"),
     url: formData.get("url"),
     stage: formData.get("stage"),
@@ -48,9 +48,9 @@ export async function createCompanyAction(formData: FormData) {
 
   const { error } = await supabase.from("companies").insert({
     user_id: user.id,
-    name: parsed.name,
-    url: parsed.url,
-    stage: parsed.stage,
+    name: companyData.name,
+    url: companyData.url,
+    stage: companyData.stage,
   });
 
   if (error) throw error;

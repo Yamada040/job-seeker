@@ -17,9 +17,18 @@ function makeId() {
 
 function parseQuestions(questions: unknown): Question[] {
   if (!questions) return [];
-  const parsed = typeof questions === "string" ? (() => { try { return JSON.parse(questions); } catch { return []; } })() : questions;
-  if (Array.isArray(parsed)) {
-    return parsed.map((q) => ({
+  const questionsValue =
+    typeof questions === "string"
+      ? (() => {
+          try {
+            return JSON.parse(questions);
+          } catch {
+            return [];
+          }
+        })()
+      : questions;
+  if (Array.isArray(questionsValue)) {
+    return questionsValue.map((q) => ({
       id: typeof q?.id === "string" ? q.id : makeId(),
       prompt: typeof q?.prompt === "string" ? q.prompt : "",
       answer_md: typeof q?.answer_md === "string" ? q.answer_md : "",

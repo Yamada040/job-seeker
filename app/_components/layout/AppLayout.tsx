@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
 import { Sidebar } from "./Sidebar";
@@ -30,6 +31,16 @@ export function AppLayout({
   actionsPlacement,
 }: AppLayoutProps) {
   const pathname = usePathname();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    if (typeof window === "undefined") return true;
+    const stored = window.localStorage.getItem("sidebar-open");
+    return stored === null ? true : stored === "true";
+  });
+
+  useEffect(() => {
+    if (!showSidebar) return;
+    window.localStorage.setItem("sidebar-open", String(isSidebarOpen));
+  }, [isSidebarOpen, showSidebar]);
 
   // ログインとホームは素の表示
   if (pathname === "/login" || pathname === "/") {
@@ -37,6 +48,7 @@ export function AppLayout({
   }
 
   const leftContent = headerLeftContent ?? <XpBadge />;
+  const shouldShowSidebar = showSidebar && isSidebarOpen;
 
   return (
     <div className="relative min-h-screen overflow-hidden text-slate-900 dark:text-slate-100 dark:bg-black">
@@ -44,24 +56,35 @@ export function AppLayout({
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(255,196,38,0.12),transparent_50%),radial-gradient(circle_at_80%_10%,rgba(56,189,248,0.12),transparent_55%)] dark:bg-none" />
       </div>
 
-      {showSidebar && <Sidebar />}
+      {shouldShowSidebar && <Sidebar onToggle={() => setIsSidebarOpen(false)} />}
+      {showSidebar && !isSidebarOpen ? (
+        <button
+          type="button"
+          onClick={() => setIsSidebarOpen(true)}
+          className="fixed left-0 top-1/2 z-40 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-r-full border border-slate-200 bg-white text-slate-700 shadow-md transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          aria-label="サイドバーを開く"
+        >
+          {">"}
+        </button>
+      ) : null}
 
       <div
-        className={clsx("min-h-screen", {
-          "ml-60": showSidebar,
-          "ml-0": !showSidebar,
+        className={clsx("min-h-screen transition-[margin] duration-300", {
+          "ml-60": shouldShowSidebar,
+          "ml-0": !shouldShowSidebar,
         })}
       >
-        {showHeader && (
+      {showHeader && (
           <Header
             actions={headerActions}
             leftContent={leftContent}
             actionsPlacement={actionsPlacement ?? "left"}
+            showBrand
           />
         )}
 
         <main
-          className={clsx("mx-auto max-w-7xl px-6 py-8 sm:px-10 sm:py-12", className)}
+          className={clsx("mx-auto max-w-7xl px-6 pb-8 pt-24 sm:px-10 sm:pb-12", className)}
         >
           {(headerTitle || headerDescription) && (
             <div className="mb-6 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/80">

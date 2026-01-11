@@ -8,6 +8,10 @@ type ProfileLite = {
   level: number | null;
 };
 
+const PROFILE_CACHE_KEY = "profile-lite";
+const PROFILE_CACHE_TS_KEY = "profile-lite-ts";
+const CACHE_TTL_MS = 5 * 60 * 1000;
+
 function computeLevel(xp: number) {
   return Math.max(1, Math.floor(xp / 25) + 1);
 }
@@ -19,6 +23,16 @@ export function XpBadge() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        const cached = sessionStorage.getItem(PROFILE_CACHE_KEY);
+        const cachedAt = Number(sessionStorage.getItem(PROFILE_CACHE_TS_KEY) || "0");
+        if (cached) {
+          const cachedData = JSON.parse(cached) as ProfileLite | null;
+          setData(cachedData);
+          if (Date.now() - cachedAt < CACHE_TTL_MS) {
+            return;
+          }
+        }
+
         const supabase = createSupabaseBrowserClient();
         const { data: userData } = await supabase.auth.getUser();
         const userId = userData?.user?.id;
@@ -29,11 +43,13 @@ export function XpBadge() {
           .eq("id", userId)
           .maybeSingle<ProfileLite>();
         setData(profile ?? null);
+        sessionStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profile ?? null));
+        sessionStorage.setItem(PROFILE_CACHE_TS_KEY, String(Date.now()));
       } catch (e) {
         // fail silently
       }
     };
-    fetchProfile();
+    void fetchProfile();
   }, []);
 
   useEffect(() => {

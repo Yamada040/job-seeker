@@ -10,15 +10,15 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json().catch(() => null);
-  const parsed = idAndSummarySchema.safeParse(body);
-  if (!parsed.success) {
+  const requestValidation = idAndSummarySchema.safeParse(body);
+  if (!requestValidation.success) {
     return NextResponse.json({ error: "id and summary are required" }, { status: 400 });
   }
 
   const { error } = await supabase
     .from("es_entries")
-    .update({ ai_summary: parsed.data.summary })
-    .eq("id", parsed.data.id)
+    .update({ ai_summary: requestValidation.data.summary })
+    .eq("id", requestValidation.data.id)
     .eq("user_id", userData.user.id);
 
   if (error) {

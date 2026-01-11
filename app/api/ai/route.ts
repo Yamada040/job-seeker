@@ -7,13 +7,13 @@ import { aiRequestSchema } from "@/lib/validation/schemas/ai";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => null);
-    const parsed = aiRequestSchema.safeParse(body);
-    if (!parsed.success) {
+    const requestValidation = aiRequestSchema.safeParse(body);
+    if (!requestValidation.success) {
       return NextResponse.json({ error: "input and kind are required" }, { status: 400 });
     }
 
     const client = createAiClient();
-    const result = await client.call(parsed.data.input, parsed.data.kind as AiPromptKind);
+    const result = await client.call(requestValidation.data.input, requestValidation.data.kind as AiPromptKind);
 
     return NextResponse.json({ provider: client.provider, ...result });
   } catch (error) {
