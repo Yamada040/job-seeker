@@ -74,11 +74,11 @@ export function Sidebar({ onToggle }: Props) {
   );
 
   return (
-    <div className="fixed left-0 top-20 z-40 h-[calc(100vh-5rem)] w-60 border-r border-white/50 bg-white/70 backdrop-blur dark:border-gray-800 dark:bg-black">
+    <div className="fixed left-0 top-20 z-40 h-[calc(100vh-5rem)] w-60 border-r border-[#d9c3a0] bg-[#f7f0e3]/90 backdrop-blur dark:border-gray-800 dark:bg-black">
       <button
         type="button"
         onClick={onToggle}
-        className="absolute -right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-md transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+        className="absolute -right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#d9c3a0] bg-[#f6efe2] text-[#5b3b1a] shadow-md transition hover:bg-[#efe4d2] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
         aria-label="サイドバーを閉じる"
       >
         {"<"}

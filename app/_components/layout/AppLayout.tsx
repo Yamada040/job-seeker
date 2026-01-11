@@ -53,7 +53,7 @@ export function AppLayout({
   return (
     <div className="relative min-h-screen overflow-hidden text-slate-900 dark:text-slate-100 dark:bg-black">
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(255,196,38,0.12),transparent_50%),radial-gradient(circle_at_80%_10%,rgba(56,189,248,0.12),transparent_55%)] dark:bg-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(255,244,219,0.6),transparent_55%),radial-gradient(circle_at_80%_10%,rgba(216,196,160,0.35),transparent_60%)] dark:bg-none" />
       </div>
 
       {shouldShowSidebar && <Sidebar onToggle={() => setIsSidebarOpen(false)} />}
@@ -61,7 +61,7 @@ export function AppLayout({
         <button
           type="button"
           onClick={() => setIsSidebarOpen(true)}
-          className="fixed left-0 top-1/2 z-40 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-r-full border border-slate-200 bg-white text-slate-700 shadow-md transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          className="fixed left-0 top-1/2 z-40 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-r-full border border-[#d9c3a0] bg-[#f6efe2] text-[#5b3b1a] shadow-md transition hover:bg-[#efe4d2] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           aria-label="サイドバーを開く"
         >
           {">"}

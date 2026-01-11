@@ -86,7 +86,7 @@ export function Header({
   const generatedBreadcrumbs = breadcrumbs || generateBreadcrumbs(pathname);
 
   return (
-    <header className="fixed left-0 top-0 z-50 w-full border-b border-white/40 bg-white/80 px-6 py-4 backdrop-blur dark:border-gray-800 dark:bg-black">
+    <header className="fixed left-0 top-0 z-50 w-full border-b border-[#d9c3a0] bg-[#f7f0e3]/90 px-6 py-4 backdrop-blur dark:border-gray-800 dark:bg-black">
       <div className="flex flex-col gap-3">
         {generatedBreadcrumbs.length > 1 && (
           <nav className="flex items-center space-x-1 text-sm">
@@ -117,11 +117,12 @@ export function Header({
           <div className="flex items-start justify-between gap-6">
             <div className="flex items-center gap-3">
               {showBrand ? (
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-linear-to-br from-amber-300 to-orange-500 text-xs font-bold text-slate-900 shadow-md shadow-amber-300/40">
-                    就
+                <div className="flex items-center gap-1">
+                  <span className="relative inline-flex h-14 w-14 items-center justify-center text-lg font-bold text-[#3f2d1b]">
+                    <span className="absolute inset-0 bg-[url('/shield.png')] bg-contain bg-center bg-no-repeat" />
+                    <span className="relative drop-shadow-[0_1px_0_rgba(255,240,210,0.8)]">就</span>
                   </span>
-                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">就活Copilot</span>
+                  <span className="text-sm font-semibold text-[#3e2a16] dark:text-slate-100">就活Copilot</span>
                 </div>
               ) : null}
               {leftContent ? <div className="flex-shrink-0">{leftContent}</div> : null}

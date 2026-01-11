@@ -17,20 +17,19 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: "魔導太丸ゴシック", var(--font-geist-sans), "Hiragino Maru Gothic ProN", "Yu Gothic UI", "Yu Gothic", sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
 body {
   background:
-    url("/bg-abstract.svg"),
-    radial-gradient(circle at 20% 20%, rgba(255, 196, 38, 0.12), transparent 38%),
-    radial-gradient(circle at 80% 10%, rgba(56, 189, 248, 0.1), transparent 40%),
-    linear-gradient(135deg, #ffedd5 0%, #e0f2fe 45%, #e9d5ff 100%);
-  background-size: cover, 100% 100%, 100% 100%, 100% 100%;
-  background-repeat: no-repeat;
+    radial-gradient(circle at 20% 15%, rgba(255, 244, 219, 0.9), transparent 55%),
+    radial-gradient(circle at 80% 10%, rgba(216, 196, 160, 0.35), transparent 60%),
+    linear-gradient(135deg, #f7f0e3 0%, #f1e6d2 55%, #e8dcc8 100%);
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+  background-repeat: no-repeat, no-repeat, no-repeat;
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-family: "魔導太丸ゴシック", var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   min-height: 100vh;
 }
 
@@ -112,7 +111,7 @@ body {
 /* MVP Background Decorations */
 .mvp-bg {
   position: relative;
-  background: linear-gradient(to bottom, #f1f5f9 0%, #ffffff 60%, #f5f7fb 100%);
+  background: linear-gradient(to bottom, #f6efe2 0%, #f7f0e3 60%, #efe2cd 100%);
   min-height: 100vh;
 }
 
@@ -123,10 +122,10 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 20%, rgba(255, 196, 38, 0.07), transparent 35%),
-    radial-gradient(circle at 80% 10%, rgba(56, 189, 248, 0.08), transparent 40%),
-    linear-gradient(120deg, rgba(15, 23, 42, 0.04) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(15, 23, 42, 0.04) 100%);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 244, 219, 0.55), transparent 40%),
+    radial-gradient(circle at 80% 10%, rgba(216, 196, 160, 0.35), transparent 45%),
+    linear-gradient(120deg, rgba(90, 62, 36, 0.06) 0%, rgba(255, 255, 255, 0.22) 50%, rgba(90, 62, 36, 0.06) 100%);
   pointer-events: none;
   z-index: -1;
 }
@@ -136,6 +135,10 @@ body {
     radial-gradient(circle at 20% 20%, rgba(255, 196, 38, 0.12), transparent 35%),
     radial-gradient(circle at 80% 10%, rgba(56, 189, 248, 0.12), transparent 40%),
     linear-gradient(120deg, rgba(148, 163, 184, 0.1) 0%, rgba(15, 23, 42, 0.6) 50%, rgba(148, 163, 184, 0.1) 100%);
+}
+
+.pixel-art {
+  image-rendering: pixelated;
 }
 
 
@@ -289,4 +292,3 @@ body {
 .dark .bg-linear-to-r {
   background: linear-gradient(to right, #fbbf24, #f97316) !important;
 }
-
