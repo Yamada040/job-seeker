@@ -49,7 +49,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
 
       {editing ? (
         <div className="grid gap-4 lg:grid-cols-[1.4fr,0.9fr]">
-          <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+          <div className="dq-card p-6">
             <form action={handleUpdate} className="space-y-4">
               <div className="space-y-2">
                 <label className="block text-xs text-slate-600">
@@ -58,7 +58,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
                 <input
                   name="company_name"
                   defaultValue={entry.company_name ?? ""}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                  className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm text-white outline-none focus:border-yellow-400"
                   placeholder="例）Alpha SaaS"
                   required
                 />
@@ -72,7 +72,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
                   name="title"
                   defaultValue={entry.title ?? ""}
                   required
-                  className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                  className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm text-white outline-none focus:border-yellow-400"
                 />
               </div>
 
@@ -82,7 +82,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
                   <input
                     name="selection_status"
                     defaultValue={entry.selection_status ?? ""}
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                    className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-yellow-400"
                     placeholder="例）エンジニア職"
                   />
                 </label>
@@ -92,7 +92,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
                     name="deadline"
                     type="date"
                     defaultValue={entry.deadline ?? ""}
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                    className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-yellow-400"
                   />
                 </label>
               </div>
@@ -103,7 +103,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
                   <input
                     name="company_url"
                     defaultValue={entry.company_url ?? ""}
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                    className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-yellow-400"
                     placeholder="https://example.com"
                   />
                 </label>
@@ -112,7 +112,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
                   <input
                     name="memo"
                     defaultValue={entry.memo ?? ""}
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                    className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-yellow-400"
                     placeholder="応募メモなど"
                   />
                 </label>
@@ -126,7 +126,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
                   name="content_md"
                   rows={8}
                   defaultValue={entry.content_md ?? ""}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                  className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white outline-none focus:border-yellow-400"
                   placeholder="本文を入力してください"
                   required
                 />
@@ -154,7 +154,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
             </button>
           </form>
 
-          <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+          <div className="dq-card p-6">
             <EsAiPanel
               content={combinedContent}
               cacheKey={`es-${entry.id}`}
@@ -170,39 +170,39 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
         </div>
       ) : (
         <div className="grid gap-4 lg:grid-cols-[1.4fr,0.9fr]">
-          <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+          <div className="dq-card p-6">
             <div className="space-y-4 text-sm text-slate-800">
               <div>
                 <p className="text-xs text-slate-600">企業名</p>
-                <p className="rounded-lg border border-slate-200 bg-white px-3 py-2">{entry.company_name || "-"}</p>
+                <p className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white">{entry.company_name || "-"}</p>
               </div>
               <div>
                 <p className="text-xs text-slate-600">タイトル</p>
-                <p className="rounded-lg border border-slate-200 bg-white px-3 py-2">{entry.title || "-"}</p>
+                <p className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white">{entry.title || "-"}</p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <p className="text-xs text-slate-600">職種 / 募集枠</p>
-                  <p className="rounded-lg border border-slate-200 bg-white px-3 py-2">{entry.selection_status || "-"}</p>
+                  <p className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white">{entry.selection_status || "-"}</p>
                 </div>
                 <div>
                   <p className="text-xs text-slate-600">締切日</p>
-                  <p className="rounded-lg border border-slate-200 bg-white px-3 py-2">{entry.deadline || "-"}</p>
+                  <p className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white">{entry.deadline || "-"}</p>
                 </div>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <p className="text-xs text-slate-600">企業URL</p>
-                  <p className="break-all rounded-lg border border-slate-200 bg-white px-3 py-2">{entry.company_url || "-"}</p>
+                  <p className="break-all rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white">{entry.company_url || "-"}</p>
                 </div>
                 <div>
                   <p className="text-xs text-slate-600">メモ</p>
-                  <p className="rounded-lg border border-slate-200 bg-white px-3 py-2">{entry.memo || "-"}</p>
+                  <p className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white">{entry.memo || "-"}</p>
                 </div>
               </div>
               <div className="space-y-2">
                 <p className="text-xs text-slate-600">本文</p>
-                <p className="whitespace-pre-wrap rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800">
+                <p className="whitespace-pre-wrap rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white">
                   {entry.content_md || "-"}
                 </p>
               </div>
@@ -215,7 +215,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
               </div>
             </div>
           </div>
-          <div className="rounded-2xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+          <div className="dq-card p-6">
             <EsAiPanel
               content={combinedContent}
               cacheKey={`es-${entry.id}`}

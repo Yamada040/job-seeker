@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { clsx } from "clsx";
 
-interface BreadcrumbItem {
+export interface BreadcrumbItem {
   label: string;
   href: string;
 }
@@ -78,43 +78,12 @@ export function Header({
   description,
   actions,
   leftContent,
-  breadcrumbs,
   actionsPlacement = "left",
   showBrand,
 }: HeaderProps) {
-  const pathname = usePathname();
-  const generatedBreadcrumbs = breadcrumbs || generateBreadcrumbs(pathname);
-
   return (
     <header className="fixed left-0 top-0 z-50 w-full border-b border-[#3b2a18] bg-[#1b1b1b]/85 px-6 py-4 backdrop-blur">
       <div className="flex flex-col gap-3">
-        {generatedBreadcrumbs.length > 1 && (
-          <nav className="flex items-center space-x-1 text-sm">
-            <HomeIcon className="h-4 w-4 text-slate-300" />
-            <ChevronRightIcon className="h-4 w-4 text-slate-300" />
-
-            {generatedBreadcrumbs.map((item, index) => (
-              <div key={item.href} className="flex items-center space-x-1">
-                {index === generatedBreadcrumbs.length - 1 ? (
-                  <span className="font-medium text-slate-100">
-                    {item.label}
-                  </span>
-                ) : (
-                  <>
-                    <Link
-                      href={item.href}
-                      className="text-slate-300 transition-colors hover:text-white"
-                    >
-                      {item.label}
-                    </Link>
-                    <ChevronRightIcon className="h-4 w-4 text-slate-500" />
-                  </>
-                )}
-              </div>
-            ))}
-          </nav>
-        )}
-
         {actionsPlacement === "left" ? (
           <div className="flex items-center justify-between gap-6">
             <div className="flex items-center gap-3">
@@ -171,5 +140,34 @@ export function Header({
         )}
       </div>
     </header>
+  );
+}
+
+export function Breadcrumbs({ breadcrumbs }: { breadcrumbs?: BreadcrumbItem[] }) {
+  const pathname = usePathname();
+  const generatedBreadcrumbs = breadcrumbs || generateBreadcrumbs(pathname);
+
+  if (generatedBreadcrumbs.length <= 1) return null;
+
+  return (
+    <nav className="mt-4 flex items-center space-x-1 text-xs font-bold text-white/80">
+      <HomeIcon className="h-4 w-4 text-white/70" />
+      <ChevronRightIcon className="h-4 w-4 text-white/40" />
+
+      {generatedBreadcrumbs.map((item, index) => (
+        <div key={item.href} className="flex items-center space-x-1">
+          {index === generatedBreadcrumbs.length - 1 ? (
+            <span className="text-white">{item.label}</span>
+          ) : (
+            <>
+              <Link href={item.href} className="transition-colors hover:text-yellow-300">
+                {item.label}
+              </Link>
+              <ChevronRightIcon className="h-4 w-4 text-white/40" />
+            </>
+          )}
+        </div>
+      ))}
+    </nav>
   );
 }

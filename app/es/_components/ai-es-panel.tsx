@@ -62,7 +62,7 @@ export function EsAiPanel({
             setPresetKey(`${Date.now()}`);
           }}
           disabled={saved && !!saveUrl}
-          className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-800 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-800"
+          className="rounded-full border border-white/30 bg-black/70 px-4 py-2 text-xs font-semibold text-white transition hover:text-yellow-400 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {saved && saveUrl ? "保存済み（再実行不可）" : "AIに送る内容を転記"}
         </button>

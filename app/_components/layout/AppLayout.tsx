@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
 import { Sidebar } from "./Sidebar";
-import { Header } from "./Header";
+import { Breadcrumbs, Header } from "./Header";
 import { XpBadge } from "../xp-badge";
 
 interface AppLayoutProps {
@@ -93,10 +93,11 @@ export function AppLayout({
         <main
           className={clsx("mx-auto max-w-7xl px-6 pb-8 pt-24 sm:px-10 sm:pb-12", className)}
         >
+          <Breadcrumbs />
           {(headerTitle || headerDescription) && (
-            <div className="mb-6 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/80">
-              {headerTitle && <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{headerTitle}</h1>}
-              {headerDescription && <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">{headerDescription}</p>}
+            <div className="mt-4">
+              {headerTitle && <h1 className="text-lg font-semibold text-white">{headerTitle}</h1>}
+              {headerDescription && <p className="mt-1 text-sm text-white/70">{headerDescription}</p>}
             </div>
           )}
           {children}

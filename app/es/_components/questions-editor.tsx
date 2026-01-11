@@ -53,13 +53,13 @@ export function QuestionsEditor({ initialQuestions, readOnly = false }: Props) {
 
       <div className="space-y-3">
         {questions.map((q) => (
-          <div key={q.id} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <div key={q.id} className="dq-card px-4 py-3">
             <label className="block space-y-1 text-xs text-slate-600">
               質問
               <input
                 value={q.prompt}
                 onChange={(e) => handleChange(q.id, "prompt", e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-yellow-400"
                 placeholder="例） 学生時代に力を入れたこと"
                 disabled={readOnly}
               />
@@ -70,7 +70,7 @@ export function QuestionsEditor({ initialQuestions, readOnly = false }: Props) {
                 value={q.answer_md}
                 onChange={(e) => handleChange(q.id, "answer_md", e.target.value)}
                 rows={5}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-yellow-400"
                 placeholder="回答を入力"
                 disabled={readOnly}
               />
