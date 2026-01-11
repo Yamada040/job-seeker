@@ -24,32 +24,73 @@ interface NavItem {
 }
 
 const navigationItems: NavItem[] = [
-  { label: "ダッシュボード", href: "/dashboard", icon: HomeIcon, description: "全体の概要を確認" },
-  { label: "ES管理", href: "/es", icon: DocumentTextIcon, description: "エントリーシートを整理" },
-  { label: "企業管理", href: "/companies", icon: BuildingOfficeIcon, description: "企業カードと進捗を記録" },
-  { label: "適性チェック", href: "/aptitude", icon: LightBulbIcon, description: "業界・職種の向き不向きを診断" },
-  { label: "自己分析", href: "/self-analysis", icon: ClipboardDocumentCheckIcon, description: "強み・価値観を整理" },
-  { label: "面接ログ", href: "/interviews", icon: ChatBubbleLeftRightIcon, description: "面接の質問・回答を記録" },
-  { label: "Webテスト対策", href: "/webtests", icon: AcademicCapIcon, description: "演習用の問題を管理" },
-  { label: "プロフィール", href: "/profile", icon: UserIcon, description: "ユーザー設定とアバター" },
+  {
+    label: "ダッシュボード",
+    href: "/dashboard",
+    icon: HomeIcon,
+    description: "全体の概要を確認",
+  },
+  {
+    label: "ES管理",
+    href: "/es",
+    icon: DocumentTextIcon,
+    description: "エントリーシートを整理",
+  },
+  {
+    label: "企業管理",
+    href: "/companies",
+    icon: BuildingOfficeIcon,
+    description: "企業カードと進捗を記録",
+  },
+  {
+    label: "適性チェック",
+    href: "/aptitude",
+    icon: LightBulbIcon,
+    description: "業界・職種の向き不向きを診断",
+  },
+  {
+    label: "自己分析",
+    href: "/self-analysis",
+    icon: ClipboardDocumentCheckIcon,
+    description: "強み・価値観を整理",
+  },
+  {
+    label: "面接ログ",
+    href: "/interviews",
+    icon: ChatBubbleLeftRightIcon,
+    description: "面接の質問・回答を記録",
+  },
+  {
+    label: "Webテスト対策",
+    href: "/webtests",
+    icon: AcademicCapIcon,
+    description: "演習用の問題を管理",
+  },
+  {
+    label: "プロフィール",
+    href: "/profile",
+    icon: UserIcon,
+    description: "ユーザー設定とアバター",
+  },
 ];
 
-const bottomItems: NavItem[] = [{ label: "ログアウト", href: "/login", icon: ArrowRightOnRectangleIcon }];
+const bottomItems: NavItem[] = [
+  { label: "ログアウト", href: "/login", icon: ArrowRightOnRectangleIcon },
+];
 
-type Props = {
-  onToggle: () => void;
-};
-
-export function Sidebar({ onToggle }: Props) {
+export function Sidebar() {
   const pathname = usePathname();
 
-  const NavLink = ({ item, isActive }: { item: NavItem; isActive: boolean }) => (
+  const NavLink = ({
+    item,
+    isActive,
+  }: {
+    item: NavItem;
+    isActive: boolean;
+  }) => (
     <Link
       href={item.href}
-      className={clsx(
-        "dq-menu-item",
-        isActive && "dq-menu-item-active"
-      )}
+      className={clsx("dq-menu-item", isActive && "dq-menu-item-active")}
     >
       <item.icon
         className={clsx(
@@ -57,27 +98,19 @@ export function Sidebar({ onToggle }: Props) {
           isActive ? "text-sky-300" : "text-white"
         )}
       />
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-xs">{item.label}</div>
-          {item.description && (
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-xs">{item.label}</div>
+        {item.description && (
           <div className="mt-0.5 truncate text-[0.65rem] font-normal text-white/70">
             {item.description}
           </div>
-          )}
-        </div>
+        )}
+      </div>
     </Link>
   );
 
   return (
     <div className="fixed left-0 top-20 z-40 h-[calc(100vh-5rem)] w-60 border-r border-[#3b2a18] bg-black/75 backdrop-blur">
-      <button
-        type="button"
-        onClick={onToggle}
-        className="absolute -right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#3b2a18] bg-black text-slate-100 shadow-md transition hover:text-yellow-400"
-        aria-label="サイドバーを閉じる"
-      >
-        {"<"}
-      </button>
       <div className="flex h-full flex-col gap-6 overflow-y-auto px-5 py-7">
         <nav className="flex-1">
           <div className="space-y-3">
@@ -85,7 +118,9 @@ export function Sidebar({ onToggle }: Props) {
               <NavLink
                 key={item.href}
                 item={item}
-                isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
+                isActive={
+                  pathname === item.href || pathname.startsWith(item.href + "/")
+                }
               />
             ))}
           </div>
@@ -95,7 +130,11 @@ export function Sidebar({ onToggle }: Props) {
           <div className="space-y-4">
             <div className="space-y-2">
               {bottomItems.map((item) => (
-                <NavLink key={item.href} item={item} isActive={pathname === item.href} />
+                <NavLink
+                  key={item.href}
+                  item={item}
+                  isActive={pathname === item.href}
+                />
               ))}
             </div>
           </div>

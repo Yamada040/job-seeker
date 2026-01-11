@@ -88,43 +88,31 @@ export function XpBadge() {
 
   return (
     <>
-      {/* 1. 常駐ステータスバー：常に背景画像を表示 */}
-      <div className="relative flex min-w-[600px] flex-1 items-center gap-6 overflow-hidden px-6 py-4">
-        {/* 背景画像：常に前面で見えるように表示 */}
-        <img
-          src="/levelup.jpeg"
-          alt="Status Background"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-
-        {/* コンテンツを画像の上に浮かせるための relative */}
-        <div className="relative z-10 flex w-full items-center gap-6 drop-shadow-[0_2px_3px_rgba(0,0,0,0.8)]">
-          <div className="flex items-baseline gap-2">
-            <span className="text-[10px] font-bold tracking-widest text-white/90">
-              LEVEL
-            </span>
-            <span className="text-3xl font-bold tracking-tighter text-white">
-              Lv {level}
-            </span>
-            <span className="text-xs text-white/80">XP {xp}</span>
+      {/* 1. 常駐ステータスバー：DQウィンドウ形式に戻す */}
+      <div className="dq-window flex min-w-[600px] flex-1 items-center gap-4">
+        <div className="flex items-baseline gap-2">
+          <span className="text-[10px] font-bold tracking-widest text-white/90">
+            LEVEL
+          </span>
+          <span className="text-2xl font-bold tracking-tighter text-white">
+            Lv {level}
+          </span>
+          <span className="text-xs text-white/80">XP {xp}</span>
+        </div>
+        <div className="flex flex-1 flex-col gap-1 min-w-[180px]">
+          <div className="h-2.5 w-full border border-white bg-black/40 p-[2px]">
+            <div
+              className="h-full bg-white transition-all duration-1000"
+              style={{ width: `${Math.round(progress * 100)}%` }}
+            />
           </div>
-
-          <div className="flex flex-1 flex-col gap-2 min-w-[180px]">
-            {/* ゲージ：背景に馴染むよう枠線を調整 */}
-            <div className="h-3 w-full border border-white bg-black/40 p-[2px]">
-              <div
-                className="h-full bg-white transition-all duration-1000"
-                style={{ width: `${Math.round(progress * 100)}%` }}
-              />
-            </div>
-            <div className="flex justify-between text-[10px] font-bold tracking-tight text-white">
-              <span style={{ textShadow: "1px 1px 2px #000" }}>
-                つぎの レベルまで {Math.max(0, nextThreshold - xp)} XP
-              </span>
-              <span style={{ textShadow: "1px 1px 2px #000" }}>
-                {xp} / {nextThreshold}
-              </span>
-            </div>
+          <div className="flex justify-between text-[10px] font-bold tracking-tight text-white">
+            <span>
+              つぎの レベルまで {Math.max(0, nextThreshold - xp)} XP
+            </span>
+            <span>
+              {xp} / {nextThreshold}
+            </span>
           </div>
         </div>
       </div>

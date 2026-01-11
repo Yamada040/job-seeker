@@ -31,16 +31,21 @@ export function AppLayout({
   actionsPlacement,
 }: AppLayoutProps) {
   const pathname = usePathname();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
-    if (typeof window === "undefined") return true;
-    const stored = window.localStorage.getItem("sidebar-open");
-    return stored === null ? true : stored === "true";
-  });
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    if (!showSidebar) return;
+    const stored = window.localStorage.getItem("sidebar-open");
+    if (stored !== null) {
+      setIsSidebarOpen(stored === "true");
+    }
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!showSidebar || !isHydrated) return;
     window.localStorage.setItem("sidebar-open", String(isSidebarOpen));
-  }, [isSidebarOpen, showSidebar]);
+  }, [isSidebarOpen, showSidebar, isHydrated]);
 
   // ログインとホームは素の表示
   if (pathname === "/login" || pathname === "/") {
@@ -54,15 +59,19 @@ export function AppLayout({
     <div className="relative min-h-screen overflow-hidden text-slate-900 dark:text-slate-100 dark:bg-black">
       <div className="pointer-events-none absolute inset-0 -z-10" />
 
-      {shouldShowSidebar && <Sidebar onToggle={() => setIsSidebarOpen(false)} />}
-      {showSidebar && !isSidebarOpen ? (
+      {shouldShowSidebar && <Sidebar />}
+      {showSidebar ? (
         <button
           type="button"
-          onClick={() => setIsSidebarOpen(true)}
-          className="fixed left-0 top-1/2 z-40 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-r-full border border-[#d9c3a0] bg-[#f6efe2] text-[#5b3b1a] shadow-md transition hover:bg-[#efe4d2] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-          aria-label="サイドバーを開く"
+          onClick={() => setIsSidebarOpen((prev) => !prev)}
+          className="fixed left-6 top-6 z-[60] flex h-10 w-10 items-center justify-center rounded-md border-2 border-white bg-black/95 text-white shadow-[0_0_0_2px_black,0_0_0_4px_white] transition hover:border-yellow-400 hover:text-yellow-400"
+          aria-label={isSidebarOpen ? "サイドバーを閉じる" : "サイドバーを開く"}
         >
-          {">"}
+          <span className="flex h-4 w-4 flex-col items-center justify-between">
+            <span className="h-[2px] w-full bg-white" />
+            <span className="h-[2px] w-full bg-white" />
+            <span className="h-[2px] w-full bg-white" />
+          </span>
         </button>
       ) : null}
 
@@ -72,7 +81,7 @@ export function AppLayout({
           "ml-0": !shouldShowSidebar,
         })}
       >
-      {showHeader && (
+        {showHeader && (
           <Header
             actions={headerActions}
             leftContent={leftContent}
