@@ -157,13 +157,13 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
   };
 
   return (
-    <div className="mt-4 space-y-4 text-slate-900 dark:text-slate-100">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white/70 p-4 shadow-sm backdrop-blur dark:bg-slate-900/80">
+    <div className="mt-4 space-y-4 text-[#2b1d12]">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-[#d7c4a2] bg-[#efe3cf] p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={handlePrevMonth}
-            className="rounded-full border border-slate-200 bg-white p-2 shadow hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800"
+            className="rounded-full border border-[#cdb38c] bg-[#f7ecd8] p-2 shadow hover:bg-[#efe3cf]"
             aria-label="前の月へ"
           >
             <ChevronLeftIcon className="h-4 w-4" />
@@ -174,7 +174,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
           <button
             type="button"
             onClick={handleNextMonth}
-            className="rounded-full border border-slate-200 bg-white p-2 shadow hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800"
+            className="rounded-full border border-[#cdb38c] bg-[#f7ecd8] p-2 shadow hover:bg-[#efe3cf]"
             aria-label="次の月へ"
           >
             <ChevronRightIcon className="h-4 w-4" />
@@ -184,21 +184,21 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
         <button
           type="button"
           onClick={() => openModalForDate(formatDateKey(new Date()))}
-          className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-amber-600"
+          className="inline-flex items-center gap-2 rounded-full bg-[#c7923e] px-4 py-2 text-sm font-bold text-[#2b1d12] shadow hover:bg-[#b78333]"
         >
           <PlusIcon className="h-4 w-4" />
           今日に追加
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-slate-500">
+      <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-[#5a4631]">
         {["日", "月", "火", "水", "木", "金", "土"].map((d, idx) => (
           <div
             key={d}
             className={clsx(
-              "rounded-lg bg-white/60 py-2 shadow-sm backdrop-blur dark:bg-slate-900/70",
-              idx === 0 && "text-rose-500",
-              idx === 6 && "text-sky-500"
+              "rounded-lg border border-[#d7c4a2] bg-[#f7ecd8] py-2 shadow-sm",
+              idx === 0 && "text-[#b23b2b]",
+              idx === 6 && "text-[#2a5a9a]"
             )}
           >
             {d}
@@ -219,19 +219,18 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
               onClick={() => openModalForDate(date)}
               className={clsx(
                 "min-h-[120px] rounded-2xl border p-2 text-left shadow-sm transition",
-                "bg-white/80 backdrop-blur hover:-translate-y-0.5 hover:shadow-md",
-                "dark:bg-slate-900/80 dark:hover:bg-slate-900",
+                "bg-[#fbf0dd] hover:-translate-y-0.5 hover:shadow-md",
                 inCurrentMonth
-                  ? "border-slate-200 dark:border-slate-700"
-                  : "border-dashed border-slate-200/70 text-slate-400 dark:border-slate-700/70 opacity-60"
+                  ? "border-[#d7c4a2]"
+                  : "border-dashed border-[#d7c4a2]/70 text-[#9b8a74] opacity-70"
               )}
             >
-              <div className="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-300">
+              <div className="flex items-center justify-between text-xs font-bold text-[#5a4631]">
                 <span
                   className={clsx(
                     inCurrentMonth ? "" : "opacity-60",
-                    weekday === 0 && "text-rose-500",
-                    weekday === 6 && "text-sky-500"
+                    weekday === 0 && "text-[#b23b2b]",
+                    weekday === 6 && "text-[#2a5a9a]"
                   )}
                 >
                   {day}
@@ -239,7 +238,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                 <span
                   className={clsx(
                     "text-[10px] rounded-full border px-2 py-0.5",
-                    "border-slate-200 text-amber-700 dark:border-slate-700 dark:text-amber-200"
+                    "border-[#d7c4a2] text-[#7d5a2a]"
                   )}
                 >
                   ＋
@@ -251,10 +250,10 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                     key={evt.id}
                     className={clsx(
                       "rounded-xl px-2 py-1 text-[11px] leading-tight",
-                      evt.type === "es" && "bg-rose-50 text-rose-700",
-                      evt.type === "interview" && "bg-indigo-50 text-indigo-700",
-                      evt.type === "intern" && "bg-emerald-50 text-emerald-700",
-                      evt.type === "other" && "bg-slate-100 text-slate-700"
+                      evt.type === "es" && "bg-[#f2cfc2] text-[#8d2f24]",
+                      evt.type === "interview" && "bg-[#d4ddf2] text-[#2c4f7b]",
+                      evt.type === "intern" && "bg-[#d8ead8] text-[#2f5d3a]",
+                      evt.type === "other" && "bg-[#e8dcc8] text-[#6b5438]"
                     )}
                   >
                     <p className="font-semibold">{evt.company || evt.title}</p>
@@ -264,7 +263,9 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                     </p>
                   </div>
                 ))}
-                {dayEvents.length > 2 && <p className="text-[10px] text-slate-500">+{dayEvents.length - 2}件</p>}
+                {dayEvents.length > 2 && (
+                  <p className="text-[10px] text-[#6b5438]">+{dayEvents.length - 2}件</p>
+                )}
               </div>
             </button>
           );

@@ -208,6 +208,14 @@ export default async function DashboardPage() {
       </Link>
     </div>
   );
+  const urgentEvents = calendarEvents
+    .filter((evt) => {
+      const date = evt.date ? new Date(evt.date) : null;
+      if (!date) return false;
+      const diff = (date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+      return diff >= 0 && diff <= 7 && (evt.type === "es" || evt.type === "interview");
+    })
+    .slice(0, 4);
 
   return (
     <AppLayout headerActions={navigationActions} className="space-y-6">
@@ -218,81 +226,36 @@ export default async function DashboardPage() {
       />
 
       {/* カレンダー + サイドカラム */}
-      <section className="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
-        <div className="rounded-2xl border border-[#d3c1a3] bg-[#f6efe2] p-6 shadow-[0_16px_30px_-24px_rgba(64,36,8,0.35)]">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-[#3e2a16]">
-              締切カレンダー
-            </h2>
-            <span className="text-xs text-[#6d5535]">
-              ES / 面接 / インターン
-            </span>
+      <section className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+        <div className="dq-window">
+          <span className="dq-title">クエストカレンダー</span>
+          <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-300">
+            ES / 面接 / インターン
           </div>
-          <div className="mt-3 rounded-2xl border border-[#e0d2b8] bg-white/70 p-3">
+          <div className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-3 shadow-inner">
             <InteractiveCalendar initialEvents={calendarEvents} />
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* Urgent */}
           <EventListModal
             events={calendarEvents}
             trigger={
-              <div className="cursor-pointer rounded-2xl border border-[#d9c3a0] bg-[#f3ebdc] p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-[#5a3b1f]">
-                    直近で注意すべきこと
-                  </h3>
-                  <span className="text-[11px] text-[#7b5a35]">
-                    7日以内を表示
-                  </span>
-                </div>
+              <div className="dq-window cursor-pointer transition hover:scale-[1.02]">
+                <span className="dq-title">至急クエスト</span>
                 <div className="mt-3 space-y-3">
-                  {calendarEvents
-                    .filter((evt) => {
-                      const date = evt.date ? new Date(evt.date) : null;
-                      if (!date) return false;
-                      const diff =
-                        (date.getTime() - today.getTime()) /
-                        (1000 * 60 * 60 * 24);
-                      return (
-                        diff >= 0 &&
-                        diff <= 7 &&
-                        (evt.type === "es" || evt.type === "interview")
-                      );
-                    })
-                    .slice(0, 4)
-                    .map((evt) => (
-                      <div
-                        key={evt.id}
-                        className="rounded-xl border border-[#e2d2b9] bg-white/80 p-3 text-sm shadow-sm"
-                      >
-                        <div className="flex items-center justify-between text-xs text-[#6d5535]">
-                          <span className="font-semibold">
-                            {evt.type === "es" ? "ES締切" : "面接"}
-                          </span>
-                          <span>{evt.date}</span>
-                        </div>
-                        <p className="mt-1 text-sm font-semibold text-[#3e2a16]">
-                          {evt.company || evt.title}
-                        </p>
-                        <p className="text-xs text-[#6b5438]">{evt.title}</p>
-                      </div>
-                    ))}
-                  {calendarEvents.filter((evt) => {
-                    const date = evt.date ? new Date(evt.date) : null;
-                    if (!date) return false;
-                    const diff =
-                      (date.getTime() - today.getTime()) /
-                      (1000 * 60 * 60 * 24);
-                    return (
-                      diff >= 0 &&
-                      diff <= 7 &&
-                      (evt.type === "es" || evt.type === "interview")
-                    );
-                  }).length === 0 && (
-                    <div className="rounded-xl border border-dashed border-[#d9c3a0] bg-white/70 p-3 text-xs text-[#6b5438]">
-                      直近1週間の締切・面接はありません。
+                  {urgentEvents.map((evt) => (
+                    <div key={evt.id} className="dq-item">
+                      <span className="text-xs animate-pulse">▶</span>
+                      <label className="cursor-pointer text-sm font-bold">
+                        {evt.company || evt.title} ({evt.date})
+                      </label>
+                    </div>
+                  ))}
+                  {urgentEvents.length === 0 && (
+                    <div className="py-2 text-center text-xs text-gray-400">
+                      直近の 締切は ないようだ。
                     </div>
                   )}
                 </div>
@@ -303,31 +266,24 @@ export default async function DashboardPage() {
           {/* Next actions */}
           <SimpleListModal
             trigger={
-              <div className="cursor-pointer rounded-2xl border border-[#d9c3a0] bg-[#f6efe2] p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-[#3e2a16]">
-                    次に取るべき行動
-                  </h3>
-                  <span className="text-[11px] text-[#7b5a35]">最大2件</span>
-                </div>
+              <div className="dq-window cursor-pointer transition hover:scale-[1.02]">
+                <span className="dq-title">次のクエスト</span>
                 <div className="mt-3 space-y-3">
                   {nextActions.map((action) => (
                     <Link
                       key={`${action.title}-${action.href}-${action.subtitle}`}
                       href={action.href}
-                      className="block rounded-xl border border-[#e2d2b9] bg-white/80 px-4 py-3 text-sm text-[#3e2a16] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                      className="dq-item"
                     >
-                      <p className="text-xs font-semibold text-[#7d5a2a]">
-                        {action.title}
-                      </p>
-                      <p className="mt-1 text-base font-semibold text-[#3e2a16]">
+                      <span className="text-xs">▶</span>
+                      <label className="cursor-pointer text-sm font-bold">
                         {action.subtitle}
-                      </p>
+                      </label>
                     </Link>
                   ))}
                   {nextActions.length === 0 && (
-                    <div className="rounded-xl border border-dashed border-[#d9c3a0] bg-white/70 p-3 text-xs text-[#6b5438] shadow-sm">
-                      取り掛かるべきアクションはありません。
+                    <div className="py-2 text-center text-xs text-gray-400">
+                      なすべきことは すべて おわった。
                     </div>
                   )}
                 </div>
@@ -344,36 +300,25 @@ export default async function DashboardPage() {
           {/* 最近のXP獲得 */}
           <SimpleListModal
             trigger={
-              <div className="cursor-pointer rounded-2xl border border-[#d9c3a0] bg-[#f6efe2] p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-[#3e2a16]">
-                    最近の獲得
-                  </h3>
-                  <span className="text-[11px] text-[#7b5a35]">最新5件</span>
-                </div>
+              <div className="dq-window cursor-pointer transition hover:scale-[1.02]">
+                <span className="dq-title">戦歴ログ</span>
                 <div className="mt-3 space-y-2">
                   {recentXpLogs.map((log, idx) => (
                     <div
                       key={`${log.created_at}-${idx}`}
-                      className="rounded-xl border border-[#e2d2b9] bg-white/80 p-3 text-sm shadow-sm"
+                      className="dq-item justify-between border-b border-white/10 last:border-0"
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold text-[#3e2a16]">
-                          +{log.xp} XP
-                        </span>
-                        <span className="text-xs text-[#7b5a35]">
-                          {log.created_at
-                            ? new Date(log.created_at).toLocaleDateString()
-                            : ""}
-                        </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-yellow-400">●</span>
+                        <span className="text-sm">+{log.xp} XP</span>
                       </div>
-                      <p className="text-xs text-[#6b5438]">
+                      <span className="text-[10px] opacity-60">
                         {log.action || "行動"}
-                      </p>
+                      </span>
                     </div>
                   ))}
                   {recentXpLogs.length === 0 && (
-                    <div className="rounded-xl border border-dashed border-[#d9c3a0] bg-white/70 p-3 text-xs text-[#6b5438] shadow-sm">
+                    <div className="py-2 text-center text-xs text-gray-400">
                       まだXPはありません。ES提出や面接ログでXPを獲得できます。
                     </div>
                   )}

@@ -36,8 +36,7 @@ export function GoalScroll({
               <div className="flex items-center justify-between pt-2">
                 <Link
                   href={ROUTES.PROFILE}
-                  className="group flex items-center text-xs font-bold text-[#f8f0e0] transition-all hover:brightness-125"
-                  style={{ textShadow: "1px 1px 2px rgba(0,0,0,0.8)" }}
+                  className="group flex items-center text-xs font-black text-[#111111] transition-colors hover:text-[#000000]"
                 >
                   <span className="mr-1 inline-block transition-transform group-hover:translate-x-1">
                     ▶

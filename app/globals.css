@@ -141,6 +141,106 @@ body {
   image-rendering: pixelated;
 }
 
+.retro-frame {
+  position: relative;
+  border: 2px solid #c7ad86;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.45),
+    0 10px 18px -18px rgba(64, 36, 8, 0.25);
+}
+
+.retro-frame::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(90, 62, 36, 0.2);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.retro-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.35), transparent 35%),
+    linear-gradient(315deg, rgba(0, 0, 0, 0.08), transparent 40%),
+    radial-gradient(circle at 14px 14px, rgba(90, 62, 36, 0.22), transparent 55%),
+    radial-gradient(circle at calc(100% - 14px) 14px, rgba(90, 62, 36, 0.22), transparent 55%),
+    radial-gradient(circle at 14px calc(100% - 14px), rgba(90, 62, 36, 0.22), transparent 55%),
+    radial-gradient(circle at calc(100% - 14px) calc(100% - 14px), rgba(90, 62, 36, 0.22), transparent 55%);
+}
+
+.radio-group {
+  position: relative;
+  padding: 1.5rem 1rem 0.75rem 1rem;
+  border-radius: 8px;
+  border: 3px solid #f5efe2;
+  color: #f5efe2;
+  font-family: "DotGothic16", "魔導太丸ゴシック", var(--font-geist-sans), sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  background: #111111;
+  z-index: 0;
+}
+
+.radio-group::before {
+  position: absolute;
+  top: -0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #111111;
+  padding: 0 0.5rem;
+  content: attr(data-title);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #f5efe2;
+}
+
+.radio-area {
+  margin-bottom: 0.5rem;
+}
+
+.radio-area input[type="radio"] {
+  position: relative;
+  appearance: none;
+  transition: 0.3s;
+}
+
+.radio-area label {
+  cursor: pointer;
+}
+
+.radio-area input[type="radio"]:checked::before {
+  position: absolute;
+  top: -0.4rem;
+  left: -0.2rem;
+  width: 0;
+  height: 0;
+  border: solid 7px transparent;
+  border-left-color: #f5efe2;
+  margin-top: -7px;
+  content: "";
+}
+
+@layer components {
+  .dq-window {
+    @apply relative rounded-md border-2 border-white bg-black p-4 shadow-[0_0_0_2px_black,0_0_0_4px_white];
+  }
+
+  .dq-title {
+    @apply absolute -top-4 left-1/2 -translate-x-1/2 bg-black px-2 text-base font-bold text-white;
+  }
+
+  .dq-item {
+    @apply flex items-center gap-2 py-1 text-white transition-colors hover:text-yellow-400;
+  }
+}
+
 
 
 /* Form Elements Dark Mode */
