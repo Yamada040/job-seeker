@@ -24,7 +24,9 @@ export function XpBadge() {
     const fetchProfile = async () => {
       try {
         const cached = sessionStorage.getItem(PROFILE_CACHE_KEY);
-        const cachedAt = Number(sessionStorage.getItem(PROFILE_CACHE_TS_KEY) || "0");
+        const cachedAt = Number(
+          sessionStorage.getItem(PROFILE_CACHE_TS_KEY) || "0"
+        );
         if (cached) {
           const cachedData = JSON.parse(cached) as ProfileLite | null;
           setData(cachedData);
@@ -43,7 +45,10 @@ export function XpBadge() {
           .eq("id", userId)
           .maybeSingle<ProfileLite>();
         setData(profile ?? null);
-        sessionStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profile ?? null));
+        sessionStorage.setItem(
+          PROFILE_CACHE_KEY,
+          JSON.stringify(profile ?? null)
+        );
         sessionStorage.setItem(PROFILE_CACHE_TS_KEY, String(Date.now()));
       } catch (e) {
         // fail silently
@@ -70,49 +75,97 @@ export function XpBadge() {
     const lvl = data?.level ?? computeLevel(currentXp);
     const prev = Math.max(0, (lvl - 1) * 50);
     const next = lvl * 50;
-    const prog = next > prev ? Math.min(1, (currentXp - prev) / (next - prev)) : 0;
-    return { xp: currentXp, level: lvl, progress: prog, nextThreshold: next, prevThreshold: prev };
+    const prog =
+      next > prev ? Math.min(1, (currentXp - prev) / (next - prev)) : 0;
+    return {
+      xp: currentXp,
+      level: lvl,
+      progress: prog,
+      nextThreshold: next,
+      prevThreshold: prev,
+    };
   }, [data]);
 
   return (
     <>
-      <div className="flex min-w-[600px] flex-1 items-center gap-4 rounded-2xl border border-white/80 bg-black/80 px-6 py-3 text-white shadow-[0_0_0_2px_black,0_0_0_4px_white]">
-        <div className="flex items-baseline gap-2">
-          <span className="text-xs font-semibold text-white/80">LEVEL</span>
-          <span className="text-2xl font-bold">Lv.{level}</span>
-          <span className="text-sm text-white/70">XP {xp}</span>
-        </div>
-        <div className="flex flex-1 flex-col gap-1 min-w-[180px]">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
-            <div
-              className="h-full rounded-full bg-linear-to-r from-yellow-300 to-yellow-500 transition-all"
-              style={{ width: `${Math.round(progress * 100)}%` }}
-            />
-          </div>
-          <div className="flex justify-between text-[11px] text-white/70">
-            <span>次まで {Math.max(0, nextThreshold - xp)} XP</span>
-            <span>
-              {prevThreshold} / {nextThreshold} XP
+      {/* 1. 常駐ステータスバー：常に背景画像を表示 */}
+      <div className="relative flex min-w-[600px] flex-1 items-center gap-6 overflow-hidden px-6 py-4">
+        {/* 背景画像：常に前面で見えるように表示 */}
+        <img
+          src="/levelup.jpeg"
+          alt="Status Background"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+
+        {/* コンテンツを画像の上に浮かせるための relative */}
+        <div className="relative z-10 flex w-full items-center gap-6 drop-shadow-[0_2px_3px_rgba(0,0,0,0.8)]">
+          <div className="flex items-baseline gap-2">
+            <span className="text-[10px] font-bold tracking-widest text-white/90">
+              LEVEL
             </span>
+            <span className="text-3xl font-bold tracking-tighter text-white">
+              Lv {level}
+            </span>
+            <span className="text-xs text-white/80">XP {xp}</span>
+          </div>
+
+          <div className="flex flex-1 flex-col gap-2 min-w-[180px]">
+            {/* ゲージ：背景に馴染むよう枠線を調整 */}
+            <div className="h-3 w-full border border-white bg-black/40 p-[2px]">
+              <div
+                className="h-full bg-white transition-all duration-1000"
+                style={{ width: `${Math.round(progress * 100)}%` }}
+              />
+            </div>
+            <div className="flex justify-between text-[10px] font-bold tracking-tight text-white">
+              <span style={{ textShadow: "1px 1px 2px #000" }}>
+                つぎの レベルまで {Math.max(0, nextThreshold - xp)} XP
+              </span>
+              <span style={{ textShadow: "1px 1px 2px #000" }}>
+                {xp} / {nextThreshold}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* 2. レベルアップ演出：モーダル（全画面中央） */}
       {levelUp && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm">
-          <div className="relative flex items-center gap-4 rounded-3xl border border-white/80 bg-black/90 px-6 py-5 text-base font-semibold text-white shadow-[0_0_0_2px_black,0_0_0_4px_white]">
-            <span className="rounded-full border border-white/70 bg-black px-3 py-1 text-sm text-white">
-              Level Up
-            </span>
-            <span>おめでとうございます！ Lv.{levelUp} に到達しました</span>
-            <button
-              type="button"
-              aria-label="閉じる"
-              className="absolute -right-2 -top-2 h-7 w-7 rounded-full border-2 border-white bg-black text-white shadow-md transition hover:scale-105"
-              onClick={() => setLevelUp(null)}
-            >
-              ✕
-            </button>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="relative aspect-video w-full max-w-[650px] overflow-hidden border-4 border-white shadow-2xl">
+            {/* 背景画像：levelup.jpg (常駐バーより鮮明に表示) */}
+            <img
+              src="/levelup.jpg"
+              alt="Level Up Background"
+              className="absolute inset-0 h-full w-full object-cover opacity-90"
+            />
+
+            {/* DQ風メッセージウィンドウ */}
+            <div className="absolute inset-x-8 bottom-8">
+              <div className="relative border-2 border-white bg-black p-6 shadow-[0_0_0_2px_black,0_0_0_4px_white]">
+                {/* 枠に割り込むタイトル */}
+                <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-black px-4 text-lg font-bold tracking-widest text-white">
+                  LEVEL UP!
+                </span>
+
+                <div className="text-center space-y-4">
+                  <p className="text-xl font-bold leading-relaxed text-white">
+                    おめでとう！
+                    <br />
+                    あなたは Lv.{levelUp} に なった！
+                  </p>
+
+                  <button
+                    type="button"
+                    className="group flex items-center justify-center w-full gap-2 text-2xl font-bold text-white transition hover:text-yellow-400"
+                    onClick={() => setLevelUp(null)}
+                  >
+                    <span className="animate-pulse">▶</span>
+                    <span>つぎへ</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

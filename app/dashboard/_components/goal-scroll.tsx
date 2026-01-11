@@ -50,27 +50,27 @@ export function GoalScroll({
             <div className="space-y-3">
               <div className="grid gap-x-10 gap-y-2 md:grid-cols-2">
                 <div className="flex items-baseline gap-2">
-                  <span className="shrink-0 text-[10px] font-bold text-[#7d5a2a]">
+                  <span className="shrink-0 text-[11px] font-black text-[#1b1209]">
                     【志望】
                   </span>
-                  <p className="truncate text-base font-black text-[#3e2a16] md:text-xl">
+                  <p className="truncate text-lg font-black text-[#1b1209] md:text-2xl">
                     {targetIndustry || "未設定"}
                   </p>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="shrink-0 text-[10px] font-bold text-[#7d5a2a]">
+                  <span className="shrink-0 text-[11px] font-black text-[#1b1209]">
                     【軸】
                   </span>
-                  <p className="truncate text-base font-black text-[#3e2a16] md:text-xl">
+                  <p className="truncate text-lg font-black text-[#1b1209] md:text-2xl">
                     {careerAxis || "未設定"}
                   </p>
                 </div>
               </div>
-              <div className="flex flex-col justify-center rounded-md bg-[#3e2a16]/5 px-4 py-2">
-                <span className="mb-1 text-[9px] font-bold text-[#7d5a2a] opacity-70 uppercase tracking-tighter">
-                  Goal Note
+              <div className="flex flex-col justify-center">
+                <span className="mb-1 text-[11px] font-black uppercase tracking-[0.2em] text-[#1b1209]">
+                  GOAL NOTE
                 </span>
-                <p className="text-sm font-black italic leading-tight text-[#2a1a0a] md:text-lg">
+                <p className="text-base font-black leading-tight text-[#1b1209] md:text-xl">
                   「{goalState || "未設定の目標"}」
                 </p>
               </div>
