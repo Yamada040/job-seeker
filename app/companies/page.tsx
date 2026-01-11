@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { PlusIcon, ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
-
+import {
+  PlusIcon,
+  ArrowUturnLeftIcon,
+  HomeIcon,
+} from "@heroicons/react/24/outline";
 import { AppLayout } from "@/app/_components/layout";
 import { ROUTES } from "@/lib/constants/routes";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
@@ -31,11 +34,17 @@ export default async function CompaniesPage() {
             <HomeIcon className="h-4 w-4" />
             MVPホーム
           </Link>
-          <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
+          <Link
+            href={ROUTES.DASHBOARD}
+            className="mvp-button mvp-button-secondary"
+          >
             <ArrowUturnLeftIcon className="h-4 w-4" />
             ダッシュボードへ
           </Link>
-          <Link href={ROUTES.COMPANIES_NEW} className="mvp-button mvp-button-primary">
+          <Link
+            href={ROUTES.COMPANIES_NEW}
+            className="mvp-button mvp-button-primary"
+          >
             <PlusIcon className="h-4 w-4" />
             企業を追加
           </Link>

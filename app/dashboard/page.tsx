@@ -180,29 +180,28 @@ export default async function DashboardPage() {
   return (
     <AppLayout headerActions={navigationActions} className="space-y-6">
       {/* 目標エリア */}
-      <section className="rounded-3xl border border-white/70 bg-white/90 p-8 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-600">My Goal</p>
-        <div className="mt-3 space-y-3">
-          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">あなたの就活目標をいつでも思い出そう</h1>
-          <p className="text-sm text-slate-700 dark:text-slate-300">
+      <section className="relative overflow-hidden rounded-3xl border border-slate-800/80 bg-slate-950/90 p-8 shadow-2xl shadow-black/40">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(251,191,36,0.12),transparent_55%)]" />
+        <p className="relative text-xs font-semibold uppercase tracking-[0.25em] text-amber-300">My Goal</p>
+        <div className="relative mt-3 space-y-3">
+          <h1 className="text-2xl font-semibold text-slate-100">あなたの就活目標をいつでも思い出そう</h1>
+          <p className="text-sm text-slate-300">
             志望業界・職種や大切にしたい軸を短く書き留めておくと、日々の行動が目標に結びつきます。
           </p>
-          <div className="grid gap-3 md:grid-cols-2 text-lg font-semibold text-slate-800 dark:text-slate-100">
-            <span className="block rounded-2xl bg-amber-50 px-5 py-3 text-amber-800 shadow-sm ring-1 ring-amber-100 dark:bg-amber-900/30 dark:text-amber-100 dark:ring-amber-500/30">
+          <div className="grid gap-3 text-lg font-semibold text-slate-100 md:grid-cols-2">
+            <span className="block rounded-2xl border border-amber-400/20 bg-amber-200/10 px-5 py-3 text-amber-100 shadow-sm">
               志望業界: {data.profile?.target_industry || "未設定"}
             </span>
-            <span className="block rounded-2xl bg-emerald-50 px-5 py-3 text-emerald-800 shadow-sm ring-1 ring-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-100 dark:ring-emerald-500/30">
+            <span className="block rounded-2xl border border-emerald-400/20 bg-emerald-200/10 px-5 py-3 text-emerald-100 shadow-sm">
               重視する軸: {data.profile?.career_axis || "未設定"}
             </span>
           </div>
-          <div className="relative overflow-hidden rounded-2xl bg-linear-to-r from-amber-100 via-white to-rose-50 p-5 shadow-lg ring-1 ring-amber-100 dark:from-amber-900/40 dark:via-slate-900 dark:to-rose-900/30 dark:ring-amber-500/30">
-            <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-amber-200/50 blur-3xl dark:bg-amber-800/30" />
-            <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-200">Goal Note</p>
-            <p className="mt-2 text-lg font-bold text-slate-900 dark:text-slate-50">
-              {data.profile?.goal_state || "未設定"}
-            </p>
+          <div className="relative overflow-hidden rounded-2xl border border-amber-400/20 bg-slate-900/80 p-5 shadow-lg">
+            <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-amber-200/20 blur-3xl" />
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-300">Goal Note</p>
+            <p className="mt-2 text-lg font-bold text-slate-100">{data.profile?.goal_state || "未設定"}</p>
             {!data.profile?.goal_state && (
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              <p className="mt-1 text-xs text-slate-400">
                 プロフィールで「就活で達成したい状態」を短く書いておくと、日々の行動が目標に結びつきます。
               </p>
             )}
@@ -213,15 +212,14 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-
       {/* カレンダー + サイドカラム */}
       <section className="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
-        <div className="rounded-2xl border border-white/70 bg-white/90 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+        <div className="rounded-2xl border border-slate-800/80 bg-slate-950/90 p-6 shadow-xl shadow-black/40">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">締切カレンダー</h2>
-            <span className="text-xs text-slate-500">ES / 面接 / インターン</span>
+            <h2 className="text-lg font-semibold text-slate-100">締切カレンダー</h2>
+            <span className="text-xs text-slate-400">ES / 面接 / インターン</span>
           </div>
-          <div className="mt-3">
+          <div className="mt-3 rounded-2xl border border-slate-800/60 bg-white/5 p-3">
             <InteractiveCalendar initialEvents={calendarEvents} />
           </div>
         </div>
@@ -231,10 +229,10 @@ export default async function DashboardPage() {
           <EventListModal
             events={calendarEvents}
             trigger={
-              <div className="cursor-pointer rounded-2xl border border-amber-100 bg-amber-50/80 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-amber-500/30 dark:bg-amber-900/20">
+              <div className="cursor-pointer rounded-2xl border border-amber-400/30 bg-slate-950/85 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-100">直近で注意すべきこと</h3>
-                  <span className="text-[11px] text-amber-800/80 dark:text-amber-100/80">7日以内を表示</span>
+                  <h3 className="text-sm font-semibold text-amber-100">直近で注意すべきこと</h3>
+                  <span className="text-[11px] text-amber-200/70">7日以内を表示</span>
                 </div>
                 <div className="mt-3 space-y-3">
                   {calendarEvents
@@ -246,13 +244,13 @@ export default async function DashboardPage() {
                     })
                     .slice(0, 4)
                     .map((evt) => (
-                      <div key={evt.id} className="rounded-xl bg-white/70 p-3 text-sm shadow-sm dark:bg-amber-900/30">
-                        <div className="flex items-center justify-between text-xs">
+                      <div key={evt.id} className="rounded-xl border border-amber-400/20 bg-amber-50/5 p-3 text-sm shadow-sm">
+                        <div className="flex items-center justify-between text-xs text-amber-100/80">
                           <span className="font-semibold">{evt.type === "es" ? "ES締切" : "面接"}</span>
                           <span>{evt.date}</span>
                         </div>
-                        <p className="mt-1 text-sm font-semibold text-amber-900 dark:text-amber-50">{evt.company || evt.title}</p>
-                        <p className="text-xs text-amber-800/80 dark:text-amber-100/80">{evt.title}</p>
+                        <p className="mt-1 text-sm font-semibold text-amber-100">{evt.company || evt.title}</p>
+                        <p className="text-xs text-amber-100/70">{evt.title}</p>
                       </div>
                     ))}
                   {calendarEvents.filter((evt) => {
@@ -261,7 +259,7 @@ export default async function DashboardPage() {
                     const diff = (date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
                     return diff >= 0 && diff <= 7 && (evt.type === "es" || evt.type === "interview");
                   }).length === 0 && (
-                    <div className="rounded-xl border border-dashed border-amber-200/80 bg-white/50 p-3 text-xs text-amber-800 dark:border-amber-500/40 dark:bg-amber-900/20 dark:text-amber-50">
+                    <div className="rounded-xl border border-dashed border-amber-400/30 bg-amber-50/5 p-3 text-xs text-amber-100/70">
                       直近1週間の締切・面接はありません。
                     </div>
                   )}
@@ -273,24 +271,24 @@ export default async function DashboardPage() {
           {/* Next actions */}
           <SimpleListModal
             trigger={
-              <div className="cursor-pointer rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700/70 dark:bg-slate-900/80">
+              <div className="cursor-pointer rounded-2xl border border-slate-800/80 bg-slate-950/85 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50">次に取るべき行動</h3>
-                  <span className="text-[11px] text-slate-500">最大2件</span>
+                  <h3 className="text-sm font-semibold text-slate-100">次に取るべき行動</h3>
+                  <span className="text-[11px] text-slate-400">最大2件</span>
                 </div>
                 <div className="mt-3 space-y-3">
                   {nextActions.map((action) => (
                     <Link
                       key={`${action.title}-${action.href}-${action.subtitle}`}
                       href={action.href}
-                      className="block rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-100"
+                      className="block rounded-xl border border-slate-800/70 bg-white/5 px-4 py-3 text-sm text-slate-100 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                     >
-                      <p className="text-xs font-semibold text-amber-700">{action.title}</p>
+                      <p className="text-xs font-semibold text-amber-300">{action.title}</p>
                       <p className="mt-1 text-base font-semibold">{action.subtitle}</p>
                     </Link>
                   ))}
                   {nextActions.length === 0 && (
-                    <div className="rounded-xl border border-dashed border-slate-300 bg-white/70 p-3 text-xs text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
+                    <div className="rounded-xl border border-dashed border-slate-700 bg-white/5 p-3 text-xs text-slate-400 shadow-sm">
                       取り掛かるべきアクションはありません。
                     </div>
                   )}
@@ -308,28 +306,28 @@ export default async function DashboardPage() {
           {/* 最近のXP獲得 */}
           <SimpleListModal
             trigger={
-              <div className="cursor-pointer rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700/70 dark:bg-slate-900/80">
+              <div className="cursor-pointer rounded-2xl border border-slate-800/80 bg-slate-950/85 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50">最近の獲得</h3>
-                  <span className="text-[11px] text-slate-500">最新5件</span>
+                  <h3 className="text-sm font-semibold text-slate-100">最近の獲得</h3>
+                  <span className="text-[11px] text-slate-400">最新5件</span>
                 </div>
                 <div className="mt-3 space-y-2">
                   {recentXpLogs.map((log, idx) => (
                     <div
                       key={`${log.created_at}-${idx}`}
-                      className="rounded-xl border border-slate-200/70 bg-white/90 p-3 text-sm shadow-sm dark:border-slate-700/70 dark:bg-slate-800/80"
+                      className="rounded-xl border border-slate-800/70 bg-white/5 p-3 text-sm shadow-sm"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-slate-900 dark:text-slate-50">+{log.xp} XP</span>
-                        <span className="text-xs text-slate-500">
+                        <span className="font-semibold text-slate-100">+{log.xp} XP</span>
+                        <span className="text-xs text-slate-400">
                           {log.created_at ? new Date(log.created_at).toLocaleDateString() : ""}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-300">{log.action || "行動"}</p>
+                      <p className="text-xs text-slate-300">{log.action || "行動"}</p>
                     </div>
                   ))}
                   {recentXpLogs.length === 0 && (
-                    <div className="rounded-xl border border-dashed border-slate-300 bg-white/70 p-3 text-xs text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
+                    <div className="rounded-xl border border-dashed border-slate-700 bg-white/5 p-3 text-xs text-slate-400 shadow-sm">
                       まだXPはありません。ES提出や面接ログでXPを獲得できます。
                     </div>
                   )}

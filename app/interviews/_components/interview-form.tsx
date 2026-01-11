@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
-
 import { AiPanel } from "@/app/_components/ai-panel";
 import { InterviewQA, InterviewQuestionsPayload } from "../types";
 import { MAX_TEXT_LEN, tooLong } from "@/app/_components/validation";
@@ -32,16 +31,29 @@ function normalizeInitialQuestions(input?: InterviewQuestionsPayload | null): {
   reflection: Reflection;
 } {
   const baseReflection: Reflection = { improvement: "", unexpected: "" };
-  if (!input) return { items: [{ ...emptyQA }, { ...emptyQA }], reflection: baseReflection };
+  if (!input)
+    return {
+      items: [{ ...emptyQA }, { ...emptyQA }],
+      reflection: baseReflection,
+    };
   if (Array.isArray(input)) {
     const items = input.length ? input : [{ ...emptyQA }];
-    return { items: items.map((q) => ({ question: q.question, answer: q.answer, rating: q.rating ?? "average" })), reflection: baseReflection };
+    return {
+      items: items.map((q) => ({
+        question: q.question,
+        answer: q.answer,
+        rating: q.rating ?? "average",
+      })),
+      reflection: baseReflection,
+    };
   }
-  const items = (input.items?.length ? input.items : [{ ...emptyQA }]).map((q) => ({
-    question: q.question,
-    answer: q.answer,
-    rating: q.rating ?? "average",
-  }));
+  const items = (input.items?.length ? input.items : [{ ...emptyQA }]).map(
+    (q) => ({
+      question: q.question,
+      answer: q.answer,
+      rating: q.rating ?? "average",
+    })
+  );
   return {
     items,
     reflection: {
@@ -71,8 +83,12 @@ export default function InterviewForm({
   const [date, setDate] = useState(initialDate ?? "");
   const [asTemplate, setAsTemplate] = useState(Boolean(initialIsTemplate));
   const [selfReview, setSelfReview] = useState(initialSelfReview ?? "");
-  const [reflection, setReflection] = useState<Reflection>(parsedQuestions.reflection);
-  const [questions, setQuestions] = useState<InterviewQA[]>(parsedQuestions.items);
+  const [reflection, setReflection] = useState<Reflection>(
+    parsedQuestions.reflection
+  );
+  const [questions, setQuestions] = useState<InterviewQA[]>(
+    parsedQuestions.items
+  );
   const [saving, setSaving] = useState(false);
   const [resultId, setResultId] = useState<string | null>(interviewId ?? null);
   const [presetKey, setPresetKey] = useState<string | undefined>(undefined);
@@ -89,7 +105,11 @@ export default function InterviewForm({
       ...questions.map(
         (qa, idx) =>
           `${idx + 1}. Q: ${qa.question || "未入力"} / A: ${qa.answer || "未入力"} / 評価: ${
-            qa.rating === "good" ? "良い" : qa.rating === "bad" ? "悪い" : "普通"
+            qa.rating === "good"
+              ? "良い"
+              : qa.rating === "bad"
+                ? "悪い"
+                : "普通"
           }`
       ),
       "",
@@ -98,9 +118,22 @@ export default function InterviewForm({
       `メモ: ${selfReview || "未入力"}`,
     ];
     return lines.join("\n");
-  }, [companyName, date, format, questions, reflection.improvement, reflection.unexpected, selfReview, stage]);
+  }, [
+    companyName,
+    date,
+    format,
+    questions,
+    reflection.improvement,
+    reflection.unexpected,
+    selfReview,
+    stage,
+  ]);
 
-  const handleQAChange = (index: number, key: keyof InterviewQA, value: string) => {
+  const handleQAChange = (
+    index: number,
+    key: keyof InterviewQA,
+    value: string
+  ) => {
     setQuestions((prev) => {
       const next = [...prev];
       next[index] = { ...next[index], [key]: value };
@@ -109,7 +142,8 @@ export default function InterviewForm({
   };
 
   const addQA = () => setQuestions((prev) => [...prev, { ...emptyQA }]);
-  const removeQA = (idx: number) => setQuestions((prev) => prev.filter((_, i) => i !== idx));
+  const removeQA = (idx: number) =>
+    setQuestions((prev) => prev.filter((_, i) => i !== idx));
 
   const handleTemplateToggle = (checked: boolean) => {
     setAsTemplate(checked);
@@ -121,7 +155,10 @@ export default function InterviewForm({
 
   const withMissingOption = (): CompanyOption[] => {
     if (companyName && !companyOptions.find((o) => o.value === companyName)) {
-      return [{ value: companyName, label: `${companyName}（新規）` }, ...companyOptions];
+      return [
+        { value: companyName, label: `${companyName}（新規）` },
+        ...companyOptions,
+      ];
     }
     return companyOptions;
   };
@@ -149,7 +186,8 @@ export default function InterviewForm({
     ensureLength(format.trim(), "面接形式");
     ensureLength(stage.trim(), "面接回数/ステージ");
     if (!asTemplate) {
-      if (!stage.trim()) throw new Error("面接回数を入力してください（一次/最終など）");
+      if (!stage.trim())
+        throw new Error("面接回数を入力してください（一次/最終など）");
       if (!date) throw new Error("実施日を入力してください");
     }
 
@@ -178,7 +216,9 @@ export default function InterviewForm({
       const payload = buildPayload();
       setSaving(true);
       const isUpdate = mode === "update" && interviewId;
-      const endpoint = isUpdate ? `/api/interviews/${interviewId}` : "/api/interviews";
+      const endpoint = isUpdate
+        ? `/api/interviews/${interviewId}`
+        : "/api/interviews";
       const method = isUpdate ? "PUT" : "POST";
       const res = await fetch(endpoint, {
         method,
@@ -216,7 +256,13 @@ export default function InterviewForm({
                 placeholder="企業管理から選択"
               />
             ) : (
-              <Field label="企業名（必須）" value={companyName} onChange={setCompanyName} required placeholder="例）Alpha株式会社" />
+              <Field
+                label="企業名（必須）"
+                value={companyName}
+                onChange={setCompanyName}
+                required
+                placeholder="例）Alpha株式会社"
+              />
             )}
             <Field
               label="面接形式"
@@ -260,8 +306,14 @@ export default function InterviewForm({
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">質問ログ（質問・回答・自己評価）</span>
-              <button type="button" onClick={addQA} className="mvp-button mvp-button-secondary">
+              <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                質問ログ（質問・回答・自己評価）
+              </span>
+              <button
+                type="button"
+                onClick={addQA}
+                className="mvp-button mvp-button-secondary"
+              >
                 <PlusIcon className="h-4 w-4" />
                 行を追加
               </button>
@@ -287,10 +339,18 @@ export default function InterviewForm({
                     />
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <label className="text-xs text-slate-600 dark:text-slate-300">自己評価</label>
+                    <label className="text-xs text-slate-600 dark:text-slate-300">
+                      自己評価
+                    </label>
                     <select
                       value={qa.rating}
-                      onChange={(e) => handleQAChange(idx, "rating", e.target.value as InterviewQA["rating"])}
+                      onChange={(e) =>
+                        handleQAChange(
+                          idx,
+                          "rating",
+                          e.target.value as InterviewQA["rating"]
+                        )
+                      }
                       className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                     >
                       <option value="good">良い</option>
@@ -315,20 +375,34 @@ export default function InterviewForm({
 
           <div className="grid gap-3 md:grid-cols-2">
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">次回改善したい点</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                次回改善したい点
+              </span>
               <textarea
                 value={reflection.improvement}
-                onChange={(e) => setReflection((prev) => ({ ...prev, improvement: e.target.value }))}
+                onChange={(e) =>
+                  setReflection((prev) => ({
+                    ...prev,
+                    improvement: e.target.value,
+                  }))
+                }
                 rows={4}
                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 placeholder="例）結論を先に述べる / プロジェクトの定量成果を追加 など"
               />
             </label>
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">想定外だった質問・論点</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                想定外だった質問・論点
+              </span>
               <textarea
                 value={reflection.unexpected}
-                onChange={(e) => setReflection((prev) => ({ ...prev, unexpected: e.target.value }))}
+                onChange={(e) =>
+                  setReflection((prev) => ({
+                    ...prev,
+                    unexpected: e.target.value,
+                  }))
+                }
                 rows={4}
                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 placeholder="例）最近の業界トレンドについて深掘りされた など"
@@ -337,7 +411,9 @@ export default function InterviewForm({
           </div>
 
           <div className="space-y-2">
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-200">メモ（任意）</span>
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+              メモ（任意）
+            </span>
             <textarea
               value={selfReview}
               onChange={(e) => setSelfReview(e.target.value)}
@@ -348,7 +424,12 @@ export default function InterviewForm({
           </div>
 
           <div className="mt-6 flex justify-start">
-            <button type="button" onClick={handleSave} disabled={saving} className="mvp-button mvp-button-primary">
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saving}
+              className="mvp-button mvp-button-primary"
+            >
               {saving ? "保存中..." : "保存する"}
             </button>
           </div>

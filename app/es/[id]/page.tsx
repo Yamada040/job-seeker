@@ -1,7 +1,10 @@
 ﻿import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
-
+import {
+  ArrowLeftIcon,
+  HomeIcon,
+  ArrowUturnLeftIcon,
+} from "@heroicons/react/24/outline";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { ROUTES } from "@/lib/constants/routes";
 import { AppLayout } from "@/app/_components/layout";
@@ -11,7 +14,8 @@ import { EsDetailClient } from "../_components/es-detail-client";
 type Question = { id: string; prompt: string; answer_md: string };
 
 function makeId() {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function")
+    return crypto.randomUUID();
   return Math.random().toString(36).slice(2);
 }
 
@@ -37,7 +41,11 @@ function parseQuestions(questions: unknown): Question[] {
   return [];
 }
 
-export default async function EsDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function EsDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const supabase = await createSupabaseReadonlyClient();
   if (!supabase) throw new Error("Supabase client unavailable");
@@ -61,10 +69,12 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
   const combinedContent =
     questions.length > 0
       ? questions
-          .map((q) => [q.prompt?.trim(), q.answer_md?.trim()].filter(Boolean).join("\n"))
+          .map((q) =>
+            [q.prompt?.trim(), q.answer_md?.trim()].filter(Boolean).join("\n")
+          )
           .filter(Boolean)
           .join("\n\n")
-      : data.content_md ?? "";
+      : (data.content_md ?? "");
 
   const handleUpdate = updateEs.bind(null, id);
   const handleDelete = deleteEs.bind(null, id);
@@ -79,7 +89,10 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
             <HomeIcon className="h-4 w-4" />
             MVPホーム
           </Link>
-          <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
+          <Link
+            href={ROUTES.DASHBOARD}
+            className="mvp-button mvp-button-secondary"
+          >
             <ArrowUturnLeftIcon className="h-4 w-4" />
             ダッシュボードへ
           </Link>
