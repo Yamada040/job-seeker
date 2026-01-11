@@ -23,7 +23,12 @@ export function SimpleListModal({ trigger, items, emptyText = "項目があり�
 
   return (
     <>
-      <div onClick={() => setOpen(true)} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && setOpen(true)}>
+      <div
+        onClick={() => setOpen(true)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && setOpen(true)}
+      >
         {trigger}
       </div>
 

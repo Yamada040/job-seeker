@@ -15,6 +15,6 @@ export function BlockingOverlay({ message = "AI処理中です。画面を閉じ
         {message}
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }

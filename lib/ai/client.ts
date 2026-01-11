@@ -109,7 +109,11 @@ async function callGemini(prompt: string): Promise<AiResponse> {
   type GeminiResponse = { candidates?: { content?: GeminiContent }[] };
   const data = (await res.json()) as GeminiResponse;
   const parts = data?.candidates?.[0]?.content?.parts ?? [];
-  const text: string | undefined = parts.map((p) => p.text ?? "").filter(Boolean).join("\n") || undefined;
+  const text: string | undefined =
+    parts
+      .map((p) => p.text ?? "")
+      .filter(Boolean)
+      .join("\n") || undefined;
 
   if (!text) {
     return { summary: "Geminiからテキストが取得できませんでした。" };
@@ -121,7 +125,11 @@ async function callGemini(prompt: string): Promise<AiResponse> {
     .filter((line) => line.startsWith("-") || line.startsWith("・"))
     .map((line) => line.replace(/^[-・]\s?/, ""));
 
-  return { summary: text, bulletPoints: bulletPoints.length ? bulletPoints : undefined, provider: "gemini" };
+  return {
+    summary: text,
+    bulletPoints: bulletPoints.length ? bulletPoints : undefined,
+    provider: "gemini",
+  };
 }
 
 async function callGpt(prompt: string): Promise<AiResponse> {
@@ -138,7 +146,10 @@ async function callGpt(prompt: string): Promise<AiResponse> {
     body: JSON.stringify({
       model,
       messages: [
-        { role: "system", content: "You are an assistant for Japanese job hunting. Reply in Japanese." },
+        {
+          role: "system",
+          content: "You are an assistant for Japanese job hunting. Reply in Japanese.",
+        },
         { role: "user", content: prompt },
       ],
       temperature: 0.7,
@@ -147,7 +158,10 @@ async function callGpt(prompt: string): Promise<AiResponse> {
 
   if (!res.ok) {
     const bodyText = await res.text().catch(() => "");
-    return { summary: `GPT呼び出しに失敗しました (${res.status})`, bulletPoints: bodyText ? [bodyText] : undefined };
+    return {
+      summary: `GPT呼び出しに失敗しました (${res.status})`,
+      bulletPoints: bodyText ? [bodyText] : undefined,
+    };
   }
 
   type OpenAIChoice = { message?: { content?: string } };
@@ -165,7 +179,11 @@ async function callGpt(prompt: string): Promise<AiResponse> {
     .filter((line: string) => line.startsWith("-") || line.startsWith("・"))
     .map((line: string) => line.replace(/^[-・]\s?/, ""));
 
-  return { summary: text, bulletPoints: bulletPoints.length ? bulletPoints : undefined, provider: "gpt" };
+  return {
+    summary: text,
+    bulletPoints: bulletPoints.length ? bulletPoints : undefined,
+    provider: "gpt",
+  };
 }
 
 export function createAiClient(): AiClient {

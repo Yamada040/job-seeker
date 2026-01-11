@@ -125,7 +125,11 @@ export default async function NewCompanyPage() {
           </label>
 
           <label className="inline-flex items-center gap-2 text-sm text-slate-700">
-            <input type="checkbox" name="favorite" className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400" />
+            <input
+              type="checkbox"
+              name="favorite"
+              className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400"
+            />
             お気に入りに追加
           </label>
         </div>

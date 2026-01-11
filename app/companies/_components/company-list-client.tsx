@@ -39,7 +39,9 @@ export function CompanyListClient({ items }: Props) {
               type="button"
               onClick={() => setStage(opt)}
               className={`rounded-full px-3 py-1 ${
-                stage === opt ? "bg-emerald-300/30 text-emerald-50 border border-emerald-300/50" : "bg-white/5 text-slate-100 border border-white/10"
+                stage === opt
+                  ? "bg-emerald-300/30 text-emerald-50 border border-emerald-300/50"
+                  : "bg-white/5 text-slate-100 border border-white/10"
               }`}
             >
               {opt}
@@ -72,7 +74,11 @@ export function CompanyListClient({ items }: Props) {
           >
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-white">{c.name}</p>
-              {c.favorite ? <span className="rounded-full bg-amber-300/90 px-2 py-1 text-[11px] font-semibold text-slate-950">Fav</span> : null}
+              {c.favorite ? (
+                <span className="rounded-full bg-amber-300/90 px-2 py-1 text-[11px] font-semibold text-slate-950">
+                  Fav
+                </span>
+              ) : null}
             </div>
             <p className="mt-1 text-xs text-slate-200/80">{c.url}</p>
             <p className="mt-2 inline-flex rounded-full bg-white/10 px-3 py-1 text-[11px] text-slate-100">{c.stage}</p>

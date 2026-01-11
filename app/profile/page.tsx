@@ -30,22 +30,24 @@ export default async function ProfilePage() {
     .select("full_name, university, faculty, avatar_id, target_industry, career_axis, goal_state")
     .eq("id", userId)
     .maybeSingle<
-      Pick<ProfileRow, "full_name" | "university" | "faculty" | "avatar_id" | "target_industry" | "career_axis" | "goal_state">
+      Pick<
+        ProfileRow,
+        "full_name" | "university" | "faculty" | "avatar_id" | "target_industry" | "career_axis" | "goal_state"
+      >
     >();
 
   const profile: Pick<
     ProfileRow,
     "full_name" | "university" | "faculty" | "avatar_id" | "target_industry" | "career_axis" | "goal_state"
-  > =
-    profileData ?? {
-      full_name: "",
-      university: "",
-      faculty: "",
-      avatar_id: "",
-      target_industry: "",
-      career_axis: "",
-      goal_state: "",
-    };
+  > = profileData ?? {
+    full_name: "",
+    university: "",
+    faculty: "",
+    avatar_id: "",
+    target_industry: "",
+    career_axis: "",
+    goal_state: "",
+  };
 
   const headerActions = (
     <div className="flex gap-3">
@@ -151,7 +153,9 @@ export default async function ProfilePage() {
                 <label
                   key={opt.id}
                   className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-4 transition-colors ${
-                    profile.avatar_id === opt.id ? "border-amber-300 bg-amber-50" : "border-slate-200 bg-white hover:bg-slate-50"
+                    profile.avatar_id === opt.id
+                      ? "border-amber-300 bg-amber-50"
+                      : "border-slate-200 bg-white hover:bg-slate-50"
                   }`}
                 >
                   <input
@@ -176,7 +180,13 @@ export default async function ProfilePage() {
                   !profile.avatar_id ? "border-amber-300 bg-amber-50" : "border-slate-200 bg-white hover:bg-slate-50"
                 }`}
               >
-                <input type="radio" name="avatar_id" value="" defaultChecked={!profile.avatar_id} className="h-4 w-4 accent-amber-300" />
+                <input
+                  type="radio"
+                  name="avatar_id"
+                  value=""
+                  defaultChecked={!profile.avatar_id}
+                  className="h-4 w-4 accent-amber-300"
+                />
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-600">
                   なし
                 </div>

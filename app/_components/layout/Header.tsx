@@ -72,7 +72,14 @@ function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
   return breadcrumbs;
 }
 
-export function Header({ title, description, actions, leftContent, breadcrumbs, actionsPlacement = "left" }: HeaderProps) {
+export function Header({
+  title,
+  description,
+  actions,
+  leftContent,
+  breadcrumbs,
+  actionsPlacement = "left",
+}: HeaderProps) {
   const pathname = usePathname();
   const generatedBreadcrumbs = breadcrumbs || generateBreadcrumbs(pathname);
 
@@ -106,16 +113,12 @@ export function Header({ title, description, actions, leftContent, breadcrumbs, 
 
         {actionsPlacement === "left" ? (
           <div className="flex items-start justify-between gap-6">
-            {leftContent ? (
-              <div className="flex-shrink-0">{leftContent}</div>
-            ) : null}
+            {leftContent ? <div className="flex-shrink-0">{leftContent}</div> : null}
             <div className="flex-1 min-w-0">
               {title && <h1 className="truncate text-2xl font-semibold text-slate-900 dark:text-slate-100">{title}</h1>}
               {description && <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{description}</p>}
             </div>
-            {actions ? (
-              <div className="flex-shrink-0 flex items-center gap-2">{actions}</div>
-            ) : null}
+            {actions ? <div className="flex-shrink-0 flex items-center gap-2">{actions}</div> : null}
           </div>
         ) : (
           <div className="flex items-start justify-between gap-3">
@@ -124,9 +127,7 @@ export function Header({ title, description, actions, leftContent, breadcrumbs, 
               {description && <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{description}</p>}
             </div>
 
-            <div className={clsx("ml-4 flex items-center gap-2")}>
-              {actions}
-            </div>
+            <div className={clsx("ml-4 flex items-center gap-2")}>{actions}</div>
           </div>
         )}
       </div>

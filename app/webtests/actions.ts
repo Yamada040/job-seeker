@@ -12,7 +12,7 @@ export async function createWebtestQuestion(formData: FormData) {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
-  const parsed = webtestQuestionFormSchema.parse({
+  const questionData = webtestQuestionFormSchema.parse({
     title: formData.get("title"),
     body: formData.get("body"),
     answer: formData.get("answer"),
@@ -25,7 +25,7 @@ export async function createWebtestQuestion(formData: FormData) {
     time_limit: formData.get("time_limit"),
   });
 
-  const choicesRaw = parsed.choices || "";
+  const choicesRaw = questionData.choices || "";
   const choices =
     choicesRaw
       .split("\n")
@@ -34,16 +34,16 @@ export async function createWebtestQuestion(formData: FormData) {
 
   const payload = {
     user_id: userData.user.id,
-    title: parsed.title,
-    body: parsed.body,
-    test_type: parsed.test_type ?? null,
+    title: questionData.title,
+    body: questionData.body,
+    test_type: questionData.test_type ?? null,
     choices: choices?.length ? choices : null,
-    answer: parsed.answer,
-    explanation: parsed.explanation ?? null,
-    category: parsed.category ?? null,
-    format: parsed.format ?? null,
-    difficulty: parsed.difficulty ?? null,
-    time_limit: parsed.time_limit ?? null,
+    answer: questionData.answer,
+    explanation: questionData.explanation ?? null,
+    category: questionData.category ?? null,
+    format: questionData.format ?? null,
+    difficulty: questionData.difficulty ?? null,
+    time_limit: questionData.time_limit ?? null,
   };
 
   const { data, error } = await supabase.from("webtest_questions").insert(payload).select("id").single();
@@ -61,7 +61,7 @@ export async function submitWebtestAnswer(questionId: string, formData: FormData
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
-  const parsed = webtestAnswerFormSchema.parse({
+  const answerData = webtestAnswerFormSchema.parse({
     answer: formData.get("answer"),
     time_spent: formData.get("time_spent"),
   });
@@ -78,14 +78,18 @@ export async function submitWebtestAnswer(questionId: string, formData: FormData
   }
 
   const normalize = (s: string) => s.trim().toLowerCase();
-  const isCorrect = normalize(parsed.answer) === normalize(question.answer);
+  const isCorrect = normalize(answerData.answer) === normalize(question.answer);
 
-  const { data: attempt, error } = await supabase.from("webtest_attempts").insert({
-    user_id: userData.user.id,
-    question_id: questionId,
-    is_correct: isCorrect,
-    time_spent: timeSpent,
-  }).select("id").single();
+  const { data: attempt, error } = await supabase
+    .from("webtest_attempts")
+    .insert({
+      user_id: userData.user.id,
+      question_id: questionId,
+      is_correct: isCorrect,
+      time_spent: answerData.time_spent ?? null,
+    })
+    .select("id")
+    .single();
   if (error || !attempt?.id) throw error || new Error("回答の保存に失敗しました");
 
   await awardXp(userData.user.id, "webtest_attempt_complete", { refId: attempt.id, supabase });

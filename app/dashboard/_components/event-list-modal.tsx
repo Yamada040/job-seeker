@@ -40,7 +40,12 @@ export function EventListModal({ events, trigger }: Props) {
 
   return (
     <>
-      <div onClick={() => setOpen(true)} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && setOpen(true)}>
+      <div
+        onClick={() => setOpen(true)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && setOpen(true)}
+      >
         {trigger}
       </div>
 

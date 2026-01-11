@@ -16,7 +16,9 @@ const createQuestion = (): Question => ({
 });
 
 export function QuestionsEditor({ initialQuestions, readOnly = false }: Props) {
-  const [questions, setQuestions] = useState<Question[]>(() => (initialQuestions.length ? initialQuestions : [createQuestion()]));
+  const [questions, setQuestions] = useState<Question[]>(() =>
+    initialQuestions.length ? initialQuestions : [createQuestion()],
+  );
 
   const handleChange = (id: string, key: keyof Question, value: string) => {
     if (readOnly) return;

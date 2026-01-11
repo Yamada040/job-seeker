@@ -68,7 +68,9 @@ export default async function WebtestDetailPage({
           正解です！
         </div>
       ) : status === "incorrect" ? (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">不正解です。もう一度チャレンジしましょう。</div>
+        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+          不正解です。もう一度チャレンジしましょう。
+        </div>
       ) : null}
 
       <div className="grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
@@ -82,7 +84,10 @@ export default async function WebtestDetailPage({
           </div>
           <p className="whitespace-pre-line text-sm leading-6 text-slate-900 dark:text-slate-100">{question.body}</p>
 
-          <form action={submitWebtestAnswer.bind(null, id)} className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-700 dark:bg-slate-800/60">
+          <form
+            action={submitWebtestAnswer.bind(null, id)}
+            className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-700 dark:bg-slate-800/60"
+          >
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-800 dark:text-slate-100">解答</label>
               {Array.isArray(question.choices) ? (
@@ -143,9 +148,12 @@ export default async function WebtestDetailPage({
                   key={a.id}
                   className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-800"
                 >
-                  <span className={a.is_correct ? "text-emerald-600" : "text-rose-500"}>{a.is_correct ? "正解" : "不正解"}</span>
+                  <span className={a.is_correct ? "text-emerald-600" : "text-rose-500"}>
+                    {a.is_correct ? "正解" : "不正解"}
+                  </span>
                   <span className="text-slate-500 dark:text-slate-400">
-                    {a.time_spent ? `${a.time_spent}s` : "-"} / {a.created_at ? new Date(a.created_at).toLocaleDateString() : "-"}
+                    {a.time_spent ? `${a.time_spent}s` : "-"} /{" "}
+                    {a.created_at ? new Date(a.created_at).toLocaleDateString() : "-"}
                   </span>
                 </div>
               ))

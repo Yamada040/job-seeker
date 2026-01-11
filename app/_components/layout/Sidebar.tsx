@@ -34,9 +34,7 @@ const navigationItems: NavItem[] = [
   { label: "プロフィール", href: "/profile", icon: UserIcon, description: "ユーザー設定とアバター" },
 ];
 
-const bottomItems: NavItem[] = [
-  { label: "ログアウト", href: "/login", icon: ArrowRightOnRectangleIcon },
-];
+const bottomItems: NavItem[] = [{ label: "ログアウト", href: "/login", icon: ArrowRightOnRectangleIcon }];
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -51,7 +49,7 @@ export function Sidebar() {
             isActive,
           "text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-900":
             !isActive,
-        }
+        },
       )}
     >
       <item.icon
