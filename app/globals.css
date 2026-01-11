@@ -23,11 +23,9 @@
 
 body {
   background:
-    radial-gradient(circle at 20% 15%, rgba(255, 244, 219, 0.9), transparent 55%),
-    radial-gradient(circle at 80% 10%, rgba(216, 196, 160, 0.35), transparent 60%),
-    linear-gradient(135deg, #f7f0e3 0%, #f1e6d2 55%, #e8dcc8 100%);
-  background-size: 100% 100%, 100% 100%, 100% 100%;
-  background-repeat: no-repeat, no-repeat, no-repeat;
+    url("/renga.jpg");
+  background-size: cover;
+  background-repeat: repeat;
   color: var(--foreground);
   font-family: "魔導太丸ゴシック", var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   min-height: 100vh;
@@ -238,6 +236,39 @@ body {
 
   .dq-item {
     @apply flex items-center gap-2 py-1 text-white transition-colors hover:text-yellow-400;
+  }
+
+  .dq-button {
+    @apply inline-flex items-center gap-2 rounded-md border-2 border-white bg-black px-4 py-2 text-sm font-bold text-white shadow-[0_0_0_2px_black,0_0_0_4px_white] transition;
+  }
+
+  .dq-button:hover {
+    color: #facc15;
+  }
+
+  .dq-button-secondary {
+    @apply inline-flex items-center gap-2 rounded-md border-2 border-white bg-transparent px-4 py-2 text-sm font-bold text-white shadow-[0_0_0_2px_black,0_0_0_4px_white] transition;
+  }
+
+  .dq-button-secondary:hover {
+    color: #facc15;
+  }
+
+  .dq-menu-item {
+    @apply flex items-center gap-2.5 rounded-lg border-2 border-white bg-black px-4 py-2 text-xs font-bold text-white shadow-[0_0_0_2px_black,0_0_0_4px_white] transition;
+  }
+
+  .dq-menu-item:hover {
+    color: #facc15;
+    text-shadow: 0 0 6px rgba(250, 204, 21, 0.4);
+  }
+
+  .dq-menu-item-active {
+    color: #dbeafe;
+    border-color: #93c5fd;
+    box-shadow:
+      0 0 0 2px #000000,
+      0 0 0 4px #93c5fd;
   }
 }
 

@@ -184,7 +184,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
         <button
           type="button"
           onClick={() => openModalForDate(formatDateKey(new Date()))}
-          className="inline-flex items-center gap-2 rounded-full bg-[#c7923e] px-4 py-2 text-sm font-bold text-[#2b1d12] shadow hover:bg-[#b78333]"
+          className="dq-button"
         >
           <PlusIcon className="h-4 w-4" />
           今日に追加

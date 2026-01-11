@@ -192,16 +192,16 @@ export default async function DashboardPage() {
 
   const navigationActions = (
     <div className="flex flex-wrap items-center gap-3">
-      <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
-        MVPホーム
+      <Link href={ROUTES.HOME} className="dq-button">
+        ホームへ
       </Link>
-      <Link href={ROUTES.ES_NEW} className="mvp-button mvp-button-primary">
+      <Link href={ROUTES.ES_NEW} className="dq-button">
         <PlusIcon className="h-4 w-4" />
-        新しいES
+        ESを追加
       </Link>
       <Link
         href={ROUTES.COMPANIES_NEW}
-        className="mvp-button mvp-button-primary"
+        className="dq-button"
       >
         <PlusIcon className="h-4 w-4" />
         企業を追加

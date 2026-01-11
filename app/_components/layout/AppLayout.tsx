@@ -52,9 +52,7 @@ export function AppLayout({
 
   return (
     <div className="relative min-h-screen overflow-hidden text-slate-900 dark:text-slate-100 dark:bg-black">
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(255,244,219,0.6),transparent_55%),radial-gradient(circle_at_80%_10%,rgba(216,196,160,0.35),transparent_60%)] dark:bg-none" />
-      </div>
+      <div className="pointer-events-none absolute inset-0 -z-10" />
 
       {shouldShowSidebar && <Sidebar onToggle={() => setIsSidebarOpen(false)} />}
       {showSidebar && !isSidebarOpen ? (

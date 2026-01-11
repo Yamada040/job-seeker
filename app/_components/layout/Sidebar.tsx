@@ -47,25 +47,20 @@ export function Sidebar({ onToggle }: Props) {
     <Link
       href={item.href}
       className={clsx(
-        "group flex items-center gap-2.5 rounded-xl px-4 py-2.5 text-xs font-semibold transition-all duration-200",
-        {
-          "bg-white/90 text-amber-700 shadow-md shadow-amber-200/50 border border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30 dark:shadow-none":
-            isActive,
-          "text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-900":
-            !isActive,
-        }
+        "dq-menu-item",
+        isActive && "dq-menu-item-active"
       )}
     >
       <item.icon
-        className={clsx("h-4 w-4 shrink-0 transition-colors", {
-          "text-amber-600 dark:text-amber-400": isActive,
-          "text-slate-500 group-hover:text-slate-800 dark:text-slate-500 dark:group-hover:text-slate-300": !isActive,
-        })}
+        className={clsx(
+          "h-4 w-4 shrink-0 transition-colors",
+          isActive ? "text-sky-300" : "text-white"
+        )}
       />
         <div className="min-w-0 flex-1">
           <div className="truncate text-xs">{item.label}</div>
           {item.description && (
-          <div className="mt-0.5 truncate text-[0.65rem] font-normal text-slate-500 dark:text-slate-400">
+          <div className="mt-0.5 truncate text-[0.65rem] font-normal text-white/70">
             {item.description}
           </div>
           )}
@@ -74,11 +69,11 @@ export function Sidebar({ onToggle }: Props) {
   );
 
   return (
-    <div className="fixed left-0 top-20 z-40 h-[calc(100vh-5rem)] w-60 border-r border-[#d9c3a0] bg-[#f7f0e3]/90 backdrop-blur dark:border-gray-800 dark:bg-black">
+    <div className="fixed left-0 top-20 z-40 h-[calc(100vh-5rem)] w-60 border-r border-[#3b2a18] bg-black/75 backdrop-blur">
       <button
         type="button"
         onClick={onToggle}
-        className="absolute -right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#d9c3a0] bg-[#f6efe2] text-[#5b3b1a] shadow-md transition hover:bg-[#efe4d2] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+        className="absolute -right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#3b2a18] bg-black text-slate-100 shadow-md transition hover:text-yellow-400"
         aria-label="サイドバーを閉じる"
       >
         {"<"}
@@ -96,7 +91,7 @@ export function Sidebar({ onToggle }: Props) {
           </div>
         </nav>
 
-        <div className="border-t border-white/60 pt-5 dark:border-gray-800">
+        <div className="border-t border-white/20 pt-5">
           <div className="space-y-4">
             <div className="space-y-2">
               {bottomItems.map((item) => (
