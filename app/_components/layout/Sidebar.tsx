@@ -14,7 +14,6 @@ import {
   LightBulbIcon,
 } from "@heroicons/react/24/outline";
 import { clsx } from "clsx";
-import { ThemeToggle } from "../theme-toggle";
 
 interface NavItem {
   label: string;
@@ -127,21 +126,15 @@ export function Sidebar() {
         </nav>
 
         <div className="border-t border-white/20 pt-5">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              {bottomItems.map((item) => (
-                <NavLink
-                  key={item.href}
-                  item={item}
-                  isActive={pathname === item.href}
-                />
-              ))}
-            </div>
+          <div className="space-y-2">
+            {bottomItems.map((item) => (
+              <NavLink
+                key={item.href}
+                item={item}
+                isActive={pathname === item.href}
+              />
+            ))}
           </div>
-        </div>
-
-        <div className="flex justify-center pb-2">
-          <ThemeToggle />
         </div>
       </div>
     </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
 import { 
   ArrowRightIcon, 
   SparklesIcon, 
@@ -13,7 +12,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 
-import { useAppTheme } from "@/app/theme-provider";
 import { ROUTES } from "@/lib/constants/routes";
 
 const features = [
@@ -77,10 +75,6 @@ const staggerChildren = {
 };
 
 export default function Home() {
-  const { setTheme } = useAppTheme();
-  useEffect(() => {
-    setTheme("light");
-  }, [setTheme]);
 
   return (
     <div className="relative min-h-screen overflow-hidden text-white">

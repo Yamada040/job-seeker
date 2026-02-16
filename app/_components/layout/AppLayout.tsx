@@ -56,7 +56,7 @@ export function AppLayout({
   const shouldShowSidebar = showSidebar && isSidebarOpen;
 
   return (
-    <div className="relative min-h-screen overflow-hidden text-slate-900 dark:text-slate-100 dark:bg-black">
+    <div className="relative min-h-screen overflow-hidden text-slate-900">
       <div className="pointer-events-none absolute inset-0 -z-10" />
 
       {shouldShowSidebar && <Sidebar />}

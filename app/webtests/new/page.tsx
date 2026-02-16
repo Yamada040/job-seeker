@@ -46,7 +46,7 @@ export default async function WebtestNewPage() {
           <Field name="time_limit" label="制限時間（秒）" placeholder="60" type="number" />
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-800 dark:text-slate-200">
+          <label className="text-sm font-medium text-slate-800">
             問題文 <span className="text-rose-500">*</span>
           </label>
           <textarea
@@ -59,7 +59,7 @@ export default async function WebtestNewPage() {
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-800 dark:text-slate-200">選択肢（改行区切り）</label>
+            <label className="text-sm font-medium text-slate-800">選択肢（改行区切り）</label>
             <textarea
               name="choices"
               rows={4}
@@ -70,7 +70,7 @@ export default async function WebtestNewPage() {
           <Field name="answer" label="正解" required placeholder="例）C" />
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-800 dark:text-slate-200">解説（任意）</label>
+          <label className="text-sm font-medium text-slate-800">解説（任意）</label>
           <textarea
             name="explanation"
             rows={4}
@@ -104,7 +104,7 @@ function Field({
 }) {
   return (
     <label className="block space-y-2">
-      <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
+      <span className="text-sm font-medium text-slate-800">
         {label}
         {required ? <span className="text-rose-500"> *</span> : null}
       </span>

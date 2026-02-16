@@ -65,12 +65,12 @@ export default async function InterviewsListPage() {
               className="dq-card flex flex-col gap-2 p-4 text-sm text-white transition hover:-translate-y-0.5"
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs rounded-full bg-amber-50 px-2 py-1 text-amber-700 dark:bg-amber-900/30 dark:text-amber-200">
+                <span className="text-xs rounded-full bg-amber-50 px-2 py-1 text-amber-700">
                   {item.stage === "template"
                     ? "雛形"
                     : item.stage || "面接回数未設定"}
                 </span>
-                <span className="text-xs text-white dark:text-white">
+                <span className="text-xs text-white">
                   {item.stage === "template"
                     ? "-"
                     : item.interview_date
@@ -79,17 +79,17 @@ export default async function InterviewsListPage() {
                 </span>
               </div>
               <div className="text-base font-semibold">{item.company_name}</div>
-              <div className="text-xs text-white dark:text-white">
+              <div className="text-xs text-white">
                 {item.stage === "template"
                   ? "準備用雛形"
                   : item.interview_title || "面接形式未設定"}
               </div>
               {item.ai_summary ? (
-                <div className="mt-1 rounded-lg bg-emerald-50 px-2 py-1 text-[11px] text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200">
+                <div className="mt-1 rounded-lg bg-emerald-50 px-2 py-1 text-[11px] text-emerald-700">
                   AI改善サマリー保存済み
                 </div>
               ) : null}
-              <div className="truncate text-xs text-white dark:text-white">
+              <div className="truncate text-xs text-white">
                 {item.self_review ? item.self_review : "振り返りは未入力です"}
               </div>
             </Link>

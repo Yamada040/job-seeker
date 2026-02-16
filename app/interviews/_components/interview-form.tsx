@@ -281,7 +281,7 @@ export default function InterviewForm({
               required={!asTemplate}
             />
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-white dark:text-white">
+              <div className="flex items-center gap-2 text-sm font-medium text-white">
                 <span>実施日（必須）</span>
                 <label className="inline-flex items-center gap-1 text-xs font-normal text-white">
                   <input
@@ -306,7 +306,7 @@ export default function InterviewForm({
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-white dark:text-white">
+              <span className="text-sm font-semibold text-white">
                 質問ログ（質問・回答・自己評価）
               </span>
               <button
@@ -339,7 +339,7 @@ export default function InterviewForm({
                     />
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <label className="text-xs text-white dark:text-white">
+                    <label className="text-xs text-white">
                       自己評価
                     </label>
                     <select
@@ -375,7 +375,7 @@ export default function InterviewForm({
 
           <div className="grid gap-3 md:grid-cols-2">
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-white dark:text-white">
+              <span className="text-sm font-medium text-white">
                 次回改善したい点
               </span>
               <textarea
@@ -392,7 +392,7 @@ export default function InterviewForm({
               />
             </label>
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-white dark:text-white">
+              <span className="text-sm font-medium text-white">
                 想定外だった質問・論点
               </span>
               <textarea
@@ -411,7 +411,7 @@ export default function InterviewForm({
           </div>
 
           <div className="space-y-2">
-            <span className="text-sm font-medium text-white dark:text-white">
+            <span className="text-sm font-medium text-white">
               メモ（任意）
             </span>
             <textarea
@@ -469,7 +469,7 @@ function Field({
 }) {
   return (
     <label className="block space-y-2">
-      <span className="text-sm font-medium text-white dark:text-white">
+      <span className="text-sm font-medium text-white">
         {label}
         {required ? <span className="text-rose-500"> *</span> : null}
       </span>
@@ -501,7 +501,7 @@ function SelectField({
 }) {
   return (
     <label className="block space-y-2">
-      <span className="text-sm font-medium text-white dark:text-white">
+      <span className="text-sm font-medium text-white">
         {label}
         {required ? <span className="text-rose-500"> *</span> : null}
       </span>
