@@ -16,7 +16,7 @@ export function GoalScroll({
     <section className="relative pb-6 pt-6">
       <div className="relative mx-auto w-[min(96%,1000px)]">
         {/* 1. 縦幅を抑えた横長の巻き物コンテナ */}
-        <div className="relative aspect-[2048/750] w-full drop-shadow-lg">
+        <div className="relative aspect-[16/8] w-full drop-shadow-lg sm:aspect-[2048/750]">
           <img
             src="/parchment.png"
             alt="巻物"
@@ -24,19 +24,19 @@ export function GoalScroll({
           />
 
           {/* 2. コンテンツエリア：高さを抑えて情報の密度を上げる */}
-          <div className="absolute inset-0 z-10 flex flex-col justify-center px-16 py-4 md:px-32">
+          <div className="absolute inset-0 z-10 flex flex-col justify-center px-[clamp(0.75rem,4vw,8rem)] py-[clamp(0.5rem,1.5vw,1rem)]">
             {/* 上部：タイトルと編集リンクを一行にまとめてスペース節約 */}
-            <div className="mb-2 flex items-end justify-between border-b border-[#3e2a16]/20 pb-1">
+            <div className="mb-2 flex flex-wrap items-end justify-between gap-x-3 gap-y-1 border-b border-[#3e2a16]/20 pb-1">
               <h1
-                className="text-lg font-black text-[#3e2a16] md:text-2xl"
+                className="text-[clamp(0.75rem,2.1vw,1.5rem)] font-black text-[#3e2a16]"
                 style={{ textShadow: "1px 1px 0px rgba(255,255,255,0.4)" }}
               >
                 ▼ 現在の目標
               </h1>
-              <div className="flex items-center justify-between pt-2">
+              <div className="flex items-center justify-between pt-1">
                 <Link
                   href={ROUTES.PROFILE}
-                  className="group flex items-center text-xs font-black text-[#111111] transition-colors hover:text-[#000000]"
+                  className="group flex items-center whitespace-nowrap text-[clamp(0.55rem,1.2vw,0.75rem)] font-black text-[#111111] transition-colors hover:text-[#000000]"
                 >
                   <span className="mr-1 inline-block transition-transform group-hover:translate-x-1">
                     ▶
@@ -47,30 +47,30 @@ export function GoalScroll({
             </div>
 
             {/* 3. 志望・軸を横並び、その下に目標 */}
-            <div className="space-y-3">
-              <div className="grid gap-x-10 gap-y-2 md:grid-cols-2">
+            <div className="space-y-2 sm:space-y-3">
+              <div className="grid gap-x-[clamp(0.5rem,2vw,2.5rem)] gap-y-1.5 sm:gap-y-2 md:grid-cols-2">
                 <div className="flex items-baseline gap-2">
-                  <span className="shrink-0 text-[11px] font-black text-[#1b1209]">
+                  <span className="shrink-0 text-[clamp(0.5rem,0.95vw,0.6875rem)] font-black text-[#1b1209]">
                     【志望】
                   </span>
-                  <p className="truncate text-lg font-black text-[#1b1209] md:text-2xl">
+                  <p className="truncate text-[clamp(0.75rem,2vw,1.5rem)] font-black leading-tight text-[#1b1209]">
                     {targetIndustry || "未設定"}
                   </p>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="shrink-0 text-[11px] font-black text-[#1b1209]">
+                  <span className="shrink-0 text-[clamp(0.5rem,0.95vw,0.6875rem)] font-black text-[#1b1209]">
                     【軸】
                   </span>
-                  <p className="truncate text-lg font-black text-[#1b1209] md:text-2xl">
+                  <p className="truncate text-[clamp(0.75rem,2vw,1.5rem)] font-black leading-tight text-[#1b1209]">
                     {careerAxis || "未設定"}
                   </p>
                 </div>
               </div>
               <div className="flex flex-col justify-center">
-                <span className="mb-1 text-[11px] font-black uppercase tracking-[0.2em] text-[#1b1209]">
+                <span className="mb-1 text-[clamp(0.5rem,0.95vw,0.6875rem)] font-black uppercase tracking-[0.2em] text-[#1b1209]">
                   GOAL NOTE
                 </span>
-                <p className="text-base font-black leading-tight text-[#1b1209] md:text-xl">
+                <p className="text-[clamp(0.7rem,1.6vw,1.25rem)] font-black leading-tight text-[#1b1209]">
                   「{goalState || "未設定の目標"}」
                 </p>
               </div>
