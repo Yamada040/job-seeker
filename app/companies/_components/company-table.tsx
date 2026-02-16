@@ -41,17 +41,17 @@ export function CompanyTable({ items }: { items: Company[] }) {
     <div className="space-y-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-wrap gap-3">
-          <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
-            <MagnifyingGlassIcon className="h-4 w-4 text-slate-400" />
+          <div className="dq-panel flex items-center gap-2 px-3 py-2 text-sm text-white">
+            <MagnifyingGlassIcon className="h-4 w-4 text-white/60" />
             <input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="企業名・メモで検索"
-              className="bg-transparent text-sm outline-none placeholder:text-slate-400"
+              className="bg-transparent text-sm outline-none placeholder:text-white/50"
             />
           </div>
-          <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
-            <span className="text-xs text-slate-500 dark:text-slate-400">業界</span>
+          <div className="dq-panel flex items-center gap-2 px-3 py-2 text-sm text-white">
+            <span className="text-xs text-white/60">業界</span>
             <select
               value={industry}
               onChange={(e) => setIndustry(e.target.value)}
@@ -68,9 +68,9 @@ export function CompanyTable({ items }: { items: Company[] }) {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white/90 shadow-md dark:border-slate-700 dark:bg-slate-900/80">
-        <table className="w-full table-fixed divide-y divide-slate-200 text-sm text-slate-900 dark:divide-slate-700 dark:text-slate-100">
-          <thead className="bg-slate-50 dark:bg-slate-800">
+      <div className="dq-card overflow-x-auto">
+        <table className="w-full table-fixed divide-y divide-white/10 text-sm text-white">
+          <thead className="bg-black/60">
             <tr>
               <Th className="w-[35%]">企業名</Th>
               <Th className="w-[30%]">業界</Th>
@@ -78,20 +78,20 @@ export function CompanyTable({ items }: { items: Company[] }) {
               <Th className="w-[15%]">志望度</Th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+          <tbody className="divide-y divide-white/10">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-4 text-center text-slate-500 dark:text-slate-400">
+                <td colSpan={5} className="px-4 py-4 text-center text-white/60">
                   該当する企業がありません。
                 </td>
               </tr>
             ) : (
               filtered.map((c) => (
-                <tr key={c.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/60">
+                <tr key={c.id} className="hover:bg-white/5">
                   <Td className="truncate">
-                    <Link
-                      href={ROUTES.COMPANY_DETAIL(c.id)}
-                      className="font-semibold text-amber-700 hover:underline dark:text-amber-300 block truncate"
+                    <Link 
+                      href={ROUTES.COMPANY_DETAIL(c.id)} 
+                      className="font-semibold text-yellow-200 hover:underline block truncate"
                       title={c.name}
                     >
                       {c.name}
@@ -108,7 +108,7 @@ export function CompanyTable({ items }: { items: Company[] }) {
                     </span>
                   </Td>
                   <Td>
-                    <span className="rounded-full bg-amber-50 px-2 py-1 text-xs text-amber-700 dark:bg-amber-900/30 dark:text-amber-200 inline-block">
+                    <span className="rounded-full border border-yellow-300/40 bg-yellow-500/20 px-2 py-1 text-xs text-yellow-200 inline-block">
                       {c.preference ?? "-"}
                     </span>
                   </Td>
@@ -123,12 +123,8 @@ export function CompanyTable({ items }: { items: Company[] }) {
 }
 
 const Th = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-  <th
-    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300 ${className}`}
-  >
-    {children}
-  </th>
+  <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-white/70 ${className}`}>{children}</th>
 );
 const Td = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-  <td className={`px-4 py-3 align-top ${className}`}>{children}</td>
+  <td className={`px-4 py-3 align-top text-white/90 ${className}`}>{children}</td>
 );
