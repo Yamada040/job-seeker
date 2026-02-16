@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import { Entry, Question } from "./es-detail/types";
-import { EsEditSection } from "./es-detail/EsEditSection";
-import { EsPreviewSection } from "./es-detail/EsPreviewSection";
+import { EsAiPanel } from "./ai-es-panel";
+import { QuestionsEditor } from "./questions-editor";
 
 type Props = {
   entry: Entry;

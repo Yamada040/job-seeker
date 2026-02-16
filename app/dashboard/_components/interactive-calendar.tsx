@@ -1,11 +1,10 @@
 "use client";
 
+import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "@heroicons/react/24/outline";
+import clsx from "clsx";
 import { useMemo, useState } from "react";
 
-import { CalendarGrid } from "./calendar/CalendarGrid";
-import { CalendarHeader } from "./calendar/CalendarHeader";
-import { CalendarModal } from "./calendar/CalendarModal";
-import { CalendarWeekdays } from "./calendar/CalendarWeekdays";
+import { TYPE_LABEL } from "./calendar/constants";
 import { CalendarDayCell, CalendarEvent, CalendarFormState } from "./calendar/types";
 import { formatDateKey } from "./calendar/utils";
 
@@ -71,6 +70,14 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
       return acc;
     }, {});
   }, [events]);
+
+  const handlePrevMonth = () => {
+    setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  };
 
   const openModalForDate = (date: string) => {
     setSelectedDate(date);

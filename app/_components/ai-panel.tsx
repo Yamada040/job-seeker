@@ -1,14 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { CheckIcon, ClipboardDocumentIcon, CloudArrowUpIcon } from "@heroicons/react/24/outline";
 
 import { BlockingOverlay } from "./blocking-overlay";
-import { AiPanelHeader } from "./ai-panel/AiPanelHeader";
-import { AiPanelInput } from "./ai-panel/AiPanelInput";
-import { AiPanelNotice } from "./ai-panel/AiPanelNotice";
-import { AiPanelResponse } from "./ai-panel/AiPanelResponse";
 import { AiResponse } from "./ai-panel/types";
-import { buildCopyText } from "./ai-panel/utils";
+import { buildCopyText, sanitizeMarkdown } from "./ai-panel/utils";
 
 type Props = {
   kind: "es_review" | "company_analysis" | "aptitude_analysis" | "self_analysis" | "interview_review";

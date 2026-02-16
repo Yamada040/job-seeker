@@ -21,7 +21,6 @@ export function XpBadge() {
   const [levelUp, setLevelUp] = useState<number | null>(null);
 
   useEffect(() => {
-    let timer: number | null = null;
     const fetchProfile = async () => {
       try {
         const cached = sessionStorage.getItem(PROFILE_CACHE_KEY);
@@ -51,7 +50,7 @@ export function XpBadge() {
           JSON.stringify(profile ?? null)
         );
         sessionStorage.setItem(PROFILE_CACHE_TS_KEY, String(Date.now()));
-      } catch (e) {
+      } catch {
         // fail silently
       }
     };

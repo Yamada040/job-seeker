@@ -16,6 +16,18 @@ type CalendarRow = Database["public"]["Tables"]["calendar_events"]["Row"];
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 type InterviewRow = Database["public"]["Tables"]["interview_logs"]["Row"];
 type XpLogRow = Database["public"]["Tables"]["xp_logs"]["Row"];
+type CalendarEvent = {
+  id: string;
+  date: string;
+  title: string;
+  company?: string | null;
+  type: "es" | "interview" | "intern" | "other";
+  time?: string | null;
+};
+
+function computeLevel(xp: number) {
+  return Math.max(1, Math.floor(xp / 50) + 1);
+}
 
 async function getDashboardData() {
   const supabase = await createSupabaseReadonlyClient();

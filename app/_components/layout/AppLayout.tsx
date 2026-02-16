@@ -31,21 +31,16 @@ export function AppLayout({
   actionsPlacement,
 }: AppLayoutProps) {
   const pathname = usePathname();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  useEffect(() => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    if (typeof window === "undefined") return true;
     const stored = window.localStorage.getItem("sidebar-open");
-    if (stored !== null) {
-      setIsSidebarOpen(stored === "true");
-    }
-    setIsHydrated(true);
-  }, []);
+    return stored !== null ? stored === "true" : true;
+  });
 
   useEffect(() => {
-    if (!showSidebar || !isHydrated) return;
+    if (!showSidebar) return;
     window.localStorage.setItem("sidebar-open", String(isSidebarOpen));
-  }, [isSidebarOpen, showSidebar, isHydrated]);
+  }, [isSidebarOpen, showSidebar]);
 
   // ログインとホームは素の表示
   if (pathname === "/login" || pathname === "/") {

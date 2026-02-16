@@ -6,7 +6,6 @@ import Link from "next/link";
 import { AiPanel } from "@/app/_components/ai-panel";
 import { ROUTES } from "@/lib/constants/routes";
 import { Answers } from "../types";
-import { CheckboxGroup, SelectBox, TextArea } from "./aptitude-fields";
 import { defaultAnswers, interestOptions, mbtiOptions, strengthOptions, valueOptions } from "./aptitude-constants";
 import { buildPrompt } from "./aptitude-utils";
 
