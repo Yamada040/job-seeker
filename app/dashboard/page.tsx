@@ -105,7 +105,6 @@ export default async function DashboardPage() {
   ].slice(0, 2);
 
   const recentXpLogs = data.xpLogs ?? [];
-
   const navigationActions = (
     <div className="flex flex-wrap items-center gap-3">
       <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">

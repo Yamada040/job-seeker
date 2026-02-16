@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   HomeIcon,
@@ -12,8 +13,10 @@ import {
   AcademicCapIcon,
   ClipboardDocumentCheckIcon,
   LightBulbIcon,
+  ChartBarSquareIcon,
 } from "@heroicons/react/24/outline";
 import { clsx } from "clsx";
+import { ROUTES } from "@/lib/constants/routes";
 import { ThemeToggle } from "../theme-toggle";
 
 interface NavItem {
@@ -23,23 +26,8 @@ interface NavItem {
   description?: string;
 }
 
-const navigationItems: NavItem[] = [
-  { label: "ダッシュボード", href: "/dashboard", icon: HomeIcon, description: "全体の概要を確認" },
-  { label: "ES管理", href: "/es", icon: DocumentTextIcon, description: "エントリーシートを整理" },
-  { label: "企業管理", href: "/companies", icon: BuildingOfficeIcon, description: "企業カードと進捗を記録" },
-  { label: "適性チェック", href: "/aptitude", icon: LightBulbIcon, description: "業界・職種の向き不向きを診断" },
-  { label: "自己分析", href: "/self-analysis", icon: ClipboardDocumentCheckIcon, description: "強み・価値観を整理" },
-  { label: "面接ログ", href: "/interviews", icon: ChatBubbleLeftRightIcon, description: "面接の質問・回答を記録" },
-  { label: "Webテスト対策", href: "/webtests", icon: AcademicCapIcon, description: "演習用の問題を管理" },
-  { label: "プロフィール", href: "/profile", icon: UserIcon, description: "ユーザー設定とアバター" },
-];
-
-const bottomItems: NavItem[] = [{ label: "ログアウト", href: "/login", icon: ArrowRightOnRectangleIcon }];
-
-export function Sidebar() {
-  const pathname = usePathname();
-
-  const NavLink = ({ item, isActive }: { item: NavItem; isActive: boolean }) => (
+function NavLink({ item, isActive }: { item: NavItem; isActive: boolean }) {
+  return (
     <Link
       href={item.href}
       className={clsx(
@@ -66,6 +54,48 @@ export function Sidebar() {
       </div>
     </Link>
   );
+}
+
+const navigationItems: NavItem[] = [
+  { label: "ダッシュボード", href: "/dashboard", icon: HomeIcon, description: "全体の概要を確認" },
+  { label: "ES管理", href: "/es", icon: DocumentTextIcon, description: "エントリーシートを整理" },
+  { label: "企業管理", href: "/companies", icon: BuildingOfficeIcon, description: "企業カードと進捗を記録" },
+  { label: "適性チェック", href: "/aptitude", icon: LightBulbIcon, description: "業界・職種の向き不向きを診断" },
+  { label: "自己分析", href: "/self-analysis", icon: ClipboardDocumentCheckIcon, description: "強み・価値観を整理" },
+  { label: "面接ログ", href: "/interviews", icon: ChatBubbleLeftRightIcon, description: "面接の質問・回答を記録" },
+  { label: "Webテスト対策", href: "/webtests", icon: AcademicCapIcon, description: "演習用の問題を管理" },
+  { label: "プロフィール", href: "/profile", icon: UserIcon, description: "ユーザー設定とアバター" },
+];
+
+const bottomItems: NavItem[] = [{ label: "ログアウト", href: "/login", icon: ArrowRightOnRectangleIcon }];
+const developerItem: NavItem = {
+  label: "開発者ダッシュボード",
+  href: ROUTES.DEVELOPER,
+  icon: ChartBarSquareIcon,
+  description: "利用状況の分析",
+};
+
+export function Sidebar() {
+  const pathname = usePathname();
+  const [isDeveloper, setIsDeveloper] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchRole = async () => {
+      try {
+        const res = await fetch("/api/developer/me", { cache: "no-store" });
+        if (!res.ok) return;
+        const json = (await res.json()) as { isDeveloper?: boolean };
+        if (mounted) setIsDeveloper(Boolean(json.isDeveloper));
+      } catch {
+        if (mounted) setIsDeveloper(false);
+      }
+    };
+    void fetchRole();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <div className="fixed left-0 top-0 z-50 h-full w-60 border-r border-white/50 bg-white/70 backdrop-blur dark:border-gray-800 dark:bg-black">
@@ -94,6 +124,12 @@ export function Sidebar() {
             {bottomItems.map((item) => (
               <NavLink key={item.href} item={item} isActive={pathname === item.href} />
             ))}
+            {isDeveloper ? (
+              <NavLink
+                item={developerItem}
+                isActive={pathname === developerItem.href || pathname.startsWith(developerItem.href + "/")}
+              />
+            ) : null}
           </div>
         </div>
       </div>
