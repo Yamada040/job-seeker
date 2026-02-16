@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { AiPanel } from "@/app/_components/ai-panel";
 import { InterviewQA, InterviewQuestionsPayload } from "../types";
 import { MAX_TEXT_LEN, tooLong } from "@/app/_components/validation";
@@ -33,19 +34,29 @@ function normalizeInitialQuestions(input?: InterviewQuestionsPayload | null): {
   reflection: Reflection;
 } {
   const baseReflection: Reflection = { improvement: "", unexpected: "" };
-  if (!input) return { items: [{ ...emptyQA }, { ...emptyQA }], reflection: baseReflection };
+  if (!input)
+    return {
+      items: [{ ...emptyQA }, { ...emptyQA }],
+      reflection: baseReflection,
+    };
   if (Array.isArray(input)) {
     const items = input.length ? input : [{ ...emptyQA }];
     return {
-      items: items.map((q) => ({ question: q.question, answer: q.answer, rating: q.rating ?? "average" })),
+      items: items.map((q) => ({
+        question: q.question,
+        answer: q.answer,
+        rating: q.rating ?? "average",
+      })),
       reflection: baseReflection,
     };
   }
-  const items = (input.items?.length ? input.items : [{ ...emptyQA }]).map((q) => ({
-    question: q.question,
-    answer: q.answer,
-    rating: q.rating ?? "average",
-  }));
+  const items = (input.items?.length ? input.items : [{ ...emptyQA }]).map(
+    (q) => ({
+      question: q.question,
+      answer: q.answer,
+      rating: q.rating ?? "average",
+    })
+  );
   return {
     items,
     reflection: {
@@ -75,8 +86,12 @@ export default function InterviewForm({
   const [date, setDate] = useState(initialDate ?? "");
   const [asTemplate, setAsTemplate] = useState(Boolean(initialIsTemplate));
   const [selfReview, setSelfReview] = useState(initialSelfReview ?? "");
-  const [reflection, setReflection] = useState<Reflection>(parsedQuestions.reflection);
-  const [questions, setQuestions] = useState<InterviewQA[]>(parsedQuestions.items);
+  const [reflection, setReflection] = useState<Reflection>(
+    parsedQuestions.reflection
+  );
+  const [questions, setQuestions] = useState<InterviewQA[]>(
+    parsedQuestions.items
+  );
   const [saving, setSaving] = useState(false);
   const [resultId, setResultId] = useState<string | null>(interviewId ?? null);
   const [presetKey, setPresetKey] = useState<string | undefined>(undefined);
@@ -93,8 +108,12 @@ export default function InterviewForm({
       ...questions.map(
         (qa, idx) =>
           `${idx + 1}. Q: ${qa.question || "未入力"} / A: ${qa.answer || "未入力"} / 評価: ${
-            qa.rating === "good" ? "良い" : qa.rating === "bad" ? "悪い" : "普通"
-          }`,
+            qa.rating === "good"
+              ? "良い"
+              : qa.rating === "bad"
+                ? "悪い"
+                : "普通"
+          }`
       ),
       "",
       `改善したい点: ${reflection.improvement || "未入力"}`,
@@ -102,9 +121,22 @@ export default function InterviewForm({
       `メモ: ${selfReview || "未入力"}`,
     ];
     return lines.join("\n");
-  }, [companyName, date, format, questions, reflection.improvement, reflection.unexpected, selfReview, stage]);
+  }, [
+    companyName,
+    date,
+    format,
+    questions,
+    reflection.improvement,
+    reflection.unexpected,
+    selfReview,
+    stage,
+  ]);
 
-  const handleQAChange = (index: number, key: keyof InterviewQA, value: string) => {
+  const handleQAChange = (
+    index: number,
+    key: keyof InterviewQA,
+    value: string
+  ) => {
     setQuestions((prev) => {
       const next = [...prev];
       next[index] = { ...next[index], [key]: value };
@@ -113,7 +145,8 @@ export default function InterviewForm({
   };
 
   const addQA = () => setQuestions((prev) => [...prev, { ...emptyQA }]);
-  const removeQA = (idx: number) => setQuestions((prev) => prev.filter((_, i) => i !== idx));
+  const removeQA = (idx: number) =>
+    setQuestions((prev) => prev.filter((_, i) => i !== idx));
 
   const handleTemplateToggle = (checked: boolean) => {
     setAsTemplate(checked);
@@ -121,6 +154,16 @@ export default function InterviewForm({
       setStage("template");
       setDate("");
     }
+  };
+
+  const withMissingOption = (): CompanyOption[] => {
+    if (companyName && !companyOptions.find((o) => o.value === companyName)) {
+      return [
+        { value: companyName, label: `${companyName}（新規）` },
+        ...companyOptions,
+      ];
+    }
+    return companyOptions;
   };
 
   const ensureLength = (value: string, label: string) => {
@@ -146,7 +189,8 @@ export default function InterviewForm({
     ensureLength(format.trim(), "面接形式");
     ensureLength(stage.trim(), "面接回数/ステージ");
     if (!asTemplate) {
-      if (!stage.trim()) throw new Error("面接回数を入力してください（一次/最終など）");
+      if (!stage.trim())
+        throw new Error("面接回数を入力してください（一次/最終など）");
       if (!date) throw new Error("実施日を入力してください");
     }
 
@@ -175,7 +219,9 @@ export default function InterviewForm({
       const payload = buildPayload();
       setSaving(true);
       const isUpdate = mode === "update" && interviewId;
-      const endpoint = isUpdate ? `/api/interviews/${interviewId}` : "/api/interviews";
+      const endpoint = isUpdate
+        ? `/api/interviews/${interviewId}`
+        : "/api/interviews";
       const method = isUpdate ? "PUT" : "POST";
       const res = await fetch(endpoint, {
         method,
@@ -200,42 +246,200 @@ export default function InterviewForm({
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr]">
-      <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+      <div className="dq-card p-6">
         <div className="mt-4 space-y-4">
-          <InterviewMetaFields
-            companyName={companyName}
-            format={format}
-            stage={stage}
-            date={date}
-            asTemplate={asTemplate}
-            companyOptions={companyOptions}
-            onCompanyChange={setCompanyName}
-            onFormatChange={setFormat}
-            onStageChange={setStage}
-            onDateChange={setDate}
-            onTemplateToggle={handleTemplateToggle}
-          />
+          <div className="grid gap-4 md:grid-cols-2">
+            {companyOptions.length > 0 ? (
+              <SelectField
+                label="企業名（必須）"
+                value={companyName}
+                onChange={setCompanyName}
+                options={withMissingOption()}
+                required
+                placeholder="企業管理から選択"
+              />
+            ) : (
+              <Field
+                label="企業名（必須）"
+                value={companyName}
+                onChange={setCompanyName}
+                required
+                placeholder="例）Alpha株式会社"
+              />
+            )}
+            <Field
+              label="面接形式"
+              value={format}
+              onChange={setFormat}
+              placeholder="対面 / オンライン / ハイブリッド など"
+              required
+            />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field
+              label="面接回数（必須）"
+              value={stage}
+              onChange={setStage}
+              placeholder="一次 / 二次 / 最終 など"
+              required={!asTemplate}
+            />
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-white">
+                <span>実施日（必須）</span>
+                <label className="inline-flex items-center gap-1 text-xs font-normal text-white">
+                  <input
+                    type="checkbox"
+                    checked={asTemplate}
+                    onChange={(e) => handleTemplateToggle(e.target.checked)}
+                    className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400"
+                  />
+                  準備用の雛形として保存（実施日なし）
+                </label>
+              </div>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                required={!asTemplate}
+                disabled={asTemplate}
+                className="dq-input text-sm"
+              />
+            </div>
+          </div>
 
-          <InterviewQuestionsSection
-            questions={questions}
-            onChange={handleQAChange}
-            onAdd={addQA}
-            onRemove={removeQA}
-          />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-white">
+                質問ログ（質問・回答・自己評価）
+              </span>
+              <button
+                type="button"
+                onClick={addQA}
+                className="dq-button-secondary"
+              >
+                <PlusIcon className="h-4 w-4" />
+                行を追加
+              </button>
+            </div>
+            <div className="space-y-3">
+              {questions.map((qa, idx) => (
+                <div
+                  key={`${idx}-${qa.question}-${qa.answer}`}
+                  className="dq-panel space-y-3 p-3"
+                >
+                  <div className="grid gap-2 md:grid-cols-2">
+                    <Field
+                      label={`質問 ${idx + 1}`}
+                      value={qa.question}
+                      onChange={(v) => handleQAChange(idx, "question", v)}
+                      placeholder="自己紹介をお願いします など"
+                    />
+                    <Field
+                      label="自分の回答（要点）"
+                      value={qa.answer}
+                      onChange={(v) => handleQAChange(idx, "answer", v)}
+                      placeholder="研究概要と志望理由を簡潔に述べた"
+                    />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <label className="text-xs text-white">
+                      自己評価
+                    </label>
+                    <select
+                      value={qa.rating}
+                      onChange={(e) =>
+                        handleQAChange(
+                          idx,
+                          "rating",
+                          e.target.value as InterviewQA["rating"]
+                        )
+                      }
+                      className="dq-input text-sm"
+                    >
+                      <option value="good">良い</option>
+                      <option value="average">普通</option>
+                      <option value="bad">悪い</option>
+                    </select>
+                    {questions.length > 1 ? (
+                      <button
+                        type="button"
+                        onClick={() => removeQA(idx)}
+                        className="ml-auto inline-flex items-center gap-1 text-xs text-rose-500 hover:underline"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                        削除
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-          <InterviewReflectionSection reflection={reflection} onChange={setReflection} />
+          <div className="grid gap-3 md:grid-cols-2">
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-white">
+                次回改善したい点
+              </span>
+              <textarea
+                value={reflection.improvement}
+                onChange={(e) =>
+                  setReflection((prev) => ({
+                    ...prev,
+                    improvement: e.target.value,
+                  }))
+                }
+                rows={4}
+                className="dq-input text-sm"
+                placeholder="例）結論を先に述べる / プロジェクトの定量成果を追加 など"
+              />
+            </label>
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-white">
+                想定外だった質問・論点
+              </span>
+              <textarea
+                value={reflection.unexpected}
+                onChange={(e) =>
+                  setReflection((prev) => ({
+                    ...prev,
+                    unexpected: e.target.value,
+                  }))
+                }
+                rows={4}
+                className="dq-input text-sm"
+                placeholder="例）最近の業界トレンドについて深掘りされた など"
+              />
+            </label>
+          </div>
 
-          <InterviewSelfReviewSection value={selfReview} onChange={setSelfReview} />
+          <div className="space-y-2">
+            <span className="text-sm font-medium text-white">
+              メモ（任意）
+            </span>
+            <textarea
+              value={selfReview}
+              onChange={(e) => setSelfReview(e.target.value)}
+              rows={3}
+              className="dq-input text-sm"
+              placeholder="感想ではなく、次に活かすためのメモを残してください"
+            />
+          </div>
 
           <div className="mt-6 flex justify-start">
-            <button type="button" onClick={handleSave} disabled={saving} className="mvp-button mvp-button-primary">
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saving}
+              className="dq-button"
+            >
               {saving ? "保存中..." : "保存する"}
             </button>
           </div>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-5 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+      <div className="dq-card p-5">
         <AiPanel
           kind="interview_review"
           defaultInput={prompt}
@@ -250,5 +454,75 @@ export default function InterviewForm({
         />
       </div>
     </div>
+  );
+}
+
+function Field({
+  label,
+  value,
+  onChange,
+  placeholder,
+  required,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  required?: boolean;
+}) {
+  return (
+    <label className="block space-y-2">
+      <span className="text-sm font-medium text-white">
+        {label}
+        {required ? <span className="text-rose-500"> *</span> : null}
+      </span>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required={required}
+        placeholder={placeholder}
+        className="dq-input text-sm"
+      />
+    </label>
+  );
+}
+
+function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+  required,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: CompanyOption[];
+  required?: boolean;
+  placeholder?: string;
+}) {
+  return (
+    <label className="block space-y-2">
+      <span className="text-sm font-medium text-white">
+        {label}
+        {required ? <span className="text-rose-500"> *</span> : null}
+      </span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required={required}
+        className="dq-input text-sm"
+      >
+        <option value="" disabled className="text-white">
+          {placeholder || "選択してください"}
+        </option>
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }

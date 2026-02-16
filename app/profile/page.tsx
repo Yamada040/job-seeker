@@ -51,7 +51,7 @@ export default async function ProfilePage() {
 
   const headerActions = (
     <div className="flex gap-3">
-      <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="dq-button-secondary">
         <ArrowLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
@@ -68,45 +68,45 @@ export default async function ProfilePage() {
       <form
         id="profile-form"
         action={updateProfile}
-        className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80"
+        className="dq-card p-8"
       >
         <div className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700">氏名</span>
+              <span className="text-sm font-medium text-white">氏名</span>
               <input
                 name="full_name"
                 defaultValue={profile.full_name ?? ""}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                className="dq-input text-sm"
                 placeholder="例）山田 太郎"
               />
             </label>
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700">メール</span>
+              <span className="text-sm font-medium text-white">メール</span>
               <input
                 value={userData.user.email ?? ""}
                 disabled
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 outline-none"
+                className="dq-input text-sm"
               />
             </label>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700">大学</span>
+              <span className="text-sm font-medium text-white">大学</span>
               <input
                 name="university"
                 defaultValue={profile.university ?? ""}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                className="dq-input text-sm"
                 placeholder="例）○○大学"
               />
             </label>
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700">学部・学科</span>
+              <span className="text-sm font-medium text-white">学部・学科</span>
               <input
                 name="faculty"
                 defaultValue={profile.faculty ?? ""}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                className="dq-input text-sm"
                 placeholder="例）経済学部 経済学科"
               />
             </label>
@@ -114,20 +114,20 @@ export default async function ProfilePage() {
 
           <div className="grid gap-6 md:grid-cols-2">
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700">志望業界（任意）</span>
+              <span className="text-sm font-medium text-white">志望業界（任意）</span>
               <input
                 name="target_industry"
                 defaultValue={profile.target_industry ?? ""}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                className="dq-input text-sm"
                 placeholder="例）IT、コンサル、メーカー など"
               />
             </label>
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700">大切にしたい軸（任意）</span>
+              <span className="text-sm font-medium text-white">大切にしたい軸（任意）</span>
               <input
                 name="career_axis"
                 defaultValue={profile.career_axis ?? ""}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                className="dq-input text-sm"
                 placeholder="例）成長環境、技術志向、社会貢献 など"
               />
             </label>
@@ -135,27 +135,25 @@ export default async function ProfilePage() {
 
           <div>
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700">就活で達成したい状態（短文）</span>
+              <span className="text-sm font-medium text-white">就活で達成したい状態（短文）</span>
               <textarea
                 name="goal_state"
                 defaultValue={profile.goal_state ?? ""}
                 rows={3}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                className="dq-input text-sm"
                 placeholder="例）自社開発で技術を磨ける環境に入社する / 社会課題に取り組む事業で働く など"
               />
             </label>
           </div>
 
           <div className="space-y-3">
-            <span className="text-sm font-medium text-slate-700">アバターを選ぶ</span>
+            <span className="text-sm font-medium text-white">アバターを選ぶ</span>
             <div className="grid gap-3 sm:grid-cols-2">
               {avatarOptions.map((opt) => (
                 <label
                   key={opt.id}
                   className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-4 transition-colors ${
-                    profile.avatar_id === opt.id
-                      ? "border-amber-300 bg-amber-50"
-                      : "border-slate-200 bg-white hover:bg-slate-50"
+                  profile.avatar_id === opt.id ? "border-white bg-black text-white" : "border-white/40 bg-black/70 text-white hover:text-yellow-400"
                   }`}
                 >
                   <input
@@ -170,33 +168,27 @@ export default async function ProfilePage() {
                     alt={opt.label}
                     width={48}
                     height={48}
-                    className="h-12 w-12 rounded-xl border border-slate-200 bg-slate-50 object-cover"
+                    className="h-12 w-12 rounded-xl border border-white/30 bg-black/70 object-cover"
                   />
-                  <span className="text-sm text-slate-900">{opt.label}</span>
+                  <span className="text-sm text-white">{opt.label}</span>
                 </label>
               ))}
               <label
                 className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-4 transition-colors ${
-                  !profile.avatar_id ? "border-amber-300 bg-amber-50" : "border-slate-200 bg-white hover:bg-slate-50"
+                  !profile.avatar_id ? "border-white bg-black text-white" : "border-white/40 bg-black/70 text-white hover:text-yellow-400"
                 }`}
               >
-                <input
-                  type="radio"
-                  name="avatar_id"
-                  value=""
-                  defaultChecked={!profile.avatar_id}
-                  className="h-4 w-4 accent-amber-300"
-                />
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-600">
+                <input type="radio" name="avatar_id" value="" defaultChecked={!profile.avatar_id} className="h-4 w-4 accent-amber-300" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/30 bg-black/70 text-xs text-white">
                   なし
                 </div>
-                <span className="text-sm text-slate-900">選択しない</span>
+                <span className="text-sm text-white">選択しない</span>
               </label>
             </div>
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <button type="submit" className="mvp-button mvp-button-primary">
+            <button type="submit" className="dq-button">
               <UserCircleIcon className="h-4 w-4" />
               保存する
             </button>

@@ -82,9 +82,9 @@ export default function SelfAnalysisForm({
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr]">
-      <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+      <div className="dq-card p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">質問リスト</h2>
+          <h2 className="text-lg font-semibold text-white">質問リスト</h2>
         </div>
         <div className="mt-4 space-y-3">
           <TextArea label="強み・得意なこと" value={answers.strengths} onChange={(v) => handleChange("strengths", v)} />
@@ -115,14 +115,14 @@ export default function SelfAnalysisForm({
             onChange={(v) => handleChange("future", v)}
           />
           <div className="flex flex-wrap gap-3">
-            <button onClick={handleRun} disabled={saving} className="mvp-button mvp-button-primary">
+            <button onClick={handleRun} disabled={saving} className="dq-button">
               {saving ? "保存中..." : "保存する"}
             </button>
           </div>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-5 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+      <div className="dq-card p-5">
         <AiPanel
           kind="self_analysis"
           defaultInput={prompt}
@@ -143,12 +143,12 @@ export default function SelfAnalysisForm({
 function TextArea({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <label className="block space-y-2">
-      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{label}</span>
+      <span className="text-sm font-medium text-white">{label}</span>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={3}
-        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+        className="dq-input text-sm"
       />
     </label>
   );

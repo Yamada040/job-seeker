@@ -24,11 +24,11 @@ export default async function InterviewNewPage() {
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href={ROUTES.INTERVIEWS} className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.INTERVIEWS} className="dq-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         面接ログ一覧へ
       </Link>
-      <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="dq-button-secondary">
         <HomeIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>

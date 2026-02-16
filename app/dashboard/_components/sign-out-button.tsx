@@ -25,7 +25,7 @@ export default function SignOutButton() {
     <button
       onClick={handleSignOut}
       disabled={loading}
-      className="h-fit rounded-full border border-white/20 bg-white/5 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+      className="dq-button-secondary text-xs disabled:cursor-not-allowed disabled:opacity-60"
     >
       {loading ? "サインアウト中..." : "サインアウト"}
     </button>
