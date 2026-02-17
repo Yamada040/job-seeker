@@ -29,18 +29,32 @@ function NavLink({ item, isActive }: { item: NavItem; isActive: boolean }) {
   return (
     <Link
       href={item.href}
-      className={clsx("dq-menu-item", isActive && "dq-menu-item-active")}
+      className={clsx(
+        "group flex items-center gap-2.5 rounded-md px-2 py-2 text-xs font-bold transition",
+        isActive ? "text-sky-300" : "text-white hover:text-yellow-400",
+      )}
     >
+      <span
+        aria-hidden
+        className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
+      >
+        ▶
+      </span>
       <item.icon
         className={clsx(
           "h-4 w-4 shrink-0 transition-colors",
-          isActive ? "text-sky-300" : "text-white",
+          isActive ? "text-sky-300" : "text-white group-hover:text-yellow-400",
         )}
       />
       <div className="min-w-0 flex-1">
         <div className="truncate text-xs">{item.label}</div>
         {item.description && (
-          <div className="mt-0.5 truncate text-[0.65rem] font-normal text-white/70">
+          <div
+            className={clsx(
+              "mt-0.5 truncate text-[0.65rem] font-normal",
+              isActive ? "text-sky-200/80" : "text-white/70",
+            )}
+          >
             {item.description}
           </div>
         )}
@@ -114,7 +128,6 @@ const developerItem: NavItem = {
 export function Sidebar() {
   const pathname = usePathname();
   const [isDeveloper, setIsDeveloper] = useState(false);
-
   useEffect(() => {
     let mounted = true;
     const fetchRole = async () => {
