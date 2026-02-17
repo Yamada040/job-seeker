@@ -90,7 +90,7 @@ export default function SelfAnalysisForm({
     <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr]">
       <div className="dq-card p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">質問リスト</h2>
+          <h2 className="theme-readable text-lg font-semibold">質問リスト</h2>
         </div>
         <div className="mt-4 space-y-3">
           <div className="dq-panel px-3 py-2 text-xs font-semibold text-yellow-200">
@@ -152,7 +152,7 @@ export default function SelfAnalysisForm({
 function TextArea({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <label className="block space-y-2">
-      <span className="text-sm font-medium text-white">{label}</span>
+      <span className="theme-readable text-sm font-medium">{label}</span>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}

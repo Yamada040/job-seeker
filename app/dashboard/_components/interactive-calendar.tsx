@@ -103,11 +103,17 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
   }, [events]);
 
   const handlePrevMonth = () => {
-    setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+    setCurrentMonth((prev) => {
+      const base = prev instanceof Date ? prev : new Date();
+      return new Date(base.getFullYear(), base.getMonth() - 1, 1);
+    });
   };
 
   const handleNextMonth = () => {
-    setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    setCurrentMonth((prev) => {
+      const base = prev instanceof Date ? prev : new Date();
+      return new Date(base.getFullYear(), base.getMonth() + 1, 1);
+    });
   };
 
   const openModalForDate = (date: string) => {

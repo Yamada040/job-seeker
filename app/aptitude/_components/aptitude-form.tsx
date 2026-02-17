@@ -70,7 +70,7 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
     <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr]">
       <div className="dq-card p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">質問リスト</h2>
+          <h2 className="theme-readable text-lg font-semibold">質問リスト</h2>
         </div>
 
         <div className="mt-4 space-y-4">
@@ -165,7 +165,7 @@ function CheckboxGroup({
 }) {
   return (
     <div className="space-y-2">
-      <p className="text-sm font-semibold text-white">{label}</p>
+      <p className="theme-readable text-sm font-semibold">{label}</p>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         {options.map((opt) => (
           <label
@@ -197,7 +197,7 @@ function TextArea({
 }) {
   return (
     <label className="block space-y-2">
-      <span className="text-sm font-medium text-white">{label}</span>
+      <span className="theme-readable text-sm font-medium">{label}</span>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -223,7 +223,7 @@ function SelectBox({
 }) {
   return (
     <label className="block space-y-2">
-      <span className="text-sm font-medium text-white">{label}</span>
+      <span className="theme-readable text-sm font-medium">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}

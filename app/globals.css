@@ -278,6 +278,22 @@ html.theme-light .app-header .app-brand-text {
   color: #4a2f16 !important;
 }
 
+.theme-readable {
+  color: #ffffff;
+}
+
+.theme-readable-muted {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+html.theme-light .theme-readable {
+  color: #4a2f16 !important;
+}
+
+html.theme-light .theme-readable-muted {
+  color: #6f4b25 !important;
+}
+
 
 .shadow-soft {
   box-shadow: 0 20px 55px rgba(15, 23, 42, 0.09);
@@ -646,7 +662,6 @@ html.theme-light .dq-input::placeholder {
 
 
 /* Dark mode specific overrides for glassmorphism */
-
 
 
 
