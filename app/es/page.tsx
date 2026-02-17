@@ -30,15 +30,15 @@ export default async function EsListPage() {
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href={ROUTES.HOME} className="dq-button-secondary">
+      <Link href={ROUTES.HOME} className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300">
         <HomeIcon className="h-4 w-4" />
         MVPホーム
       </Link>
-      <Link href={ROUTES.DASHBOARD} className="dq-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href={ROUTES.ES_NEW} className="dq-button">
+      <Link href={ROUTES.ES_NEW} className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#262626] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300">
         <PlusIcon className="h-4 w-4" />
         新規作成
       </Link>
@@ -52,14 +52,14 @@ export default async function EsListPage() {
       headerActions={headerActions}
       className="space-y-4"
     >
-      <div className="dq-card p-6">
+      <div className="rounded-xl border border-[#3f3f46] bg-[#111111] p-6">
         <div className="flex flex-col gap-2">
           <p className="text-sm font-semibold text-yellow-200">ES一覧</p>
           <p className="text-sm text-white/70">
             下書きと提出済みをタブレス表示。
           </p>
         </div>
-        <div className="dq-panel mt-4 p-4">
+        <div className="mt-4 rounded-lg border border-[#3f3f46] bg-[#1a1a1a] p-4">
           <EsListClient initialItems={esList} />
         </div>
       </div>

@@ -79,7 +79,7 @@ async function getDashboardData() {
         .select("xp, action, created_at")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
-        .limit(5),
+        .limit(100),
     ]);
 
   const esEntries = (esRes.data as EsRow[] | null) ?? [];
@@ -178,7 +178,8 @@ export default async function DashboardPage() {
     ...interviewActions,
   ].slice(0, 2);
 
-  const recentXpLogs = data.xpLogs ?? [];
+  const allXpLogs = data.xpLogs ?? [];
+  const recentXpLogs = allXpLogs.slice(0, 5);
   const fallbackXp = recentXpLogs.reduce((sum, log) => sum + (log.xp ?? 0), 0);
   const xp = data.profile?.xp ?? fallbackXp;
   const level = data.profile?.level ?? computeLevel(xp);
@@ -323,7 +324,7 @@ export default async function DashboardPage() {
                 </div>
               </div>
             }
-            items={recentXpLogs.map((log) => ({
+            items={allXpLogs.map((log) => ({
               title: `+${log.xp} XP`,
               subtitle: log.action || "行動",
               meta: log.created_at

@@ -88,7 +88,7 @@ export default function Home() {
           className="flex items-center justify-between gap-4"
         >
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg border-2 border-white bg-black text-sm font-bold text-white shadow-[0_0_0_2px_black,0_0_0_4px_white]">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#52525b] bg-[#111111] text-sm font-bold text-white">
               就
             </span>
             <span>就活Copilot</span>
@@ -229,7 +229,7 @@ export default function Home() {
                 whileHover={{ scale: 1.02, y: -5 }}
                 className="dq-card p-8 transition-all duration-300"
               >
-                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-white bg-black text-white shadow-[0_0_0_2px_black,0_0_0_4px_white]">
+                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[#52525b] bg-[#111111] text-white">
                   <feature.icon className="h-6 w-6" />
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
@@ -268,7 +268,7 @@ export default function Home() {
                 variants={fadeInUp}
                 className="dq-card relative p-6 text-center"
               >
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-black text-lg font-bold text-white shadow-[0_0_0_2px_black,0_0_0_4px_white]">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full border border-[#52525b] bg-[#111111] text-lg font-bold text-white">
                   {step.step}
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-2">{step.title}</h3>

@@ -45,7 +45,11 @@ export function QuestionsEditor({ initialQuestions, readOnly = false }: Props) {
       <div className="flex items-center justify-between text-sm text-white/70">
         <span>質問カード（必要に応じて追加できます）</span>
         {!readOnly && (
-          <button type="button" onClick={handleAdd} className="dq-button-secondary">
+          <button
+            type="button"
+            onClick={handleAdd}
+            className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+          >
             カードを追加
           </button>
         )}
@@ -55,7 +59,7 @@ export function QuestionsEditor({ initialQuestions, readOnly = false }: Props) {
 
       <div className="space-y-3">
         {questions.map((q) => (
-          <div key={q.id} className="dq-card px-4 py-3">
+          <div key={q.id} className="rounded-xl border border-[#3f3f46] bg-[#111111] px-4 py-3">
             <label className="block space-y-1 text-xs text-white/70">
               質問
               <input
@@ -82,7 +86,7 @@ export function QuestionsEditor({ initialQuestions, readOnly = false }: Props) {
                 <button
                   type="button"
                   onClick={() => handleRemove(q.id)}
-                  className="dq-button-secondary text-xs"
+                  className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-2 py-1 text-xs font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
                 >
                   削除
                 </button>

@@ -24,15 +24,15 @@ export default async function NewEsPage() {
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href={ROUTES.HOME} className="dq-button-secondary">
+      <Link href={ROUTES.HOME} className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300">
         <HomeIcon className="h-4 w-4" />
         MVPへ
       </Link>
-      <Link href={ROUTES.DASHBOARD} className="dq-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href={ROUTES.ES} className="dq-button-secondary">
+      <Link href={ROUTES.ES} className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300">
         <ArrowLeftIcon className="h-4 w-4" />
         一覧へ戻る
       </Link>
@@ -46,13 +46,17 @@ export default async function NewEsPage() {
       headerActions={headerActions}
       className="flex flex-col gap-8"
     >
-      <div className="dq-card p-6 text-sm text-white">
+      <div className="rounded-xl border border-[#3f3f46] bg-[#111111] p-6 text-sm text-white">
         <div className="space-y-2">
           <h2 className="text-lg font-semibold">ES入力</h2>
           <p className="text-sm text-white/70">企業名や職種、提出日を入れておくと、後の提出管理が明確になります。</p>
         </div>
 
-        <form id="es-form-new" action={createEs} className="dq-panel space-y-4 p-4">
+        <form
+          id="es-form-new"
+          action={createEs}
+          className="space-y-4 rounded-lg border border-[#3f3f46] bg-[#1a1a1a] p-4"
+        >
           <div className="space-y-2">
             <label className="block text-xs text-white/70">企業名</label>
             <input
@@ -110,10 +114,13 @@ export default async function NewEsPage() {
           <QuestionsEditor initialQuestions={initialQuestions} />
 
           <div className="flex justify-wrap gap-3">
-            <button type="submit" className="dq-button">
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#262626] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+            >
               下書きとして保存
             </button>
-            <Link href={ROUTES.ES} className="dq-button-secondary">
+            <Link href={ROUTES.ES} className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300">
               キャンセル
             </Link>
           </div>
