@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { Database } from "@/lib/database.types";
 
 const getEnv = () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -38,6 +40,20 @@ export const createSupabaseServerActionClient = async (): Promise<SupabaseClient
       remove(name: string, options?: { path?: string }) {
         cookieStore.set(name, "", { path: options?.path ?? "/", expires: new Date(0) });
       },
+    },
+  });
+};
+
+export const createSupabaseAdminClient = (): SupabaseClient<Database> => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error("Supabase URL/Service Role Key is missing. Check env.");
+  }
+  return createClient<Database>(supabaseUrl, serviceRoleKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
     },
   });
 };
