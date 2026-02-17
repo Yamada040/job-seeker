@@ -101,12 +101,12 @@ export function Header({
             </div>
             <div className="flex-1 min-w-0">
               {title && (
-                <h1 className="truncate text-2xl font-semibold text-slate-100">
+                <h1 className="theme-readable truncate text-2xl font-semibold">
                   {title}
                 </h1>
               )}
               {description && (
-                <p className="mt-1 text-sm text-slate-300">{description}</p>
+                <p className="theme-readable-muted mt-1 text-sm">{description}</p>
               )}
             </div>
             {actions ? (
@@ -119,12 +119,12 @@ export function Header({
           <div className="flex items-center justify-between gap-3">
             <div className="flex-1 min-w-0">
               {title && (
-                <h1 className="truncate text-2xl font-semibold text-slate-100">
+                <h1 className="theme-readable truncate text-2xl font-semibold">
                   {title}
                 </h1>
               )}
               {description && (
-                <p className="mt-1 text-sm text-slate-300">{description}</p>
+                <p className="theme-readable-muted mt-1 text-sm">{description}</p>
               )}
             </div>
 
@@ -149,20 +149,20 @@ export function Breadcrumbs({ breadcrumbs }: { breadcrumbs?: BreadcrumbItem[] })
   if (generatedBreadcrumbs.length <= 1) return null;
 
   return (
-    <nav className="mt-4 flex items-center space-x-1 text-xs font-bold text-white/80">
-      <HomeIcon className="h-4 w-4 text-white/70" />
-      <ChevronRightIcon className="h-4 w-4 text-white/40" />
+    <nav className="theme-readable-muted mt-4 flex items-center space-x-1 text-xs font-bold">
+      <HomeIcon className="h-4 w-4" />
+      <ChevronRightIcon className="h-4 w-4 opacity-60" />
 
       {generatedBreadcrumbs.map((item, index) => (
         <div key={item.href} className="flex items-center space-x-1">
           {index === generatedBreadcrumbs.length - 1 ? (
-            <span className="text-white">{item.label}</span>
+            <span className="theme-readable">{item.label}</span>
           ) : (
             <>
               <Link href={item.href} className="transition-colors hover:text-yellow-300">
                 {item.label}
               </Link>
-              <ChevronRightIcon className="h-4 w-4 text-white/40" />
+              <ChevronRightIcon className="h-4 w-4 opacity-60" />
             </>
           )}
         </div>
