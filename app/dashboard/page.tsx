@@ -188,7 +188,6 @@ export default async function DashboardPage() {
     nextThreshold > prevThreshold
       ? Math.min(1, (xp - prevThreshold) / (nextThreshold - prevThreshold))
       : 0;
-
   const navigationActions = (
     <div className="flex flex-wrap items-center gap-3">
       <Link href={ROUTES.HOME} className="dq-button">

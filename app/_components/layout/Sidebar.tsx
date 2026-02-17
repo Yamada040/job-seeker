@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   HomeIcon,
@@ -12,14 +13,40 @@ import {
   AcademicCapIcon,
   ClipboardDocumentCheckIcon,
   LightBulbIcon,
+  ChartBarSquareIcon,
 } from "@heroicons/react/24/outline";
 import { clsx } from "clsx";
+import { ROUTES } from "@/lib/constants/routes";
 
 interface NavItem {
   label: string;
   href: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   description?: string;
+}
+
+function NavLink({ item, isActive }: { item: NavItem; isActive: boolean }) {
+  return (
+    <Link
+      href={item.href}
+      className={clsx("dq-menu-item", isActive && "dq-menu-item-active")}
+    >
+      <item.icon
+        className={clsx(
+          "h-4 w-4 shrink-0 transition-colors",
+          isActive ? "text-sky-300" : "text-white",
+        )}
+      />
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-xs">{item.label}</div>
+        {item.description && (
+          <div className="mt-0.5 truncate text-[0.65rem] font-normal text-white/70">
+            {item.description}
+          </div>
+        )}
+      </div>
+    </Link>
+  );
 }
 
 const navigationItems: NavItem[] = [
@@ -73,38 +100,38 @@ const navigationItems: NavItem[] = [
   },
 ];
 
-const bottomItems: NavItem[] = [{ label: "ログアウト", href: "/login", icon: ArrowRightOnRectangleIcon }];
+const bottomItems: NavItem[] = [
+  { label: "ログアウト", href: "/login", icon: ArrowRightOnRectangleIcon },
+];
+
+const developerItem: NavItem = {
+  label: "開発者ダッシュボード",
+  href: ROUTES.DEVELOPER,
+  icon: ChartBarSquareIcon,
+  description: "利用状況の分析",
+};
 
 export function Sidebar() {
   const pathname = usePathname();
+  const [isDeveloper, setIsDeveloper] = useState(false);
 
-  const NavLink = ({
-    item,
-    isActive,
-  }: {
-    item: NavItem;
-    isActive: boolean;
-  }) => (
-    <Link
-      href={item.href}
-      className={clsx("dq-menu-item", isActive && "dq-menu-item-active")}
-    >
-      <item.icon
-        className={clsx(
-          "h-4 w-4 shrink-0 transition-colors",
-          isActive ? "text-sky-300" : "text-white"
-        )}
-      />
-      <div className="min-w-0 flex-1">
-        <div className="truncate text-xs">{item.label}</div>
-        {item.description && (
-          <div className="mt-0.5 truncate text-[0.65rem] font-normal text-white/70">
-            {item.description}
-          </div>
-        )}
-      </div>
-    </Link>
-  );
+  useEffect(() => {
+    let mounted = true;
+    const fetchRole = async () => {
+      try {
+        const res = await fetch("/api/developer/me", { cache: "no-store" });
+        if (!res.ok) return;
+        const json = (await res.json()) as { isDeveloper?: boolean };
+        if (mounted) setIsDeveloper(Boolean(json.isDeveloper));
+      } catch {
+        if (mounted) setIsDeveloper(false);
+      }
+    };
+    void fetchRole();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <div className="fixed left-0 top-20 z-40 h-[calc(100vh-5rem)] w-60 border-r border-[#3b2a18] bg-black/75 backdrop-blur">
@@ -115,9 +142,7 @@ export function Sidebar() {
               <NavLink
                 key={item.href}
                 item={item}
-                isActive={
-                  pathname === item.href || pathname.startsWith(item.href + "/")
-                }
+                isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
               />
             ))}
           </div>
@@ -126,12 +151,14 @@ export function Sidebar() {
         <div className="border-t border-white/20 pt-5">
           <div className="space-y-2">
             {bottomItems.map((item) => (
-              <NavLink
-                key={item.href}
-                item={item}
-                isActive={pathname === item.href}
-              />
+              <NavLink key={item.href} item={item} isActive={pathname === item.href} />
             ))}
+            {isDeveloper ? (
+              <NavLink
+                item={developerItem}
+                isActive={pathname === developerItem.href || pathname.startsWith(developerItem.href + "/")}
+              />
+            ) : null}
           </div>
         </div>
       </div>

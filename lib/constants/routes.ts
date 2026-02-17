@@ -2,6 +2,7 @@ export const ROUTES = {
   HOME: "/",
   LOGIN: "/login",
   DASHBOARD: "/dashboard",
+  DEVELOPER: "/developer",
   PROFILE: "/profile",
 
   // 企業関連
