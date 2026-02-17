@@ -24,7 +24,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
           <span
             className={`rounded-full border px-3 py-1 text-xs font-semibold ${
               entry.status === "submitted"
-                ? "border-emerald-300/50 bg-emerald-500/20 text-emerald-200"
+                ? "border-emerald-500 bg-emerald-300 text-emerald-950"
                 : "border-white/40 bg-black/60 text-white"
             }`}
           >
