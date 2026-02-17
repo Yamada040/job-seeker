@@ -16,7 +16,7 @@
     "@supabase/ssr": "^0.5.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.26",
-    "next": "16.0.6",
+    "next": "^16.1.6",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "zod": "^4.3.5"
@@ -27,7 +27,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.0.6",
+    "eslint-config-next": "^16.1.6",
     "prettier": "^3.7.4",
     "tailwindcss": "^4",
     "typescript": "^5"
