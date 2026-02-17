@@ -19,15 +19,24 @@ export async function POST(req: NextRequest) {
 
   const { data, error } = await supabase
     .from("aptitude_results")
-    .insert({ user_id: userData.user.id, answers: payloadValidation.data.answers })
+    .insert({
+      user_id: userData.user.id,
+      answers: payloadValidation.data.answers,
+    })
     .select("id")
     .maybeSingle();
 
   if (error || !data?.id) {
-    return NextResponse.json({ error: error?.message ?? "failed to insert" }, { status: 500 });
+    return NextResponse.json(
+      { error: error?.message ?? "failed to insert" },
+      { status: 500 }
+    );
   }
 
-  await awardXp(userData.user.id, "aptitude_complete", { refId: data.id, supabase });
+  await awardXp(userData.user.id, "aptitude_complete", {
+    refId: data.id,
+    supabase,
+  });
   revalidatePath("/dashboard");
 
   return NextResponse.json({ id: data.id });

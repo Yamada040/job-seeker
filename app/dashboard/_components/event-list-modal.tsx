@@ -51,13 +51,13 @@ export function EventListModal({ events, trigger }: Props) {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl dark:border-slate-700 dark:bg-slate-900">
+          <div className="dq-window relative w-full max-w-2xl p-5">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">締切・面接の一覧</h3>
+              <h3 className="text-lg font-semibold text-white">締切・面接の一覧</h3>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="text-sm text-slate-500 hover:text-slate-800 dark:text-slate-300 dark:hover:text-white"
+                className="text-sm text-white/70 hover:text-yellow-300"
               >
                 ✕
               </button>
@@ -67,30 +67,30 @@ export function EventListModal({ events, trigger }: Props) {
               {visible.map((evt) => (
                 <div
                   key={evt.id}
-                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-slate-700 dark:bg-slate-800"
+                  className="dq-panel px-3 py-2 text-sm"
                 >
-                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-300">
+                  <div className="flex items-center justify-between text-xs text-white/60">
                     <span className="font-semibold">
                       {evt.type === "es" ? "ES締切" : evt.type === "interview" ? "面接" : "予定"}
                     </span>
                     <span>{evt.date || "未設定"}</span>
                   </div>
-                  <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-50">
+                  <p className="mt-1 text-sm font-semibold text-white">
                     {evt.company || evt.title || "件名未設定"}
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-300">{evt.title}</p>
+                  <p className="text-xs text-white/60">{evt.title}</p>
                 </div>
               ))}
 
               {visible.length === 0 && (
-                <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200">
+                <div className="dq-panel border-dashed p-3 text-xs text-white/60">
                   表示できる予定はありません。
                 </div>
               )}
             </div>
 
             <div className="mt-4 flex items-center justify-between">
-              <div className="text-xs text-slate-500 dark:text-slate-300">
+              <div className="text-xs text-white/60">
                 {visible.length} / {sorted.length} 件
               </div>
               <div className="flex gap-2">
@@ -98,7 +98,7 @@ export function EventListModal({ events, trigger }: Props) {
                   <button
                     type="button"
                     onClick={() => setVisibleCount((v) => v + 10)}
-                    className="rounded-lg border border-slate-200 px-3 py-1 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                    className="dq-button-secondary text-sm"
                   >
                     さらに読み込む
                   </button>
@@ -106,7 +106,7 @@ export function EventListModal({ events, trigger }: Props) {
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="rounded-lg border border-slate-200 px-3 py-1 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                  className="dq-button-secondary text-sm"
                 >
                   閉じる
                 </button>

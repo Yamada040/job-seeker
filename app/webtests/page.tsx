@@ -54,15 +54,15 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href={ROUTES.DASHBOARD} className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="dq-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href={ROUTES.HOME} className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.HOME} className="dq-button-secondary">
         <HomeIcon className="h-4 w-4" />
         MVPホーム
       </Link>
-      <Link href={ROUTES.WEBTESTS_NEW} className="mvp-button mvp-button-primary">
+      <Link href={ROUTES.WEBTESTS_NEW} className="dq-button">
         <PlusIcon className="h-4 w-4" />
         問題を追加
       </Link>
@@ -76,14 +76,14 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
       headerActions={headerActions}
       className="space-y-6"
     >
-      <div className="space-y-4 rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-md dark:border-slate-700 dark:bg-slate-900/80">
+      <div className="dq-card space-y-4 p-4">
         <div className="flex flex-wrap gap-3 text-sm">
           <form
-            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+            className="dq-panel flex items-center gap-2 px-3 py-2"
             method="GET"
             action={ROUTES.WEBTESTS}
           >
-            <span className="text-xs text-slate-500 dark:text-slate-400">テスト形式</span>
+            <span className="text-xs text-white/60">テスト形式</span>
             <select
               name="test_type"
               defaultValue={testTypeFilter ?? ""}
@@ -98,15 +98,15 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
             </select>
             <button
               type="submit"
-              className="text-xs rounded-full border border-slate-200 px-2 py-1 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="rounded-full border border-white/30 px-2 py-1 text-xs text-white/80 hover:text-yellow-400"
             >
               絞り込む
             </button>
           </form>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200 text-sm text-slate-900 dark:divide-slate-700 dark:text-slate-100">
-            <thead className="bg-slate-50 dark:bg-slate-800">
+          <table className="min-w-full divide-y divide-white/10 text-sm text-white">
+            <thead className="bg-black/60">
               <tr>
                 <Th>タイトル</Th>
                 <Th>テスト形式</Th>
@@ -117,21 +117,18 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
                 <Th>作成日</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+            <tbody className="divide-y divide-white/10">
               {items.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-4 text-center text-slate-500 dark:text-slate-400">
+                  <td colSpan={7} className="px-4 py-4 text-center text-white/60">
                     まだ問題がありません。右上の「問題を追加」から登録してください。
                   </td>
                 </tr>
               ) : (
                 items.map((q) => (
-                  <tr key={q.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/60">
+                  <tr key={q.id} className="hover:bg-white/5">
                     <Td>
-                      <Link
-                        href={ROUTES.WEBTEST_DETAIL(q.id)}
-                        className="font-semibold text-amber-700 hover:underline dark:text-amber-300"
-                      >
+                      <Link href={ROUTES.WEBTEST_DETAIL(q.id)} className="font-semibold text-yellow-200 hover:underline">
                         {q.title}
                       </Link>
                     </Td>
@@ -153,8 +150,6 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
 }
 
 const Th = ({ children }: { children: React.ReactNode }) => (
-  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
-    {children}
-  </th>
+  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-white/70">{children}</th>
 );
-const Td = ({ children }: { children: React.ReactNode }) => <td className="px-4 py-3 align-top">{children}</td>;
+const Td = ({ children }: { children: React.ReactNode }) => <td className="px-4 py-3 align-top text-white/90">{children}</td>;
