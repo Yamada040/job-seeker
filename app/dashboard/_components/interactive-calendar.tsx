@@ -300,7 +300,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
         </section>
 
         <section className="rounded-xl border border-[#3f3f46] bg-[#111111] p-4">
-          <h3 className="text-sm font-bold text-sky-300">今週の予定</h3>
+          <h3 className="text-sm font-bold text-yellow-300">今週の予定</h3>
           <div className="mt-3 space-y-2">
             {weekEvents.length > 0 ? (
               weekEvents.map((evt) => {

@@ -24,7 +24,7 @@ export function BrandLogo({
           就
         </span>
       </span>
-      <span className={clsx("text-sm font-semibold text-slate-100", textClassName)}>
+      <span className={clsx("brand-logo-text text-sm font-semibold text-slate-100", textClassName)}>
         就活Copilot
       </span>
     </div>

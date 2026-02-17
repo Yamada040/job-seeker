@@ -83,7 +83,7 @@ export function Header({
   showBrand,
 }: HeaderProps) {
   return (
-    <header className="fixed left-0 top-0 z-50 w-full border-b border-[#3b2a18] bg-[#1b1b1b]/85 px-6 py-4 backdrop-blur">
+    <header className="app-header fixed left-0 top-0 z-50 w-full border-b px-6 py-4 backdrop-blur">
       <div className="flex flex-col gap-3">
         {actionsPlacement === "left" ? (
           <div className="flex items-center justify-between gap-6">
@@ -92,6 +92,7 @@ export function Header({
                 <BrandLogo
                   className="w-60 pl-16"
                   iconClassName="h-14 w-14"
+                  textClassName="app-brand-text"
                 />
               ) : null}
               {leftContent ? (
