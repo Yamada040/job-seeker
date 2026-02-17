@@ -78,7 +78,7 @@ export function EsListClient({ initialItems }: Props) {
           <Link
             key={es.id}
             href={`/es/${es.id}`}
-            className="dq-card px-4 py-4 text-white transition hover:-translate-y-0.5"
+            className="rounded-xl border border-[#3f3f46] bg-[#111111] px-4 py-4 text-white transition hover:-translate-y-0.5"
           >
             <p className="text-sm font-semibold">{es.title}</p>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-white/70">
@@ -99,7 +99,7 @@ export function EsListClient({ initialItems }: Props) {
           </Link>
         ))}
         {filtered.length === 0 ? (
-          <div className="dq-card px-6 py-6 text-sm text-white/80">
+          <div className="rounded-xl border border-[#3f3f46] bg-[#111111] px-6 py-6 text-sm text-white/80">
             該当するESがありません。フィルタやキーワードを変えてみてください。
           </div>
         ) : null}

@@ -24,7 +24,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
           <span
             className={`rounded-full border px-3 py-1 text-xs font-semibold ${
               entry.status === "submitted"
-                ? "border-emerald-300/50 bg-emerald-500/20 text-emerald-200"
+                ? "border-emerald-500 bg-emerald-300 text-emerald-950"
                 : "border-white/40 bg-black/60 text-white"
             }`}
           >
@@ -38,7 +38,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
 
       {editing ? (
         <div className="grid gap-4 lg:grid-cols-[1.4fr,0.9fr]">
-          <div className="dq-card p-6">
+          <div className="rounded-xl border border-[#3f3f46] bg-[#111111] p-6">
             <form action={handleUpdate} className="space-y-4">
               <div className="space-y-2">
                 <label className="block text-xs text-white/70">
@@ -124,26 +124,43 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
               <input type="hidden" name="questions_json" value={JSON.stringify(questions)} />
 
               <div className="flex flex-wrap gap-3">
-                <button type="submit" name="intent" value="submit" className="dq-button">
+                <button
+                  type="submit"
+                  name="intent"
+                  value="submit"
+                  className="sidebar-link-style text-sm"
+                >
                   提出として保存
                 </button>
-                <button type="submit" name="intent" value="save" className="dq-button-secondary">
+                <button
+                  type="submit"
+                  name="intent"
+                  value="save"
+                  className="sidebar-link-style text-sm"
+                >
                   下書きを保存
                 </button>
-                <button type="button" className="dq-button-secondary" onClick={() => setEditing(false)}>
+                <button
+                  type="button"
+                  className="sidebar-link-style text-sm"
+                  onClick={() => setEditing(false)}
+                >
                   プレビューへ
                 </button>
               </div>
             </form>
           </div>
           <form action={handleDelete} className="flex justify-end">
-            <button type="submit" className="dq-button-secondary text-rose-300">
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 rounded-md border border-rose-400/60 bg-rose-950/30 px-3 py-2 text-sm font-bold text-rose-200 transition hover:border-rose-300 hover:text-rose-100"
+            >
               <TrashIcon className="h-4 w-4" />
               削除する
             </button>
           </form>
 
-          <div className="dq-card p-6">
+          <div className="rounded-xl border border-[#3f3f46] bg-[#111111] p-6">
             <EsAiPanel
               content={combinedContent}
               cacheKey={`es-${entry.id}`}
@@ -159,52 +176,56 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
         </div>
       ) : (
         <div className="grid gap-4 lg:grid-cols-[1.4fr,0.9fr]">
-          <div className="dq-card p-6">
+          <div className="rounded-xl border border-[#3f3f46] bg-[#111111] p-6">
             <div className="space-y-4 text-sm text-white/90">
               <div>
                 <p className="text-xs text-white/70">企業名</p>
-                <p className="dq-panel px-3 py-2 text-white">{entry.company_name || "-"}</p>
+                <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">{entry.company_name || "-"}</p>
               </div>
               <div>
                 <p className="text-xs text-white/70">タイトル</p>
-                <p className="dq-panel px-3 py-2 text-white">{entry.title || "-"}</p>
+                <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">{entry.title || "-"}</p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <p className="text-xs text-white/70">職種 / 募集枠</p>
-                  <p className="dq-panel px-3 py-2 text-white">{entry.selection_status || "-"}</p>
+                  <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">{entry.selection_status || "-"}</p>
                 </div>
                 <div>
                   <p className="text-xs text-white/70">締切日</p>
-                  <p className="dq-panel px-3 py-2 text-white">{entry.deadline || "-"}</p>
+                  <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">{entry.deadline || "-"}</p>
                 </div>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <p className="text-xs text-white/70">企業URL</p>
-                  <p className="dq-panel break-all px-3 py-2 text-white">{entry.company_url || "-"}</p>
+                  <p className="break-all rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">{entry.company_url || "-"}</p>
                 </div>
                 <div>
                   <p className="text-xs text-white/70">メモ</p>
-                  <p className="dq-panel px-3 py-2 text-white">{entry.memo || "-"}</p>
+                  <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">{entry.memo || "-"}</p>
                 </div>
               </div>
               <div className="space-y-2">
                 <p className="text-xs text-white/70">本文</p>
-                <p className="dq-panel whitespace-pre-wrap px-3 py-2 text-sm text-white">
+                <p className="whitespace-pre-wrap rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-sm text-white">
                   {entry.content_md || "-"}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {entry.status === "submitted" && (
-                  <button type="button" onClick={() => setEditing(true)} className="dq-button">
+                  <button
+                    type="button"
+                    onClick={() => setEditing(true)}
+                    className="sidebar-link-style text-sm"
+                  >
                     編集する
                   </button>
                 )}
               </div>
             </div>
           </div>
-          <div className="dq-card p-6">
+          <div className="rounded-xl border border-[#3f3f46] bg-[#111111] p-6">
             <EsAiPanel
               content={combinedContent}
               cacheKey={`es-${entry.id}`}

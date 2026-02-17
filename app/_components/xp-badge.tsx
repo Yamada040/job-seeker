@@ -76,7 +76,7 @@ export function XpBadge() {
   return (
     <>
       {/* 1. 常駐ステータスバー：DQウィンドウ形式に戻す */}
-      <div className="dq-window flex min-w-[600px] flex-1 items-center gap-4">
+      <div className="flex min-w-[600px] flex-1 items-center gap-4 rounded-md px-2 py-1 text-white">
         <div className="flex items-baseline gap-2">
           <span className="text-[10px] font-bold tracking-widest text-white/90">
             LEVEL
@@ -117,7 +117,7 @@ export function XpBadge() {
 
             {/* DQ風メッセージウィンドウ */}
             <div className="absolute inset-x-8 bottom-8">
-              <div className="relative border-2 border-white bg-black p-6 shadow-[0_0_0_2px_black,0_0_0_4px_white]">
+              <div className="relative rounded-lg border border-[#52525b] bg-[#111111] p-6 shadow-xl">
                 {/* 枠に割り込むタイトル */}
                 <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-black px-4 text-lg font-bold tracking-widest text-white">
                   LEVEL UP!

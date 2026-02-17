@@ -142,7 +142,7 @@ export function AiPanel({
       const res = await fetch(saveUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: saveId, summary: response }),
+        body: JSON.stringify({ id: saveId, summary: JSON.stringify(response) }),
       });
       if (!res.ok) throw new Error("保存に失敗しました。");
       setSaved(true);
@@ -172,9 +172,9 @@ export function AiPanel({
   return (
     <>
       {overlay ? <BlockingOverlay message="AI処理中です。画面を閉じずにお待ちください。" /> : null}
-      <div className="dq-card relative p-5 text-sm">
+      <div className="relative rounded-xl border border-[#3f3f46] bg-[#111111] p-5 text-sm text-white">
         {showOneShotNotice ? (
-          <div className="dq-panel mb-3 px-3 py-2 text-[11px] font-semibold text-yellow-200">
+          <div className="mb-3 rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-[11px] font-semibold text-yellow-200">
             ※ 保存済みのAI回答は再実行できません。再度利用したい場合は運営にお問い合わせください。
           </div>
         ) : null}
@@ -209,7 +209,7 @@ export function AiPanel({
             type="button"
             onClick={handleRun}
             disabled={loading || (saved && !!saveUrl)}
-            className="dq-button text-xs disabled:cursor-not-allowed disabled:opacity-60"
+            className="sidebar-link-style text-xs disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? "送信中..." : saved && !!saveUrl ? "保存済み" : "AIに送る"}
           </button>
@@ -218,7 +218,7 @@ export function AiPanel({
         {error ? <p className="mt-2 text-[11px] text-rose-300">Error: {error}</p> : null}
 
         {response ? (
-          <div className="dq-panel mt-3 space-y-3 p-3">
+          <div className="mt-3 space-y-3 rounded-md border border-[#3f3f46] bg-[#1a1a1a] p-3">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold text-yellow-200">
                 AI回答 {response?.provider === "saved" ? "（保存済み）" : ""}
@@ -229,7 +229,7 @@ export function AiPanel({
                     type="button"
                     onClick={handleSave}
                     disabled={saving}
-                    className="dq-button-secondary text-[11px] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="sidebar-link-style text-[11px] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <CloudArrowUpIcon className="h-4 w-4" />
                     <span>{saving ? "保存中..." : "保存する"}</span>
@@ -244,7 +244,7 @@ export function AiPanel({
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className="dq-button-secondary text-[11px]"
+                  className="sidebar-link-style text-[11px]"
                 >
                   {copied ? <CheckIcon className="h-4 w-4" /> : <ClipboardDocumentIcon className="h-4 w-4" />}
                   <span>{copied ? "コピー済み" : "コピー"}</span>

@@ -59,13 +59,13 @@ export function AppLayout({
         <button
           type="button"
           onClick={() => setIsSidebarOpen((prev) => !prev)}
-          className="fixed left-6 top-6 z-[60] flex h-10 w-10 items-center justify-center rounded-md border-2 border-white bg-black/95 text-white shadow-[0_0_0_2px_black,0_0_0_4px_white] transition hover:border-yellow-400 hover:text-yellow-400"
+          className="fixed left-6 top-6 z-[60] flex h-10 w-10 items-center justify-center text-white transition-colors hover:text-yellow-400"
           aria-label={isSidebarOpen ? "サイドバーを閉じる" : "サイドバーを開く"}
         >
           <span className="flex h-4 w-4 flex-col items-center justify-between">
-            <span className="h-[2px] w-full bg-white" />
-            <span className="h-[2px] w-full bg-white" />
-            <span className="h-[2px] w-full bg-white" />
+            <span className="h-[2px] w-full bg-current" />
+            <span className="h-[2px] w-full bg-current" />
+            <span className="h-[2px] w-full bg-current" />
           </span>
         </button>
       ) : null}

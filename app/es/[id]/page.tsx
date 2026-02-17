@@ -85,18 +85,18 @@ export default async function EsDetailPage({
       headerDescription="提出済みはプレビュー、編集ボタンで編集モードに切り替え"
       headerActions={
         <div className="flex flex-wrap gap-3">
-          <Link href={ROUTES.HOME} className="dq-button-secondary">
+          <Link href={ROUTES.HOME} className="sidebar-link-style text-sm">
             <HomeIcon className="h-4 w-4" />
             MVPホーム
           </Link>
           <Link
             href={ROUTES.DASHBOARD}
-            className="dq-button-secondary"
+            className="sidebar-link-style text-sm"
           >
             <ArrowUturnLeftIcon className="h-4 w-4" />
             ダッシュボードへ
           </Link>
-          <Link href={ROUTES.ES} className="dq-button-secondary">
+          <Link href={ROUTES.ES} className="sidebar-link-style text-sm">
             <ArrowLeftIcon className="h-4 w-4" />
             一覧に戻る
           </Link>

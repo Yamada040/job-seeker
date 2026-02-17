@@ -17,6 +17,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { clsx } from "clsx";
 import { ROUTES } from "@/lib/constants/routes";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface NavItem {
   label: string;
@@ -25,16 +26,31 @@ interface NavItem {
   description?: string;
 }
 
-function NavLink({ item, isActive }: { item: NavItem; isActive: boolean }) {
+function NavLink({
+  item,
+  isActive,
+}: {
+  item: NavItem;
+  isActive: boolean;
+}) {
   return (
     <Link
       href={item.href}
-      className={clsx("dq-menu-item", isActive && "dq-menu-item-active")}
+      className={clsx(
+        "group flex items-center gap-2.5 rounded-md px-2 py-2 text-xs font-bold transition",
+        isActive ? "text-yellow-400" : "text-white hover:text-yellow-400",
+      )}
     >
+      <span
+        aria-hidden
+        className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
+      >
+        ▶
+      </span>
       <item.icon
         className={clsx(
           "h-4 w-4 shrink-0 transition-colors",
-          isActive ? "text-sky-300" : "text-white",
+          isActive ? "text-yellow-400" : "text-white group-hover:text-yellow-400",
         )}
       />
       <div className="min-w-0 flex-1">
@@ -134,7 +150,7 @@ export function Sidebar() {
   }, []);
 
   return (
-    <div className="fixed left-0 top-20 z-40 h-[calc(100vh-5rem)] w-60 border-r border-[#3b2a18] bg-black/75 backdrop-blur">
+    <div className="app-sidebar fixed left-0 top-20 z-40 h-[calc(100vh-5rem)] w-60 border-r backdrop-blur">
       <div className="flex h-full flex-col gap-6 overflow-y-auto px-5 py-7">
         <nav className="flex-1">
           <div className="space-y-3">
@@ -142,7 +158,9 @@ export function Sidebar() {
               <NavLink
                 key={item.href}
                 item={item}
-                isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
+                isActive={
+                  pathname === item.href || pathname.startsWith(item.href + "/")
+                }
               />
             ))}
           </div>
@@ -151,14 +169,24 @@ export function Sidebar() {
         <div className="border-t border-white/20 pt-5">
           <div className="space-y-2">
             {bottomItems.map((item) => (
-              <NavLink key={item.href} item={item} isActive={pathname === item.href} />
+              <NavLink
+                key={item.href}
+                item={item}
+                isActive={pathname === item.href}
+              />
             ))}
             {isDeveloper ? (
               <NavLink
                 item={developerItem}
-                isActive={pathname === developerItem.href || pathname.startsWith(developerItem.href + "/")}
+                isActive={
+                  pathname === developerItem.href ||
+                  pathname.startsWith(developerItem.href + "/")
+                }
               />
             ) : null}
+          </div>
+          <div className="mt-3 border-t border-white/20 pt-3">
+            <ThemeToggle />
           </div>
         </div>
       </div>

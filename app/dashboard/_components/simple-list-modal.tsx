@@ -34,23 +34,16 @@ export function SimpleListModal({ trigger, items, emptyText = "項目があり�
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-          <div className="dq-window relative w-full max-w-2xl p-5">
-            <div className="flex items-center justify-between">
+          <div className="relative w-full max-w-2xl rounded-xl border border-[#3f3f46] bg-[#111111] p-5 text-white shadow-xl">
+            <div className="flex items-center">
               <h3 className="text-lg font-semibold text-white">一覧</h3>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="text-sm text-white/70 hover:text-yellow-300"
-              >
-                ✕
-              </button>
             </div>
 
             <div className="mt-4 max-h-[70vh] overflow-y-auto space-y-2">
               {visible.map((item, idx) => (
                 <div
                   key={`${item.title}-${idx}`}
-                  className="dq-panel px-3 py-2 text-sm"
+                  className="rounded-lg border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-sm"
                 >
                   <p className="font-semibold text-white">{item.title}</p>
                   {item.subtitle && <p className="text-xs text-white/70">{item.subtitle}</p>}
@@ -59,7 +52,7 @@ export function SimpleListModal({ trigger, items, emptyText = "項目があり�
               ))}
 
               {visible.length === 0 && (
-                <div className="dq-panel border-dashed p-3 text-xs text-white/60">
+                <div className="rounded-lg border border-dashed border-[#3f3f46] bg-[#1a1a1a] p-3 text-xs text-white/60">
                   {emptyText}
                 </div>
               )}
@@ -74,7 +67,7 @@ export function SimpleListModal({ trigger, items, emptyText = "項目があり�
                   <button
                     type="button"
                     onClick={() => setVisibleCount((v) => v + 10)}
-                    className="dq-button-secondary text-sm"
+                    className="sidebar-link-style text-sm"
                   >
                     さらに読み込む
                   </button>
@@ -82,7 +75,7 @@ export function SimpleListModal({ trigger, items, emptyText = "項目があり�
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="dq-button-secondary text-sm"
+                  className="sidebar-link-style text-sm"
                 >
                   閉じる
                 </button>

@@ -11,7 +11,7 @@ export function BlockingOverlay({ message = "AI処理中です。画面を閉じ
 
   return createPortal(
     <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="dq-window px-4 py-3 text-sm font-semibold text-white">
+      <div className="rounded-lg border border-[#52525b] bg-[#111111] px-4 py-3 text-sm font-semibold text-white shadow-xl">
         {message}
       </div>
     </div>,

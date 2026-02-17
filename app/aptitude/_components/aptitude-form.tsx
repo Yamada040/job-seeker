@@ -1,10 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 
 import { AiPanel } from "@/app/_components/ai-panel";
-import { ROUTES } from "@/lib/constants/routes";
 import { Answers } from "../types";
 import { defaultAnswers, interestOptions, mbtiOptions, strengthOptions, valueOptions } from "./aptitude-constants";
 import { buildPrompt } from "./aptitude-utils";
@@ -13,9 +11,10 @@ type Props = {
   initialAnswers: Record<string, unknown> | null;
   initialSummary: string | null;
   initialResultId: string | null;
+  isMonthlyLocked: boolean;
 };
 
-export default function AptitudeForm({ initialAnswers, initialSummary, initialResultId }: Props) {
+export default function AptitudeForm({ initialAnswers, initialSummary, initialResultId, isMonthlyLocked }: Props) {
   const [answers, setAnswers] = useState<Answers>(() => {
     if (initialAnswers) return { ...defaultAnswers, ...(initialAnswers as Partial<Answers>) };
     return defaultAnswers;
@@ -43,6 +42,10 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
   };
 
   const handleSaveAnswers = async () => {
+    if (isMonthlyLocked) {
+      alert("適性チェックは現在一回しかできません。");
+      return;
+    }
     setSaving(true);
     try {
       const res = await fetch("/api/aptitude/answers", {
@@ -67,16 +70,13 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
     <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr]">
       <div className="dq-card p-6">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-white">適性チェック</h2>
-            <p className="text-sm text-white">興味・強み・価値観を整理してAI診断へ送信</p>
-          </div>
-          <Link href={ROUTES.COMPANIES} className="dq-button-secondary">
-            企業一覧へ
-          </Link>
+          <h2 className="theme-readable text-lg font-semibold">質問リスト</h2>
         </div>
 
         <div className="mt-4 space-y-4">
+          <div className="dq-panel px-3 py-2 text-xs font-semibold text-yellow-200">
+            ※ 現在は一回しかできません。
+          </div>
           <CheckboxGroup
             label="興味のある領域（複数選択可）"
             options={interestOptions}
@@ -127,8 +127,8 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
           />
           <TextArea label="補足メモ" value={answers.otherNotes} onChange={(v) => handleChange("otherNotes", v)} />
           <div className="flex flex-wrap gap-3">
-            <button onClick={handleSaveAnswers} disabled={saving} className="dq-button">
-              {saving ? "保存中..." : "保存する"}
+            <button onClick={handleSaveAnswers} disabled={saving || isMonthlyLocked} className="dq-button disabled:cursor-not-allowed disabled:opacity-60">
+              {isMonthlyLocked ? "実施済み" : saving ? "保存中..." : "保存する"}
             </button>
           </div>
         </div>
@@ -165,7 +165,7 @@ function CheckboxGroup({
 }) {
   return (
     <div className="space-y-2">
-      <p className="text-sm font-semibold text-white">{label}</p>
+      <p className="theme-readable text-sm font-semibold">{label}</p>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         {options.map((opt) => (
           <label
@@ -197,7 +197,7 @@ function TextArea({
 }) {
   return (
     <label className="block space-y-2">
-      <span className="text-sm font-medium text-white">{label}</span>
+      <span className="theme-readable text-sm font-medium">{label}</span>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -223,7 +223,7 @@ function SelectBox({
 }) {
   return (
     <label className="block space-y-2">
-      <span className="text-sm font-medium text-white">{label}</span>
+      <span className="theme-readable text-sm font-medium">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}

@@ -79,7 +79,7 @@ async function getDashboardData() {
         .select("xp, action, created_at")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
-        .limit(5),
+        .limit(100),
     ]);
 
   const esEntries = (esRes.data as EsRow[] | null) ?? [];
@@ -178,7 +178,8 @@ export default async function DashboardPage() {
     ...interviewActions,
   ].slice(0, 2);
 
-  const recentXpLogs = data.xpLogs ?? [];
+  const allXpLogs = data.xpLogs ?? [];
+  const recentXpLogs = allXpLogs.slice(0, 5);
   const fallbackXp = recentXpLogs.reduce((sum, log) => sum + (log.xp ?? 0), 0);
   const xp = data.profile?.xp ?? fallbackXp;
   const level = data.profile?.level ?? computeLevel(xp);
@@ -225,12 +226,12 @@ export default async function DashboardPage() {
 
       {/* カレンダー + サイドカラム */}
       <section className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-        <div className="dq-window">
+        <div className="relative rounded-xl border border-[#3f3f46] bg-[#111111] p-4">
           <span className="dq-title">クエストカレンダー</span>
           <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">
             ES / 面接 / インターン
           </div>
-          <div className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-3 shadow-inner">
+          <div className="mt-3 rounded-2xl border border-[#3f3f46] bg-[#1a1a1a] p-3 shadow-inner">
             <InteractiveCalendar initialEvents={calendarEvents} />
           </div>
         </div>
@@ -240,12 +241,20 @@ export default async function DashboardPage() {
           <EventListModal
             events={calendarEvents}
             trigger={
-              <div className="dq-window cursor-pointer transition hover:scale-[1.02]">
+              <div className="relative cursor-pointer rounded-xl border border-[#3f3f46] bg-[#111111] p-4 transition hover:scale-[1.02]">
                 <span className="dq-title">至急クエスト</span>
                 <div className="mt-3 space-y-3">
                   {urgentEvents.map((evt) => (
-                    <div key={evt.id} className="dq-item">
-                      <span className="text-xs animate-pulse">▶</span>
+                    <div
+                      key={evt.id}
+                      className="group flex items-center gap-2.5 rounded-md px-2 py-2 text-xs font-bold text-white transition hover:text-yellow-400"
+                    >
+                      <span
+                        aria-hidden
+                        className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
+                      >
+                        ▶
+                      </span>
                       <label className="cursor-pointer text-sm font-bold">
                         {evt.company || evt.title} ({evt.date})
                       </label>
@@ -264,16 +273,21 @@ export default async function DashboardPage() {
           {/* Next actions */}
           <SimpleListModal
             trigger={
-              <div className="dq-window cursor-pointer transition hover:scale-[1.02]">
+              <div className="relative cursor-pointer rounded-xl border border-[#3f3f46] bg-[#111111] p-4 transition hover:scale-[1.02]">
                 <span className="dq-title">次のクエスト</span>
                 <div className="mt-3 space-y-3">
                   {nextActions.map((action) => (
                     <Link
                       key={`${action.title}-${action.href}-${action.subtitle}`}
                       href={action.href}
-                      className="dq-item"
+                      className="group flex items-center gap-2.5 rounded-md px-2 py-2 text-xs font-bold text-white transition hover:text-yellow-400"
                     >
-                      <span className="text-xs">▶</span>
+                      <span
+                        aria-hidden
+                        className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
+                      >
+                        ▶
+                      </span>
                       <label className="cursor-pointer text-sm font-bold">
                         {action.subtitle}
                       </label>
@@ -298,7 +312,7 @@ export default async function DashboardPage() {
           {/* 最近のXP獲得 */}
           <SimpleListModal
             trigger={
-              <div className="dq-window cursor-pointer transition hover:scale-[1.02]">
+              <div className="relative cursor-pointer rounded-xl border border-[#3f3f46] bg-[#111111] p-4 transition hover:scale-[1.02]">
                 <span className="dq-title">戦歴ログ</span>
                 <div className="mt-3 space-y-2">
                   {recentXpLogs.map((log, idx) => (
@@ -323,7 +337,7 @@ export default async function DashboardPage() {
                 </div>
               </div>
             }
-            items={recentXpLogs.map((log) => ({
+            items={allXpLogs.map((log) => ({
               title: `+${log.xp} XP`,
               subtitle: log.action || "行動",
               meta: log.created_at

@@ -30,6 +30,8 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formState, setFormState] = useState({ ...emptyForm });
   const [saving, setSaving] = useState(false);
+  const todayKey = formatDateKey(new Date());
+  const weekdayLabel = ["日", "月", "火", "水", "木", "金", "土"];
 
   const monthDays = useMemo<CalendarDayCell[]>(() => {
     const year = currentMonth.getFullYear();
@@ -71,12 +73,47 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
     }, {});
   }, [events]);
 
+  const todayEvents = useMemo(() => {
+    return (eventsByDate[todayKey] || []).slice().sort((a, b) => {
+      const ta = a.time || "99:99";
+      const tb = b.time || "99:99";
+      return ta.localeCompare(tb);
+    });
+  }, [eventsByDate, todayKey]);
+
+  const weekEvents = useMemo(() => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const endOfWeek = new Date(now);
+    endOfWeek.setDate(now.getDate() + (6 - now.getDay()));
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    return events
+      .filter((evt) => {
+        if (!evt.date) return false;
+        const date = new Date(evt.date);
+        if (Number.isNaN(date.getTime())) return false;
+        date.setHours(0, 0, 0, 0);
+        return date >= now && date <= endOfWeek;
+      })
+      .sort((a, b) => {
+        if (a.date !== b.date) return a.date.localeCompare(b.date);
+        return (a.time || "99:99").localeCompare(b.time || "99:99");
+      });
+  }, [events]);
+
   const handlePrevMonth = () => {
-    setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+    setCurrentMonth((prev) => {
+      const base = prev instanceof Date ? prev : new Date();
+      return new Date(base.getFullYear(), base.getMonth() - 1, 1);
+    });
   };
 
   const handleNextMonth = () => {
-    setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    setCurrentMonth((prev) => {
+      const base = prev instanceof Date ? prev : new Date();
+      return new Date(base.getFullYear(), base.getMonth() + 1, 1);
+    });
   };
 
   const openModalForDate = (date: string) => {
@@ -145,24 +182,24 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
   };
 
   return (
-    <div className="mt-4 space-y-4 text-[#2b1d12]">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-[#d7c4a2] bg-[#efe3cf] p-4 shadow-sm">
+    <div className="mt-4 space-y-4 text-white">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#3f3f46] bg-[#111111] p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={handlePrevMonth}
-            className="rounded-full border border-[#cdb38c] bg-[#f7ecd8] p-2 shadow hover:bg-[#efe3cf]"
+            className="rounded-full border border-[#52525b] bg-[#1f1f1f] p-2 shadow transition-colors hover:bg-[#2a2a2a]"
             aria-label="前の月へ"
           >
             <ChevronLeftIcon className="h-4 w-4" />
           </button>
-          <div className="text-lg font-semibold">
+          <div className="text-lg font-semibold text-white">
             {currentMonth.getFullYear()}年 {currentMonth.getMonth() + 1}月
           </div>
           <button
             type="button"
             onClick={handleNextMonth}
-            className="rounded-full border border-[#cdb38c] bg-[#f7ecd8] p-2 shadow hover:bg-[#efe3cf]"
+            className="rounded-full border border-[#52525b] bg-[#1f1f1f] p-2 shadow transition-colors hover:bg-[#2a2a2a]"
             aria-label="次の月へ"
           >
             <ChevronRightIcon className="h-4 w-4" />
@@ -172,21 +209,27 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
         <button
           type="button"
           onClick={() => openModalForDate(formatDateKey(new Date()))}
-          className="dq-button"
+          className="group inline-flex items-center gap-2 px-2 py-1 text-sm font-bold text-white transition hover:text-yellow-400"
         >
+          <span
+            aria-hidden
+            className="text-[0.7rem] transition-transform group-hover:translate-x-1"
+          >
+            ▶
+          </span>
           <PlusIcon className="h-4 w-4" />
           今日に追加
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-[#5a4631]">
+      <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-white/80">
         {["日", "月", "火", "水", "木", "金", "土"].map((d, idx) => (
           <div
             key={d}
             className={clsx(
-              "rounded-lg border border-[#d7c4a2] bg-[#f7ecd8] py-2 shadow-sm",
-              idx === 0 && "text-[#b23b2b]",
-              idx === 6 && "text-[#2a5a9a]"
+              "rounded-lg border border-[#3f3f46] bg-[#1a1a1a] py-2 shadow-sm",
+              idx === 0 && "text-rose-300",
+              idx === 6 && "text-sky-300"
             )}
           >
             {d}
@@ -199,70 +242,109 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
           const jsDate = new Date(date);
           const day = jsDate.getDate();
           const weekday = jsDate.getDay();
-          const dayEvents = eventsByDate[date] || [];
+          const isToday = date === todayKey;
           return (
             <button
               key={date}
               type="button"
               onClick={() => openModalForDate(date)}
               className={clsx(
-                "min-h-[120px] rounded-2xl border p-2 text-left shadow-sm transition",
-                "bg-[#fbf0dd] hover:-translate-y-0.5 hover:shadow-md",
+                "h-14 rounded-lg border text-center text-sm font-bold shadow-sm transition",
+                "bg-[#161616] hover:-translate-y-0.5 hover:bg-[#202020] hover:shadow-md",
                 inCurrentMonth
-                  ? "border-[#d7c4a2]"
-                  : "border-dashed border-[#d7c4a2]/70 text-[#9b8a74] opacity-70"
+                  ? "border-[#3f3f46]"
+                  : "border-dashed border-[#3f3f46] text-white/40 opacity-70",
+                isToday && "border-2 border-yellow-400 ring-1 ring-yellow-300/70"
               )}
             >
-              <div className="flex items-center justify-between text-xs font-bold text-[#5a4631]">
-                <span
-                  className={clsx(
-                    inCurrentMonth ? "" : "opacity-60",
-                    weekday === 0 && "text-[#b23b2b]",
-                    weekday === 6 && "text-[#2a5a9a]"
-                  )}
-                >
-                  {day}
-                </span>
-                <span
-                  className={clsx(
-                    "text-[10px] rounded-full border px-2 py-0.5",
-                    "border-[#d7c4a2] text-[#7d5a2a]"
-                  )}
-                >
-                  ＋
-                </span>
-              </div>
-              <div className="mt-2 space-y-1">
-                {dayEvents.slice(0, 2).map((evt) => (
-                  <div
-                    key={evt.id}
-                    className={clsx(
-                      "rounded-xl px-2 py-1 text-[11px] leading-tight",
-                      evt.type === "es" && "bg-[#f2cfc2] text-[#8d2f24]",
-                      evt.type === "interview" && "bg-[#d4ddf2] text-[#2c4f7b]",
-                      evt.type === "intern" && "bg-[#d8ead8] text-[#2f5d3a]",
-                      evt.type === "other" && "bg-[#e8dcc8] text-[#6b5438]"
-                    )}
-                  >
-                    <p className="font-semibold">{evt.company || evt.title}</p>
-                    <p className="text-[10px]">
-                      {TYPE_LABEL[evt.type]}
-                      {evt.time ? ` · ${evt.time}` : ""}
-                    </p>
-                  </div>
-                ))}
-                {dayEvents.length > 2 && (
-                  <p className="text-[10px] text-[#6b5438]">+{dayEvents.length - 2}件</p>
+              <span
+                className={clsx(
+                  "inline-flex h-full items-center justify-center",
+                  inCurrentMonth ? "" : "opacity-60",
+                  weekday === 0 && "text-rose-300",
+                  weekday === 6 && "text-sky-300"
                 )}
-              </div>
+              >
+                {day}
+              </span>
             </button>
           );
         })}
       </div>
 
+      <div className="grid gap-3 md:grid-cols-2">
+        <section className="rounded-xl border border-[#3f3f46] bg-[#111111] p-4">
+          <h3 className="text-sm font-bold text-yellow-300">今日の予定</h3>
+          <div className="mt-3 space-y-2">
+            {todayEvents.length > 0 ? (
+              todayEvents.map((evt) => (
+                <button
+                  key={`today-${evt.id}`}
+                  type="button"
+                  onClick={() => handleEditPrefill(evt)}
+                  className="group flex w-full items-start gap-2.5 rounded-md px-2 py-2 text-left text-xs font-bold text-white transition hover:text-yellow-400"
+                >
+                  <span
+                    aria-hidden
+                    className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
+                  >
+                    ▶
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate">{evt.company || evt.title}</span>
+                    <span className="mt-0.5 block text-white/70">
+                      {TYPE_LABEL[evt.type]}
+                      {evt.time ? ` · ${evt.time}` : ""}
+                    </span>
+                  </span>
+                </button>
+              ))
+            ) : (
+              <p className="text-xs text-white/60">今日の予定はありません。</p>
+            )}
+          </div>
+        </section>
+
+        <section className="rounded-xl border border-[#3f3f46] bg-[#111111] p-4">
+          <h3 className="text-sm font-bold text-yellow-300">今週の予定</h3>
+          <div className="mt-3 space-y-2">
+            {weekEvents.length > 0 ? (
+              weekEvents.map((evt) => {
+                const d = new Date(evt.date);
+                const label = `${d.getMonth() + 1}/${d.getDate()}(${weekdayLabel[d.getDay()]})`;
+                return (
+                  <button
+                    key={`week-${evt.id}`}
+                    type="button"
+                    onClick={() => handleEditPrefill(evt)}
+                    className="group flex w-full items-start gap-2.5 rounded-md px-2 py-2 text-left text-xs font-bold text-white transition hover:text-yellow-400"
+                  >
+                    <span
+                      aria-hidden
+                      className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
+                    >
+                      ▶
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate">{evt.company || evt.title}</span>
+                      <span className="mt-0.5 block text-white/70">
+                        {label} / {TYPE_LABEL[evt.type]}
+                        {evt.time ? ` · ${evt.time}` : ""}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })
+            ) : (
+              <p className="text-xs text-white/60">今週の予定はありません。</p>
+            )}
+          </div>
+        </section>
+      </div>
+
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4 py-10">
-          <div className="dq-window w-full max-w-md p-5">
+          <div className="w-full max-w-md rounded-xl border border-[#3f3f46] bg-[#111111] p-5 text-white shadow-xl">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-base font-semibold text-white">選択した日の予定</h3>
@@ -270,7 +352,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
               </div>
               <button
                 type="button"
-                className="text-sm text-white/70 hover:text-yellow-300"
+                className="sidebar-link-style text-sm text-white/70"
                 onClick={() => setIsModalOpen(false)}
               >
                 閉じる
@@ -278,20 +360,20 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
             </div>
 
             <div className="mt-3 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setFormState({ ...emptyForm });
-                  setEditingId(null);
-                }}
-                className="dq-button-secondary text-xs"
-              >
-                <PlusIcon className="h-4 w-4" />
-                新しい予定を追加
-              </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormState({ ...emptyForm });
+                    setEditingId(null);
+                  }}
+                  className="sidebar-link-style text-xs"
+                >
+                  <PlusIcon className="h-4 w-4" />
+                  新しい予定を追加
+                </button>
             </div>
 
-            <div className="dq-panel mt-4 space-y-2 p-3 text-sm">
+            <div className="mt-4 space-y-2 rounded-lg border border-[#3f3f46] bg-[#1a1a1a] p-3 text-sm">
               {eventsByDate[selectedDate]?.length ? (
                 eventsByDate[selectedDate].map((evt) => (
                   <div
@@ -314,7 +396,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                       {evt.id.startsWith("es-") ? (
                         <a
                           href={`/es/${evt.id.replace("es-", "")}`}
-                          className="dq-button-secondary text-[11px]"
+                          className="sidebar-link-style text-[11px]"
                         >
                           ES詳細へ
                         </a>
@@ -323,7 +405,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                         <button
                           type="button"
                           onClick={() => handleEditPrefill(evt)}
-                          className="dq-button-secondary text-[11px]"
+                          className="sidebar-link-style text-[11px]"
                         >
                           予定を編集
                         </button>
@@ -407,13 +489,13 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                     setFormState({ ...emptyForm });
                     setEditingId(null);
                   }}
-                  className="dq-button-secondary text-sm"
+                  className="sidebar-link-style text-sm"
                 >
                   入力をクリア
                 </button>
                 <button
                   type="submit"
-                  className="dq-button text-sm"
+                  className="sidebar-link-style text-sm"
                   disabled={saving}
                 >
                   <PlusIcon className="h-4 w-4" />
