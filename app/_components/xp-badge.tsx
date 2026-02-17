@@ -76,7 +76,7 @@ export function XpBadge() {
   return (
     <>
       {/* 1. 常駐ステータスバー：DQウィンドウ形式に戻す */}
-      <div className="dq-window flex min-w-[600px] flex-1 items-center gap-4">
+      <div className="flex min-w-[600px] flex-1 items-center gap-4 rounded-md px-2 py-1 text-white">
         <div className="flex items-baseline gap-2">
           <span className="text-[10px] font-bold tracking-widest text-white/90">
             LEVEL

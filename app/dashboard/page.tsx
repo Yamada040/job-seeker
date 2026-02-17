@@ -225,12 +225,12 @@ export default async function DashboardPage() {
 
       {/* カレンダー + サイドカラム */}
       <section className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-        <div className="dq-window">
+        <div className="relative rounded-xl border border-[#3f3f46] bg-[#111111] p-4">
           <span className="dq-title">クエストカレンダー</span>
           <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">
             ES / 面接 / インターン
           </div>
-          <div className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-3 shadow-inner">
+          <div className="mt-3 rounded-2xl border border-[#3f3f46] bg-[#1a1a1a] p-3 shadow-inner">
             <InteractiveCalendar initialEvents={calendarEvents} />
           </div>
         </div>
@@ -240,7 +240,7 @@ export default async function DashboardPage() {
           <EventListModal
             events={calendarEvents}
             trigger={
-              <div className="dq-window cursor-pointer transition hover:scale-[1.02]">
+              <div className="relative cursor-pointer rounded-xl border border-[#3f3f46] bg-[#111111] p-4 transition hover:scale-[1.02]">
                 <span className="dq-title">至急クエスト</span>
                 <div className="mt-3 space-y-3">
                   {urgentEvents.map((evt) => (
@@ -264,7 +264,7 @@ export default async function DashboardPage() {
           {/* Next actions */}
           <SimpleListModal
             trigger={
-              <div className="dq-window cursor-pointer transition hover:scale-[1.02]">
+              <div className="relative cursor-pointer rounded-xl border border-[#3f3f46] bg-[#111111] p-4 transition hover:scale-[1.02]">
                 <span className="dq-title">次のクエスト</span>
                 <div className="mt-3 space-y-3">
                   {nextActions.map((action) => (
@@ -298,7 +298,7 @@ export default async function DashboardPage() {
           {/* 最近のXP獲得 */}
           <SimpleListModal
             trigger={
-              <div className="dq-window cursor-pointer transition hover:scale-[1.02]">
+              <div className="relative cursor-pointer rounded-xl border border-[#3f3f46] bg-[#111111] p-4 transition hover:scale-[1.02]">
                 <span className="dq-title">戦歴ログ</span>
                 <div className="mt-3 space-y-2">
                   {recentXpLogs.map((log, idx) => (

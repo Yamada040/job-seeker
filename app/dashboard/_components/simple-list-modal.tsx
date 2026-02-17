@@ -34,7 +34,7 @@ export function SimpleListModal({ trigger, items, emptyText = "項目があり�
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-          <div className="dq-window relative w-full max-w-2xl p-5">
+          <div className="relative w-full max-w-2xl rounded-xl border border-[#3f3f46] bg-[#111111] p-5 text-white shadow-xl">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-white">一覧</h3>
               <button
@@ -74,7 +74,7 @@ export function SimpleListModal({ trigger, items, emptyText = "項目があり�
                   <button
                     type="button"
                     onClick={() => setVisibleCount((v) => v + 10)}
-                    className="dq-button-secondary text-sm"
+                    className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
                   >
                     さらに読み込む
                   </button>
@@ -82,7 +82,7 @@ export function SimpleListModal({ trigger, items, emptyText = "項目があり�
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="dq-button-secondary text-sm"
+                  className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
                 >
                   閉じる
                 </button>

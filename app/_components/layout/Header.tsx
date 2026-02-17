@@ -115,7 +115,7 @@ export function Header({
               )}
             </div>
             {actions ? (
-              <div className="flex-shrink-0 flex items-center gap-2">
+              <div className="flex-shrink-0 flex items-center gap-2 [&_.dq-button-secondary]:border-0 [&_.dq-button-secondary]:bg-transparent [&_.dq-button-secondary]:shadow-none [&_.dq-button-secondary]:px-2 [&_.dq-button-secondary]:py-1 [&_.dq-button]:border-0 [&_.dq-button]:bg-transparent [&_.dq-button]:shadow-none [&_.dq-button]:px-2 [&_.dq-button]:py-1">
                 {actions}
               </div>
             ) : null}
@@ -133,7 +133,13 @@ export function Header({
               )}
             </div>
 
-            <div className={clsx("ml-4 flex items-center gap-2")}>{actions}</div>
+            <div
+              className={clsx(
+                "ml-4 flex items-center gap-2 [&_.dq-button-secondary]:border-0 [&_.dq-button-secondary]:bg-transparent [&_.dq-button-secondary]:shadow-none [&_.dq-button-secondary]:px-2 [&_.dq-button-secondary]:py-1 [&_.dq-button]:border-0 [&_.dq-button]:bg-transparent [&_.dq-button]:shadow-none [&_.dq-button]:px-2 [&_.dq-button]:py-1"
+              )}
+            >
+              {actions}
+            </div>
           </div>
         )}
       </div>
