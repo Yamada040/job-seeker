@@ -26,6 +26,45 @@ interface NavItem {
   description?: string;
 }
 
+function NavLink({
+  item,
+  isActive,
+}: {
+  item: NavItem;
+  isActive: boolean;
+}) {
+  return (
+    <Link
+      href={item.href}
+      className={clsx(
+        "group flex items-center gap-2.5 rounded-md px-2 py-2 text-xs font-bold transition",
+        isActive ? "text-yellow-400" : "text-white hover:text-yellow-400",
+      )}
+    >
+      <span
+        aria-hidden
+        className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
+      >
+        ▶
+      </span>
+      <item.icon
+        className={clsx(
+          "h-4 w-4 shrink-0 transition-colors",
+          isActive ? "text-yellow-400" : "text-white group-hover:text-yellow-400",
+        )}
+      />
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-xs">{item.label}</div>
+        {item.description && (
+          <div className="mt-0.5 truncate text-[0.65rem] font-normal text-white/70">
+            {item.description}
+          </div>
+        )}
+      </div>
+    </Link>
+  );
+}
+
 const navigationItems: NavItem[] = [
   {
     label: "ダッシュボード",
@@ -109,43 +148,6 @@ export function Sidebar() {
       mounted = false;
     };
   }, []);
-
-  const NavLink = ({
-    item,
-    isActive,
-  }: {
-    item: NavItem;
-    isActive: boolean;
-  }) => (
-    <Link
-      href={item.href}
-      className={clsx(
-        "group flex items-center gap-2.5 rounded-md px-2 py-2 text-xs font-bold transition",
-        isActive ? "text-yellow-400" : "text-white hover:text-yellow-400",
-      )}
-    >
-      <span
-        aria-hidden
-        className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
-      >
-        ▶
-      </span>
-      <item.icon
-        className={clsx(
-          "h-4 w-4 shrink-0 transition-colors",
-          isActive ? "text-yellow-400" : "text-white group-hover:text-yellow-400",
-        )}
-      />
-      <div className="min-w-0 flex-1">
-        <div className="truncate text-xs">{item.label}</div>
-        {item.description && (
-          <div className="mt-0.5 truncate text-[0.65rem] font-normal text-white/70">
-            {item.description}
-          </div>
-        )}
-      </div>
-    </Link>
-  );
 
   return (
     <div className="app-sidebar fixed left-0 top-20 z-40 h-[calc(100vh-5rem)] w-60 border-r backdrop-blur">

@@ -13,16 +13,16 @@ function applyTheme(mode: ThemeMode) {
 }
 
 export function ThemeToggle() {
-  const [mode, setMode] = useState<ThemeMode>("dark");
-  const [ready, setReady] = useState(false);
+  const [mode, setMode] = useState<ThemeMode>(() => {
+    if (typeof window === "undefined") return "dark";
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored === "light" ? "light" : "dark";
+  });
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    const initial: ThemeMode = stored === "light" ? "light" : "dark";
-    applyTheme(initial);
-    setMode(initial);
-    setReady(true);
-  }, []);
+    applyTheme(mode);
+    localStorage.setItem(STORAGE_KEY, mode);
+  }, [mode]);
 
   const handleToggle = () => {
     const next: ThemeMode = mode === "dark" ? "light" : "dark";
@@ -40,7 +40,6 @@ export function ThemeToggle() {
         className="theme-switch"
         aria-label={mode === "dark" ? "ライトモードへ切り替え" : "ダークモードへ切り替え"}
         aria-pressed={mode === "light"}
-        disabled={!ready}
       >
         <span className="theme-switch-text">{mode === "dark" ? "DARK" : "LIGHT"}</span>
         <span className="theme-switch-thumb" />
