@@ -245,8 +245,16 @@ export default async function DashboardPage() {
                 <span className="dq-title">至急クエスト</span>
                 <div className="mt-3 space-y-3">
                   {urgentEvents.map((evt) => (
-                    <div key={evt.id} className="dq-item">
-                      <span className="text-xs animate-pulse">▶</span>
+                    <div
+                      key={evt.id}
+                      className="group flex items-center gap-2.5 rounded-md px-2 py-2 text-xs font-bold text-white transition hover:text-yellow-400"
+                    >
+                      <span
+                        aria-hidden
+                        className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
+                      >
+                        ▶
+                      </span>
                       <label className="cursor-pointer text-sm font-bold">
                         {evt.company || evt.title} ({evt.date})
                       </label>
@@ -272,9 +280,14 @@ export default async function DashboardPage() {
                     <Link
                       key={`${action.title}-${action.href}-${action.subtitle}`}
                       href={action.href}
-                      className="dq-item"
+                      className="group flex items-center gap-2.5 rounded-md px-2 py-2 text-xs font-bold text-white transition hover:text-yellow-400"
                     >
-                      <span className="text-xs">▶</span>
+                      <span
+                        aria-hidden
+                        className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
+                      >
+                        ▶
+                      </span>
                       <label className="cursor-pointer text-sm font-bold">
                         {action.subtitle}
                       </label>

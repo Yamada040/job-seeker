@@ -24,15 +24,15 @@ export default async function NewEsPage() {
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href={ROUTES.HOME} className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300">
+      <Link href={ROUTES.HOME} className="sidebar-link-style text-sm">
         <HomeIcon className="h-4 w-4" />
         MVPへ
       </Link>
-      <Link href={ROUTES.DASHBOARD} className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300">
+      <Link href={ROUTES.DASHBOARD} className="sidebar-link-style text-sm">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href={ROUTES.ES} className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300">
+      <Link href={ROUTES.ES} className="sidebar-link-style text-sm">
         <ArrowLeftIcon className="h-4 w-4" />
         一覧へ戻る
       </Link>
@@ -116,11 +116,11 @@ export default async function NewEsPage() {
           <div className="flex justify-wrap gap-3">
             <button
               type="submit"
-              className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#262626] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+              className="sidebar-link-style text-sm"
             >
               下書きとして保存
             </button>
-            <Link href={ROUTES.ES} className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300">
+            <Link href={ROUTES.ES} className="sidebar-link-style text-sm">
               キャンセル
             </Link>
           </div>

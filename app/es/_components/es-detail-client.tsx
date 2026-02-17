@@ -128,7 +128,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
                   type="submit"
                   name="intent"
                   value="submit"
-                  className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#262626] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+                  className="sidebar-link-style text-sm"
                 >
                   提出として保存
                 </button>
@@ -136,13 +136,13 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
                   type="submit"
                   name="intent"
                   value="save"
-                  className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+                  className="sidebar-link-style text-sm"
                 >
                   下書きを保存
                 </button>
                 <button
                   type="button"
-                  className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+                  className="sidebar-link-style text-sm"
                   onClick={() => setEditing(false)}
                 >
                   プレビューへ
@@ -217,7 +217,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
                   <button
                     type="button"
                     onClick={() => setEditing(true)}
-                    className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#262626] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+                    className="sidebar-link-style text-sm"
                   >
                     編集する
                   </button>

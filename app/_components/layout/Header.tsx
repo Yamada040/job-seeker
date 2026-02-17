@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { clsx } from "clsx";
+import { BrandLogo } from "./BrandLogo";
 
 export interface BreadcrumbItem {
   label: string;
@@ -88,17 +89,10 @@ export function Header({
           <div className="flex items-center justify-between gap-6">
             <div className="flex items-center gap-3">
               {showBrand ? (
-                <div className="flex w-60 items-center gap-1 pl-16">
-                  <span className="relative inline-flex h-14 w-14 items-center justify-center rounded-full bg-white/80 text-lg font-bold text-white ring-1 ring-white/60">
-                    <span className="absolute inset-0 bg-[url('/shield.png')] bg-contain bg-center bg-no-repeat brightness-200" />
-                    <span className="relative drop-shadow-[0_1px_0_rgba(0,0,0,0.8)]">
-                      就
-                    </span>
-                  </span>
-                  <span className="text-sm font-semibold text-slate-100">
-                    就活Copilot
-                  </span>
-                </div>
+                <BrandLogo
+                  className="w-60 pl-16"
+                  iconClassName="h-14 w-14"
+                />
               ) : null}
               {leftContent ? (
                 <div className="flex-shrink-0">{leftContent}</div>
@@ -115,7 +109,7 @@ export function Header({
               )}
             </div>
             {actions ? (
-              <div className="flex-shrink-0 flex items-center gap-2 [&_.dq-button-secondary]:border-0 [&_.dq-button-secondary]:bg-transparent [&_.dq-button-secondary]:shadow-none [&_.dq-button-secondary]:px-2 [&_.dq-button-secondary]:py-1 [&_.dq-button]:border-0 [&_.dq-button]:bg-transparent [&_.dq-button]:shadow-none [&_.dq-button]:px-2 [&_.dq-button]:py-1">
+              <div className="header-nav-actions flex-shrink-0 flex items-center gap-2">
                 {actions}
               </div>
             ) : null}
@@ -135,7 +129,7 @@ export function Header({
 
             <div
               className={clsx(
-                "ml-4 flex items-center gap-2 [&_.dq-button-secondary]:border-0 [&_.dq-button-secondary]:bg-transparent [&_.dq-button-secondary]:shadow-none [&_.dq-button-secondary]:px-2 [&_.dq-button-secondary]:py-1 [&_.dq-button]:border-0 [&_.dq-button]:bg-transparent [&_.dq-button]:shadow-none [&_.dq-button]:px-2 [&_.dq-button]:py-1"
+                "header-nav-actions ml-4 flex items-center gap-2"
               )}
             >
               {actions}

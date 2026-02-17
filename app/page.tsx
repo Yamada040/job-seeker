@@ -13,6 +13,7 @@ import {
 import { motion } from "framer-motion";
 
 import { ROUTES } from "@/lib/constants/routes";
+import { BrandLogo } from "./_components/layout/BrandLogo";
 
 const features = [
   {
@@ -87,12 +88,11 @@ export default function Home() {
           transition={{ duration: 0.6 }}
           className="flex items-center justify-between gap-4"
         >
-          <div className="flex items-center gap-2 text-lg font-semibold">
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#52525b] bg-[#111111] text-sm font-bold text-white">
-              就
-            </span>
-            <span>就活Copilot</span>
-          </div>
+          <BrandLogo
+            className="gap-2 text-lg font-semibold"
+            iconClassName="h-10 w-10"
+            textClassName="text-white"
+          />
           <div className="flex items-center gap-3 text-sm">
             <Link
               href={ROUTES.LOGIN}

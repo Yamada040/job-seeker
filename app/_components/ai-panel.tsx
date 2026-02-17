@@ -209,7 +209,7 @@ export function AiPanel({
             type="button"
             onClick={handleRun}
             disabled={loading || (saved && !!saveUrl)}
-            className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#262626] px-3 py-2 text-xs font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300 disabled:cursor-not-allowed disabled:opacity-60"
+            className="sidebar-link-style text-xs disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? "送信中..." : saved && !!saveUrl ? "保存済み" : "AIに送る"}
           </button>
@@ -229,7 +229,7 @@ export function AiPanel({
                     type="button"
                     onClick={handleSave}
                     disabled={saving}
-                    className="inline-flex items-center gap-1 rounded-md border border-[#52525b] bg-[#1f1f1f] px-2 py-1 text-[11px] font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="sidebar-link-style text-[11px] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <CloudArrowUpIcon className="h-4 w-4" />
                     <span>{saving ? "保存中..." : "保存する"}</span>
@@ -244,7 +244,7 @@ export function AiPanel({
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className="inline-flex items-center gap-1 rounded-md border border-[#52525b] bg-[#1f1f1f] px-2 py-1 text-[11px] font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+                  className="sidebar-link-style text-[11px]"
                 >
                   {copied ? <CheckIcon className="h-4 w-4" /> : <ClipboardDocumentIcon className="h-4 w-4" />}
                   <span>{copied ? "コピー済み" : "コピー"}</span>

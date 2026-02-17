@@ -57,7 +57,7 @@ export function InterviewQuestionsSection({ questions, onChange, onAdd, onRemove
                 <button
                   type="button"
                   onClick={() => onRemove(idx)}
-                  className="ml-auto inline-flex items-center gap-1 text-xs text-rose-500 hover:underline"
+                  className="sidebar-link-style ml-auto text-xs"
                 >
                   <TrashIcon className="h-4 w-4" />
                   削除

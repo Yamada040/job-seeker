@@ -196,6 +196,70 @@ body {
   transform: translateY(0);
 }
 
+.header-nav-actions a,
+.header-nav-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0.25rem 0.5rem !important;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: color 0.2s ease;
+}
+
+.header-nav-actions a::before,
+.header-nav-actions button::before {
+  content: "▶";
+  display: inline-block;
+  font-size: 0.7rem;
+  transform: translateX(0);
+  transition: transform 0.2s ease;
+}
+
+.header-nav-actions a:hover,
+.header-nav-actions button:hover {
+  color: #facc15;
+}
+
+.header-nav-actions a:hover::before,
+.header-nav-actions button:hover::before {
+  transform: translateX(4px);
+}
+
+.sidebar-link-style {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0.25rem 0.5rem !important;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: color 0.2s ease;
+}
+
+.sidebar-link-style::before {
+  content: "▶";
+  display: inline-block;
+  font-size: 0.7rem;
+  transform: translateX(0);
+  transition: transform 0.2s ease;
+}
+
+.sidebar-link-style:hover {
+  color: #facc15;
+}
+
+.sidebar-link-style:hover::before {
+  transform: translateX(4px);
+}
+
 @layer components {
   .dq-window {
     @apply relative rounded-md border border-[#3f3f46] bg-[#111111] p-4;
@@ -210,19 +274,49 @@ body {
   }
 
   .dq-button {
-    @apply inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#262626] px-4 py-2 text-sm font-bold text-white transition;
+    @apply inline-flex items-center gap-2 px-2 py-1 text-sm font-bold text-white transition;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
   .dq-button:hover {
     color: #facc15;
   }
 
+  .dq-button::before {
+    content: "▶";
+    display: inline-block;
+    font-size: 0.7rem;
+    transform: translateX(0);
+    transition: transform 0.2s ease;
+  }
+
+  .dq-button:hover::before {
+    transform: translateX(4px);
+  }
+
   .dq-button-secondary {
-    @apply inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-4 py-2 text-sm font-bold text-white transition;
+    @apply inline-flex items-center gap-2 px-2 py-1 text-sm font-bold text-white transition;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
   .dq-button-secondary:hover {
     color: #facc15;
+  }
+
+  .dq-button-secondary::before {
+    content: "▶";
+    display: inline-block;
+    font-size: 0.7rem;
+    transform: translateX(0);
+    transition: transform 0.2s ease;
+  }
+
+  .dq-button-secondary:hover::before {
+    transform: translateX(4px);
   }
 
   .dq-menu-item {
@@ -281,9 +375,6 @@ body {
 
 
 /* Dark mode specific overrides for glassmorphism */
-
-
-
 
 
 

@@ -48,7 +48,7 @@ export function QuestionsEditor({ initialQuestions, readOnly = false }: Props) {
           <button
             type="button"
             onClick={handleAdd}
-            className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+            className="sidebar-link-style text-sm"
           >
             カードを追加
           </button>
@@ -86,7 +86,7 @@ export function QuestionsEditor({ initialQuestions, readOnly = false }: Props) {
                 <button
                   type="button"
                   onClick={() => handleRemove(q.id)}
-                  className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-2 py-1 text-xs font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+                  className="sidebar-link-style text-xs"
                 >
                   削除
                 </button>

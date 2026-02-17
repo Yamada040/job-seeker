@@ -203,8 +203,14 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
         <button
           type="button"
           onClick={() => openModalForDate(formatDateKey(new Date()))}
-          className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#262626] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+          className="group inline-flex items-center gap-2 px-2 py-1 text-sm font-bold text-white transition hover:text-yellow-400"
         >
+          <span
+            aria-hidden
+            className="text-[0.7rem] transition-transform group-hover:translate-x-1"
+          >
+            ▶
+          </span>
           <PlusIcon className="h-4 w-4" />
           今日に追加
         </button>
@@ -270,13 +276,21 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                   key={`today-${evt.id}`}
                   type="button"
                   onClick={() => handleEditPrefill(evt)}
-                  className="w-full rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-left text-xs transition hover:border-yellow-400/70 hover:text-yellow-200"
+                  className="group flex w-full items-start gap-2.5 rounded-md px-2 py-2 text-left text-xs font-bold text-white transition hover:text-yellow-400"
                 >
-                  <p className="font-bold">{evt.company || evt.title}</p>
-                  <p className="mt-0.5 text-white/70">
-                    {TYPE_LABEL[evt.type]}
-                    {evt.time ? ` · ${evt.time}` : ""}
-                  </p>
+                  <span
+                    aria-hidden
+                    className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
+                  >
+                    ▶
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate">{evt.company || evt.title}</span>
+                    <span className="mt-0.5 block text-white/70">
+                      {TYPE_LABEL[evt.type]}
+                      {evt.time ? ` · ${evt.time}` : ""}
+                    </span>
+                  </span>
                 </button>
               ))
             ) : (
@@ -297,13 +311,21 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                     key={`week-${evt.id}`}
                     type="button"
                     onClick={() => handleEditPrefill(evt)}
-                    className="w-full rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-left text-xs transition hover:border-sky-400/70 hover:text-sky-200"
+                    className="group flex w-full items-start gap-2.5 rounded-md px-2 py-2 text-left text-xs font-bold text-white transition hover:text-yellow-400"
                   >
-                    <p className="font-bold">{evt.company || evt.title}</p>
-                    <p className="mt-0.5 text-white/70">
-                      {label} / {TYPE_LABEL[evt.type]}
-                      {evt.time ? ` · ${evt.time}` : ""}
-                    </p>
+                    <span
+                      aria-hidden
+                      className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
+                    >
+                      ▶
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate">{evt.company || evt.title}</span>
+                      <span className="mt-0.5 block text-white/70">
+                        {label} / {TYPE_LABEL[evt.type]}
+                        {evt.time ? ` · ${evt.time}` : ""}
+                      </span>
+                    </span>
                   </button>
                 );
               })
@@ -324,7 +346,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
               </div>
               <button
                 type="button"
-                className="text-sm text-white/70 hover:text-yellow-300"
+                className="sidebar-link-style text-sm text-white/70"
                 onClick={() => setIsModalOpen(false)}
               >
                 閉じる
@@ -338,14 +360,14 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                     setFormState({ ...emptyForm });
                     setEditingId(null);
                   }}
-                  className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-1.5 text-xs font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+                  className="sidebar-link-style text-xs"
                 >
                   <PlusIcon className="h-4 w-4" />
                   新しい予定を追加
                 </button>
             </div>
 
-            <div className="dq-panel mt-4 space-y-2 p-3 text-sm">
+            <div className="mt-4 space-y-2 rounded-lg border border-[#3f3f46] bg-[#1a1a1a] p-3 text-sm">
               {eventsByDate[selectedDate]?.length ? (
                 eventsByDate[selectedDate].map((evt) => (
                   <div
@@ -368,7 +390,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                       {evt.id.startsWith("es-") ? (
                         <a
                           href={`/es/${evt.id.replace("es-", "")}`}
-                          className="inline-flex items-center gap-1 rounded-md border border-[#52525b] bg-[#1f1f1f] px-2 py-1 text-[11px] font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+                          className="sidebar-link-style text-[11px]"
                         >
                           ES詳細へ
                         </a>
@@ -377,7 +399,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                         <button
                           type="button"
                           onClick={() => handleEditPrefill(evt)}
-                          className="inline-flex items-center gap-1 rounded-md border border-[#52525b] bg-[#1f1f1f] px-2 py-1 text-[11px] font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+                          className="sidebar-link-style text-[11px]"
                         >
                           予定を編集
                         </button>
@@ -461,13 +483,13 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                     setFormState({ ...emptyForm });
                     setEditingId(null);
                   }}
-                  className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#1f1f1f] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+                  className="sidebar-link-style text-sm"
                 >
                   入力をクリア
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 rounded-md border border-[#52525b] bg-[#262626] px-3 py-2 text-sm font-bold text-white transition hover:border-yellow-400 hover:text-yellow-300"
+                  className="sidebar-link-style text-sm"
                   disabled={saving}
                 >
                   <PlusIcon className="h-4 w-4" />
