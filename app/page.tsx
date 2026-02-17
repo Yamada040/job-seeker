@@ -11,7 +11,10 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   ClipboardDocumentCheckIcon,
-  LifebuoyIcon
+  LifebuoyIcon,
+  RocketLaunchIcon,
+  TrophyIcon,
+  BoltIcon
 } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 
@@ -42,8 +45,8 @@ const features = [
 const steps = [
   {
     step: "01",
-    title: "アカウント作成",
-    description: "メールアドレスだけで簡単登録。30秒で始められます。"
+    title: "ログイン",
+    description: "Google認証でログインして、すぐに利用を開始できます。"
   },
   {
     step: "02", 
@@ -61,6 +64,18 @@ const acquisitionPoints = [
   "登録後すぐに使える。初期設定は最小限",
   "就活タスクを1画面で整理できる",
   "ES・企業管理・面接ログを横断して管理"
+];
+
+const attractionBadges = [
+  { icon: RocketLaunchIcon, label: "準備の迷いを削減" },
+  { icon: TrophyIcon, label: "継続しやすい設計" },
+  { icon: BoltIcon, label: "毎日の行動が明確" },
+];
+
+const mvpQuickGuide = [
+  "このMVPは、就活の情報整理を助けるためのツールです。",
+  "ログイン後は、自己分析・適性チェックで軸を整理してから、企業管理・ES管理・面接ログに進むと使いやすくなります。",
+  "迷ったらダッシュボードの次アクションを確認し、今日やることを1つずつ進めればOKです。"
 ];
 
 const mvpContext = [
@@ -100,14 +115,16 @@ const staggerChildren = {
 
 export default function Home() {
   const navLinkClass =
-    "group inline-flex items-center gap-2 px-2 py-1 text-sm font-bold text-[#412c18] transition hover:text-[#9a4f00]";
-  const navCaretClass =
-    "text-[0.7rem] transition-transform duration-200 group-hover:translate-x-1";
+    "sidebar-link-style text-sm";
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_20%_20%,#fff4dd_0%,#f2d8ad_45%,#d9ae74_100%)] text-[#412c18]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-linear-to-b from-[#fff7e8]/80 to-transparent" />
+      <div className="pointer-events-none absolute -left-24 top-32 h-72 w-72 rounded-full bg-[#f8e7c8]/70 blur-3xl" />
+      <div className="pointer-events-none absolute -right-24 top-80 h-72 w-72 rounded-full bg-[#f2dbb4]/70 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 opacity-30 [background-image:radial-gradient(#b8844a_1px,transparent_1px)] [background-size:24px_24px]" />
 
-      <main className="mx-auto flex max-w-6xl flex-col gap-16 px-6 py-10 sm:px-10 sm:py-14">
+      <main className="relative z-10 mx-auto flex max-w-6xl flex-col gap-16 px-6 py-10 sm:px-10 sm:py-14">
         {/* ヘッダー */}
         <motion.header
           initial={{ opacity: 0, y: -20 }}
@@ -125,14 +142,15 @@ export default function Home() {
               href={ROUTES.LOGIN}
               className={navLinkClass}
             >
-              <span className={navCaretClass}>▶</span>
               ログイン
             </Link>
           </div>
         </motion.header>
 
         {/* ヒーロー */}
-        <section className="relative overflow-hidden rounded-2xl border border-[#b8844a] bg-[#f8e7c8] p-10 shadow-xl">
+        <section className="relative overflow-hidden rounded-2xl border border-[#b8844a] bg-[#f8e7c8] p-10 shadow-[0_20px_60px_rgba(116,64,0,0.18)]">
+          <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-white/45" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-linear-to-r from-transparent via-[#9a4f00] to-transparent opacity-70" />
           <div className="pointer-events-none absolute -right-24 -top-20 h-56 w-56 rounded-full bg-linear-to-br from-[#f2dbb4]/80 to-[#e8c38d]/50 blur-3xl" />
           <div className="pointer-events-none absolute -left-28 bottom-[-110px] h-56 w-56 rounded-full bg-linear-to-br from-[#eed1a2]/70 to-[#f3ddb8]/30 blur-3xl" />
           <div className="grid gap-12 lg:grid-cols-[1.2fr,0.8fr] lg:items-center">
@@ -163,7 +181,7 @@ export default function Home() {
                 className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl"
               >
                 情報過多な就活を
-                <span className="text-[#9a4f00]">整理</span>して
+                <span className="bg-linear-to-r from-[#9a4f00] to-[#7a3f00] bg-clip-text text-transparent">整理</span>して
                 <span className="block text-[#6f4b25]">やるべき行動を明確にする</span>
               </motion.h1>
               
@@ -187,7 +205,6 @@ export default function Home() {
                   href={ROUTES.LOGIN}
                   className={navLinkClass}
                 >
-                  <span className={navCaretClass}>▶</span>
                   ログイン
                   <ArrowRightIcon className="h-4 w-4" />
                 </Link>
@@ -195,9 +212,25 @@ export default function Home() {
                   href="#features"
                   className={navLinkClass}
                 >
-                  <span className={navCaretClass}>▶</span>
                   機能を見る
                 </Link>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.95 }}
+                className="flex flex-wrap gap-2"
+              >
+                {attractionBadges.map((badge) => (
+                  <span
+                    key={badge.label}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[#b8844a] bg-[#f2dbb4]/80 px-3 py-1 text-xs font-semibold text-[#744000] shadow-sm"
+                  >
+                    <badge.icon className="h-3.5 w-3.5" />
+                    {badge.label}
+                  </span>
+                ))}
               </motion.div>
             </motion.div>
 
@@ -207,7 +240,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="grid gap-4"
             >
-              <div className="space-y-5 rounded-2xl border border-[#b8844a] bg-[#f3ddb8] p-6 shadow-sm">
+              <div className="space-y-5 rounded-2xl border border-[#b8844a] bg-[#f3ddb8] p-6 shadow-[0_10px_35px_rgba(116,64,0,0.16)]">
                 <p className="text-sm font-semibold text-[#744000]">今すぐ始める理由</p>
                 <ul className="space-y-3">
                   {acquisitionPoints.map((point, index) => (
@@ -224,7 +257,6 @@ export default function Home() {
                   ))}
                 </ul>
                 <Link href={ROUTES.LOGIN} className={navLinkClass}>
-                  <span className={navCaretClass}>▶</span>
                   ログインして始める
                   <ArrowRightIcon className="h-4 w-4" />
                 </Link>
@@ -233,9 +265,38 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="grid gap-4 md:grid-cols-3">
+          {[
+            { title: "対象", description: "自己分析から面接振り返りまで一気通貫で管理" },
+            { title: "価値", description: "就活タスクを分解し、今日やることを迷わず選べる" },
+            { title: "使い方", description: "まず自己分析と適性チェック、その後に企業とESを整備" },
+          ].map((item) => (
+            <div
+              key={item.title}
+              className="rounded-xl border border-[#b8844a] bg-[#f8e7c8]/90 p-4 shadow-[0_6px_20px_rgba(116,64,0,0.1)]"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#744000]">{item.title}</p>
+              <p className="mt-2 text-sm text-[#6f4b25]">{item.description}</p>
+            </div>
+          ))}
+        </section>
+
+        <section className="rounded-2xl border border-[#b8844a] bg-[#f3ddb8] p-6 shadow-[0_8px_30px_rgba(116,64,0,0.14)]">
+          <h2 className="text-lg font-bold text-[#412c18]">はじめての方へ</h2>
+          <ul className="mt-3 space-y-2 text-sm leading-6 text-[#6f4b25]">
+            {mvpQuickGuide.map((item) => (
+              <li key={item} className="flex items-start gap-2">
+                <span className="pt-1 text-[0.7rem] text-[#9a4f00]">▶</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
         {/* MVPコンテキスト */}
         <section className="space-y-6">
           <motion.div {...fadeInUp} className="space-y-2 text-center">
+            <div className="mx-auto h-1 w-28 rounded-full bg-linear-to-r from-transparent via-[#b8844a] to-transparent" />
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#744000]">
               MVP Overview
             </p>
@@ -255,7 +316,7 @@ export default function Home() {
               <motion.article
                 key={item.title}
                 variants={fadeInUp}
-                className="rounded-2xl border border-[#b8844a] bg-[#f8e7c8] p-6 shadow-sm"
+                className="rounded-2xl border border-[#b8844a] bg-[#f8e7c8] p-6 shadow-[0_8px_28px_rgba(116,64,0,0.12)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(116,64,0,0.18)]"
               >
                 <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[#b8844a] bg-[#f2dbb4] text-[#9a4f00]">
                   <item.icon className="h-5 w-5" />
@@ -273,6 +334,7 @@ export default function Home() {
             {...fadeInUp}
             className="text-center space-y-3"
           >
+            <div className="mx-auto h-1 w-28 rounded-full bg-linear-to-r from-transparent via-[#b8844a] to-transparent" />
             <h2 className="text-3xl font-bold text-[#412c18]">就活を変える3つの機能</h2>
             <p className="mx-auto max-w-2xl text-lg text-[#6f4b25]">
               AI技術と効率的な管理機能で、就活の成功確率を大幅に向上させます
@@ -291,7 +353,7 @@ export default function Home() {
                 key={feature.title}
                 variants={fadeInUp}
                 whileHover={{ scale: 1.02, y: -5 }}
-                className="rounded-2xl border border-[#b8844a] bg-[#f8e7c8] p-8 shadow-sm transition-all duration-300"
+                className="rounded-2xl border border-[#b8844a] bg-[#f8e7c8] p-8 shadow-[0_8px_28px_rgba(116,64,0,0.12)] transition-all duration-300"
               >
                 <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-amber-400 to-orange-400 text-white shadow-md">
                   <feature.icon className="h-6 w-6" />
@@ -313,6 +375,7 @@ export default function Home() {
             {...fadeInUp}
             className="text-center space-y-3"
           >
+            <div className="mx-auto h-1 w-28 rounded-full bg-linear-to-r from-transparent via-[#b8844a] to-transparent" />
             <h2 className="text-3xl font-bold text-[#412c18]">簡単3ステップで始める</h2>
             <p className="text-lg text-[#6f4b25]">
               面倒な設定は一切不要。今すぐ就活効率化を体験してください
@@ -330,7 +393,7 @@ export default function Home() {
               <motion.div
                 key={step.step}
                 variants={fadeInUp}
-                className="relative rounded-2xl border border-[#b8844a] bg-[#f8e7c8] p-6 text-center shadow-sm"
+                className="relative rounded-2xl border border-[#b8844a] bg-[#f8e7c8] p-6 text-center shadow-[0_8px_28px_rgba(116,64,0,0.12)]"
               >
                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full border border-[#b8844a] bg-[#f2dbb4] text-lg font-bold text-[#9a4f00]">
                   {step.step}
@@ -351,7 +414,7 @@ export default function Home() {
         {/* CTA */}
         <motion.section
           {...fadeInUp}
-          className="rounded-2xl border border-[#b8844a] bg-[#f8e7c8] p-10 text-center"
+          className="rounded-2xl border border-[#b8844a] bg-[#f8e7c8] p-10 text-center shadow-[0_12px_34px_rgba(116,64,0,0.14)]"
         >
           <div className="mx-auto max-w-2xl space-y-6">
             <h2 className="text-3xl font-bold text-[#412c18]">
@@ -366,7 +429,6 @@ export default function Home() {
                   href={ROUTES.LOGIN}
                   className={navLinkClass}
                 >
-                  <span className={navCaretClass}>▶</span>
                   ログイン
                 </Link>
               </motion.div>
@@ -377,7 +439,7 @@ export default function Home() {
         {/* セキュリティ */}
         <motion.section
           {...fadeInUp}
-          className="rounded-2xl border border-[#b8844a] bg-[#f3ddb8] p-8"
+          className="rounded-2xl border border-[#b8844a] bg-[#f3ddb8] p-8 shadow-[0_8px_30px_rgba(116,64,0,0.14)]"
         >
           <div className="flex items-center justify-center gap-3 text-[#744000]">
             <ShieldCheckIcon className="h-6 w-6" />
