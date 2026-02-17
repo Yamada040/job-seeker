@@ -142,7 +142,7 @@ export function AiPanel({
       const res = await fetch(saveUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: saveId, summary: response }),
+        body: JSON.stringify({ id: saveId, summary: JSON.stringify(response) }),
       });
       if (!res.ok) throw new Error("保存に失敗しました。");
       setSaved(true);

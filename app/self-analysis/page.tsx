@@ -20,6 +20,7 @@ export default async function SelfAnalysisPage() {
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
+  const isLocked = Boolean(data?.id);
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
@@ -45,6 +46,7 @@ export default async function SelfAnalysisPage() {
         initialAnswers={(data?.answers as Record<string, unknown>) ?? null}
         initialSummary={data?.ai_summary ?? null}
         initialResultId={data?.id ?? null}
+        isMonthlyLocked={isLocked}
       />
     </AppLayout>
   );

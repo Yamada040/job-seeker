@@ -17,6 +17,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "answers is required" }, { status: 400 });
   }
 
+  const { data: existing, error: existingError } = await supabase
+    .from("self_analysis_results")
+    .select("id")
+    .eq("user_id", userData.user.id)
+    .limit(1)
+    .maybeSingle();
+
+  if (existingError) {
+    return NextResponse.json(
+      { error: existingError.message ?? "failed to check existing result" },
+      { status: 500 }
+    );
+  }
+
+  if (existing?.id) {
+    return NextResponse.json(
+      { error: "自己分析は現在1回のみ実行できます。" },
+      { status: 409 }
+    );
+  }
+
   const { data, error } = await supabase
     .from("self_analysis_results")
     .insert({ user_id: userData.user.id, answers: payloadValidation.data.answers })

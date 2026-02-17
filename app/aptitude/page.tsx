@@ -21,6 +21,7 @@ export default async function AptitudePage() {
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
+  const isLocked = Boolean(data?.id);
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
@@ -36,11 +37,17 @@ export default async function AptitudePage() {
   );
 
   return (
-    <AppLayout headerActions={headerActions} className="space-y-6">
+    <AppLayout
+      headerTitle="適性チェック"
+      headerDescription="興味・強み・価値観を整理して、AI診断で適性の方向性を確認します"
+      headerActions={headerActions}
+      className="space-y-6"
+    >
       <AptitudeForm
         initialAnswers={(data?.answers as AptitudeAnswers) ?? null}
         initialSummary={data?.ai_summary ?? null}
         initialResultId={data?.id ?? null}
+        isMonthlyLocked={isLocked}
       />
     </AppLayout>
   );

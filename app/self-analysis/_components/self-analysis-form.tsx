@@ -38,10 +38,12 @@ export default function SelfAnalysisForm({
   initialAnswers,
   initialSummary,
   initialResultId,
+  isMonthlyLocked,
 }: {
   initialAnswers: Record<string, unknown> | null;
   initialSummary: string | null;
   initialResultId: string | null;
+  isMonthlyLocked: boolean;
 }) {
   const [answers, setAnswers] = useState<Answers>(() => {
     if (initialAnswers) return { ...defaultAnswers, ...(initialAnswers as Partial<Answers>) };
@@ -54,6 +56,10 @@ export default function SelfAnalysisForm({
   const [saving, setSaving] = useState(false);
 
   const handleRun = async () => {
+    if (isMonthlyLocked) {
+      alert("自己分析は現在一回しかできません。");
+      return;
+    }
     setSaving(true);
     try {
       const res = await fetch("/api/self-analysis/answers", {
@@ -87,6 +93,9 @@ export default function SelfAnalysisForm({
           <h2 className="text-lg font-semibold text-white">質問リスト</h2>
         </div>
         <div className="mt-4 space-y-3">
+          <div className="dq-panel px-3 py-2 text-xs font-semibold text-yellow-200">
+            ※ 現在は一回しかできません。
+          </div>
           <TextArea label="強み・得意なこと" value={answers.strengths} onChange={(v) => handleChange("strengths", v)} />
           <TextArea
             label="価値観（仕事選びで譲れないこと）"
@@ -115,8 +124,8 @@ export default function SelfAnalysisForm({
             onChange={(v) => handleChange("future", v)}
           />
           <div className="flex flex-wrap gap-3">
-            <button onClick={handleRun} disabled={saving} className="dq-button">
-              {saving ? "保存中..." : "保存する"}
+            <button onClick={handleRun} disabled={saving || isMonthlyLocked} className="dq-button disabled:cursor-not-allowed disabled:opacity-60">
+              {isMonthlyLocked ? "実施済み" : saving ? "保存中..." : "保存する"}
             </button>
           </div>
         </div>

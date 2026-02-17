@@ -88,6 +88,14 @@ create table if not exists public.self_analysis_results (
   created_at timestamptz default now()
 );
 
+create unique index if not exists aptitude_results_user_id_unique
+  on public.aptitude_results (user_id)
+  where user_id is not null;
+
+create unique index if not exists self_analysis_results_user_id_unique
+  on public.self_analysis_results (user_id)
+  where user_id is not null;
+
 alter table public.profiles enable row level security;
 alter table public.es_entries enable row level security;
 alter table public.calendar_events enable row level security;
