@@ -59,6 +59,9 @@ function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
       case "profile":
         label = "プロフィール";
         break;
+      case "contact":
+        label = "お問い合わせ";
+        break;
       case "new":
         label = "新規作成";
         break;

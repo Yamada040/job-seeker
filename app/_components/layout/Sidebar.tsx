@@ -114,6 +114,12 @@ const navigationItems: NavItem[] = [
     icon: UserIcon,
     description: "ユーザー設定とアバター",
   },
+  {
+    label: "お問い合わせ",
+    href: ROUTES.CONTACT,
+    icon: ChatBubbleLeftRightIcon,
+    description: "運営への連絡フォーム",
+  },
 ];
 
 const bottomItems: NavItem[] = [
