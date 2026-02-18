@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { ROUTES } from "@/lib/constants/routes";
+import { BrandLogo } from "@/app/_components/layout/BrandLogo";
 import { LoginClient } from "./login-client";
 
 export default async function LoginPage() {
@@ -19,12 +20,11 @@ export default async function LoginPage() {
     <div className="relative min-h-screen text-slate-100">
       <main className="mx-auto flex max-w-xl flex-col gap-6 px-6 py-12 sm:py-16">
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-lg font-semibold">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-amber-300 to-orange-500 text-sm font-bold text-slate-900 shadow-md shadow-amber-300/40">
-              就
-            </span>
-            就活Copilot
-          </div>
+          <BrandLogo
+            className="gap-2 text-lg font-semibold"
+            iconClassName="h-10 w-10 rounded-xl"
+            textClassName="theme-readable"
+          />
           <Link href={ROUTES.HOME} className="text-sm text-amber-700 hover:underline">
             ホームへ戻る
           </Link>
