@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, ChevronRightIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 
@@ -30,6 +30,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formState, setFormState] = useState({ ...emptyForm });
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const todayKey = formatDateKey(new Date());
   const weekdayLabel = ["日", "月", "火", "水", "木", "金", "土"];
 
@@ -179,6 +180,31 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
     });
     setEditingId(evt.id);
     setIsModalOpen(true);
+  };
+
+  const handleDeleteEvent = async (evt: CalendarEvent) => {
+    if (evt.id.startsWith("es-")) return;
+    if (!confirm("この予定を削除しますか？")) return;
+
+    setDeletingId(evt.id);
+    try {
+      const res = await fetch(`/api/calendar-events/${evt.id}`, { method: "DELETE" });
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.data?.id) {
+        throw new Error(json?.error ?? "削除に失敗しました");
+      }
+
+      setEvents((prev) => prev.filter((item) => item.id !== evt.id));
+      if (editingId === evt.id) {
+        setFormState({ ...emptyForm });
+        setEditingId(null);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("削除に失敗しました。再度お試しください。");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -402,14 +428,28 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                         </a>
                       ) : null}
                       {!evt.id.startsWith("es-") && (
-                        <button
-                          type="button"
-                          onClick={() => handleEditPrefill(evt)}
-                          className="sidebar-link-style text-[11px]"
-                        >
-                          予定を編集
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleEditPrefill(evt)}
+                            className="sidebar-link-style text-[11px]"
+                          >
+                            予定を編集
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteEvent(evt)}
+                            className="sidebar-link-style text-[11px]"
+                            disabled={deletingId === evt.id}
+                          >
+                            <TrashIcon className="h-3.5 w-3.5" />
+                            {deletingId === evt.id ? "削除中..." : "予定を削除"}
+                          </button>
+                        </>
                       )}
+                      {evt.id.startsWith("es-") ? (
+                        <span className="text-[11px] text-white/60">ES由来の予定はここでは削除できません</span>
+                      ) : null}
                     </div>
                   </div>
                 ))
