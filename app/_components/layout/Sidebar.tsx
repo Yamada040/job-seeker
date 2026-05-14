@@ -123,7 +123,7 @@ const navigationItems: NavItem[] = [
 ];
 
 const bottomItems: NavItem[] = [
-  { label: "ログアウト", href: "/login", icon: ArrowRightOnRectangleIcon },
+  { label: "ログアウト", href: "/auth/signout", icon: ArrowRightOnRectangleIcon },
 ];
 
 const developerItem: NavItem = {
