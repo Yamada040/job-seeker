@@ -96,11 +96,32 @@ html.theme-light [class*="bg-[#e8c38d]"] {
   background-color: #f0f9ff !important;
 }
 
+html.theme-light [class*="bg-amber-"],
+html.theme-light [class*="bg-yellow-"],
+html.theme-light [class*="bg-orange-"] {
+  background-color: #f0f9ff !important;
+}
+
+html.theme-light [class*="bg-gradient-to-"][class*="from-amber-"],
+html.theme-light [class*="bg-gradient-to-"][class*="from-yellow-"],
+html.theme-light [class*="bg-gradient-to-"][class*="from-orange-"],
+html.theme-light [class*="bg-linear-to-"][class*="from-amber-"],
+html.theme-light [class*="bg-linear-to-"][class*="from-yellow-"],
+html.theme-light [class*="bg-linear-to-"][class*="from-orange-"] {
+  background-image: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 55%, #ffffff 100%) !important;
+}
+
 html.theme-light [class*="border-[#3f3f46]"],
 html.theme-light [class*="border-[#52525b]"],
 html.theme-light [class*="border-white/"],
 html.theme-light [class*="border-[#b8844a]"] {
   border-color: #bae6fd !important;
+}
+
+html.theme-light [class*="border-amber-"],
+html.theme-light [class*="border-yellow-"],
+html.theme-light [class*="border-orange-"] {
+  border-color: #7dd3fc !important;
 }
 
 html.theme-light [class*="text-white"] {
@@ -129,6 +150,11 @@ html.theme-light [class*="text-[#744000]"] {
 html.theme-light [class*="text-[#9a4f00]"],
 html.theme-light [class*="text-[#7a3f00]"] {
   color: #0284c7 !important;
+}
+
+html.theme-light [class*="text-amber-"],
+html.theme-light [class*="text-orange-"] {
+  color: #0369a1 !important;
 }
 
 html.theme-light .text-white,
@@ -224,6 +250,18 @@ html.theme-light [class*="border-yellow-400"] {
 
 html.theme-light [class*="ring-yellow-300"] {
   --tw-ring-color: rgba(56, 189, 248, 0.35) !important;
+}
+
+html.theme-light [class*="ring-amber-"],
+html.theme-light [class*="ring-yellow-"],
+html.theme-light [class*="ring-orange-"] {
+  --tw-ring-color: rgba(125, 211, 252, 0.35) !important;
+}
+
+html.theme-light [class*="accent-amber-"],
+html.theme-light [class*="accent-yellow-"],
+html.theme-light [class*="accent-orange-"] {
+  accent-color: #38bdf8 !important;
 }
 
 .theme-switch-wrap {
@@ -684,8 +722,6 @@ html.theme-light .dq-input::placeholder {
 
 
 /* Dark mode specific overrides for glassmorphism */
-
-
 
 
 
