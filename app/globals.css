@@ -476,7 +476,7 @@ html.theme-light .theme-readable-muted {
   width: 0;
   height: 0;
   border: solid 7px transparent;
-  border-left-color: #0ea5e9;
+  border-left-color: #0284c7;
   margin-top: -7px;
   content: "";
 }
@@ -684,7 +684,6 @@ html.theme-light .dq-input::placeholder {
 
 
 /* Dark mode specific overrides for glassmorphism */
-
 
 
 

@@ -19,7 +19,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           // Variant styles
           {
             // Default
-            "border-sky-100 bg-white text-slate-700 hover:border-sky-200 hover:bg-sky-50":
+            "border-sky-100 bg-white text-slate-900 hover:border-sky-200 hover:bg-sky-50":
               variant === "default",
 
             // Primary
