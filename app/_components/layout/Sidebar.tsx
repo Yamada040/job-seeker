@@ -17,7 +17,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { clsx } from "clsx";
 import { ROUTES } from "@/lib/constants/routes";
-import { ThemeToggle } from "./ThemeToggle";
 
 interface NavItem {
   label: string;
@@ -190,9 +189,6 @@ export function Sidebar() {
                 }
               />
             ) : null}
-          </div>
-          <div className="mt-3 border-t border-white/20 pt-3">
-            <ThemeToggle />
           </div>
         </div>
       </div>

@@ -1,17 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { SITE_NAME, getSiteUrl } from "@/lib/constants/site";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
@@ -52,13 +41,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("ui-theme");var m=t==="dark"?"dark":"light";document.documentElement.classList.add(m==="light"?"theme-light":"theme-dark");}catch(e){document.documentElement.classList.add("theme-light");}})();`,
-          }}
-        />
+    <html lang="ja" className="theme-light">
+      <body className="antialiased">
         {children}
       </body>
     </html>

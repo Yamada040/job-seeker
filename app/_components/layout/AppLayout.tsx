@@ -55,13 +55,13 @@ export function AppLayout({
       <div className="pointer-events-none absolute inset-0 -z-10" />
 
       {shouldShowSidebar && <Sidebar />}
-      {showSidebar ? (
-        <button
-          type="button"
-          onClick={() => setIsSidebarOpen((prev) => !prev)}
-          className="fixed left-6 top-6 z-[60] flex h-10 w-10 items-center justify-center text-white transition-colors hover:text-yellow-400"
-          aria-label={isSidebarOpen ? "サイドバーを閉じる" : "サイドバーを開く"}
-        >
+        {showSidebar ? (
+          <button
+            type="button"
+            onClick={() => setIsSidebarOpen((prev) => !prev)}
+            className="fixed left-6 top-6 z-[60] flex h-10 w-10 items-center justify-center text-sky-700 transition-colors hover:text-sky-500"
+            aria-label={isSidebarOpen ? "サイドバーを閉じる" : "サイドバーを開く"}
+          >
           <span className="flex h-4 w-4 flex-col items-center justify-between">
             <span className="h-[2px] w-full bg-current" />
             <span className="h-[2px] w-full bg-current" />
@@ -91,8 +91,10 @@ export function AppLayout({
           <Breadcrumbs />
           {(headerTitle || headerDescription) && (
             <div className="mt-4">
-              {headerTitle && <h1 className="text-lg font-semibold text-white">{headerTitle}</h1>}
-              {headerDescription && <p className="mt-1 text-sm text-white/70">{headerDescription}</p>}
+              {headerTitle && <h1 className="theme-readable text-lg font-semibold">{headerTitle}</h1>}
+              {headerDescription && (
+                <p className="theme-readable-muted mt-1 text-sm">{headerDescription}</p>
+              )}
             </div>
           )}
           {children}
