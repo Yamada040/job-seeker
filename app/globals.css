@@ -431,12 +431,12 @@ html.theme-light .theme-readable-muted {
   position: relative;
   padding: 1.5rem 1rem 0.75rem 1rem;
   border-radius: 8px;
-  border: 3px solid #f5efe2;
-  color: #f8fafc;
+  border: 3px solid #bae6fd;
+  color: #0f172a;
   font-family: "DotGothic16", "魔導太丸ゴシック", "Hiragino Maru Gothic ProN", sans-serif;
   font-size: 18px;
   font-weight: 700;
-  background: #111111;
+  background: #ffffff;
   z-index: 0;
 }
 
@@ -445,14 +445,14 @@ html.theme-light .theme-readable-muted {
   top: -0.75rem;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #111111;
+  background-color: #ffffff;
   padding: 0 0.5rem;
   content: attr(data-title);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #f5efe2;
+  color: #0369a1;
 }
 
 .radio-area {
@@ -476,7 +476,7 @@ html.theme-light .theme-readable-muted {
   width: 0;
   height: 0;
   border: solid 7px transparent;
-  border-left-color: #f5efe2;
+  border-left-color: #0ea5e9;
   margin-top: -7px;
   content: "";
 }
@@ -684,7 +684,6 @@ html.theme-light .dq-input::placeholder {
 
 
 /* Dark mode specific overrides for glassmorphism */
-
 
 
 

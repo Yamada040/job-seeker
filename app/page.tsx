@@ -161,16 +161,16 @@ export default function Home() {
               className="space-y-6"
             >
               <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-sky-700">
-                <span className="inline-flex items-center gap-2 rounded-full border border-[#b8844a] bg-[#f2dbb4] px-3 py-1 text-[#744000]">
+                <span className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-100 px-3 py-1 text-sky-700">
                   MVP BETA
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-[#b8844a] bg-[#f8e7c8] px-3 py-1 text-[#744000]">
+                <span className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white px-3 py-1 text-sky-700">
                   AI活用
-                  <SparklesIcon className="h-3 w-3 text-[#9a4f00]" />
+                  <SparklesIcon className="h-3 w-3 text-sky-500" />
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-[#b8844a] bg-[#f2dbb4] px-3 py-1 text-[#744000]">
+                <span className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-100 px-3 py-1 text-sky-700">
                   無料で始められる
-                  <CheckCircleIcon className="h-3 w-3 text-[#9a4f00]" />
+                  <CheckCircleIcon className="h-3 w-3 text-sky-500" />
                 </span>
               </div>
               
