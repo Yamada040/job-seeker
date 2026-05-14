@@ -122,10 +122,6 @@ const navigationItems: NavItem[] = [
   },
 ];
 
-const bottomItems: NavItem[] = [
-  { label: "ログアウト", href: "/login", icon: ArrowRightOnRectangleIcon },
-];
-
 const developerItem: NavItem = {
   label: "開発者ダッシュボード",
   href: ROUTES.DEVELOPER,
@@ -174,13 +170,23 @@ export function Sidebar() {
 
         <div className="border-t border-white/20 pt-5">
           <div className="space-y-2">
-            {bottomItems.map((item) => (
-              <NavLink
-                key={item.href}
-                item={item}
-                isActive={pathname === item.href}
-              />
-            ))}
+            <form action="/auth/signout" method="post">
+              <button
+                type="submit"
+                className="group flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-xs font-bold text-white transition hover:text-yellow-400"
+              >
+                <span
+                  aria-hidden={true}
+                  className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
+                >
+                  ▶
+                </span>
+                <ArrowRightOnRectangleIcon className="h-4 w-4 shrink-0 text-white transition-colors group-hover:text-yellow-400" />
+                <div className="min-w-0 flex-1 text-left">
+                  <div className="truncate text-xs">ログアウト</div>
+                </div>
+              </button>
+            </form>
             {isDeveloper ? (
               <NavLink
                 item={developerItem}
