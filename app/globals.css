@@ -241,8 +241,14 @@ html.theme-light [class~="border-yellow-300/60"] {
   border-color: rgba(125, 211, 252, 0.6) !important;
 }
 
-html.theme-light [class~="border-amber-500/30"],
-html.theme-light [class~="border-amber-500/40"],
+html.theme-light [class~="border-amber-500/30"] {
+  border-color: rgba(56, 189, 248, 0.3) !important;
+}
+
+html.theme-light [class~="border-amber-500/40"] {
+  border-color: rgba(56, 189, 248, 0.4) !important;
+}
+
 html.theme-light [class~="border-yellow-400"] {
   border-color: #38bdf8 !important;
 }
@@ -301,7 +307,7 @@ html.theme-light [class~="ring-amber-100"] {
 
 html.theme-light [class~="ring-amber-300"],
 html.theme-light [class~="ring-yellow-300"] {
-  --tw-ring-color: rgba(125, 211, 252, 0.5) !important;
+  --tw-ring-color: #7dd3fc !important;
 }
 
 html.theme-light [class~="ring-amber-500/30"] {
@@ -313,7 +319,7 @@ html.theme-light [class~="ring-yellow-300/70"] {
 }
 
 html.theme-light [class~="focus:ring-amber-400"] {
-  --tw-ring-color: rgba(56, 189, 248, 0.5) !important;
+  --tw-ring-color: #38bdf8 !important;
 }
 
 html.theme-light [class*="text-white"] {
@@ -898,4 +904,3 @@ html.theme-light .dq-input::placeholder {
 
 
 /* Dark mode specific overrides for glassmorphism */
-
