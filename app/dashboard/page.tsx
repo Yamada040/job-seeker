@@ -5,6 +5,7 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import { Database } from "@/lib/database.types";
 import { ROUTES } from "@/lib/constants/routes";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
+import { computeLevel, getLevelThresholds } from "@/lib/xp/level";
 import { AppLayout } from "@/app/_components/layout";
 import { InteractiveCalendar } from "./_components/interactive-calendar";
 import { EventListModal } from "./_components/event-list-modal";
@@ -24,10 +25,6 @@ type CalendarEvent = {
   type: "es" | "interview" | "intern" | "other";
   time?: string | null;
 };
-
-function computeLevel(xp: number) {
-  return Math.max(1, Math.floor(xp / 50) + 1);
-}
 
 async function getDashboardData() {
   const supabase = await createSupabaseReadonlyClient();
@@ -183,8 +180,7 @@ export default async function DashboardPage() {
   const fallbackXp = recentXpLogs.reduce((sum, log) => sum + (log.xp ?? 0), 0);
   const xp = data.profile?.xp ?? fallbackXp;
   const level = data.profile?.level ?? computeLevel(xp);
-  const prevThreshold = Math.max(0, (level - 1) * 50);
-  const nextThreshold = level * 50;
+  const { prevThreshold, nextThreshold } = getLevelThresholds(level);
   const progress =
     nextThreshold > prevThreshold
       ? Math.min(1, (xp - prevThreshold) / (nextThreshold - prevThreshold))

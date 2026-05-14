@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/supabase-browser";
+import { computeLevel, getLevelThresholds } from "@/lib/xp/level";
 
 type ProfileLite = {
   xp: number | null;
@@ -9,59 +11,66 @@ type ProfileLite = {
 };
 
 const PROFILE_CACHE_KEY = "profile-lite";
-const PROFILE_CACHE_TS_KEY = "profile-lite-ts";
-const CACHE_TTL_MS = 5 * 60 * 1000;
-
-function computeLevel(xp: number) {
-  return Math.max(1, Math.floor(xp / 25) + 1);
-}
 
 export function XpBadge() {
+  const pathname = usePathname();
   const [data, setData] = useState<ProfileLite | null>(null);
   const [levelUp, setLevelUp] = useState<number | null>(null);
+  const prevLevelRef = useRef<number | null>(null);
+
+  const applyProfile = useCallback(
+    (profile: ProfileLite | null, opts?: { checkLevelUp?: boolean }) => {
+      const xp = profile?.xp ?? 0;
+      const nextLevel = profile?.level ?? computeLevel(xp);
+      if (
+        opts?.checkLevelUp &&
+        prevLevelRef.current !== null &&
+        nextLevel > prevLevelRef.current
+      ) {
+        setLevelUp(nextLevel);
+      }
+      prevLevelRef.current = nextLevel;
+      setData(profile);
+    },
+    []
+  );
 
   useEffect(() => {
+    let active = true;
     const fetchProfile = async () => {
       try {
         const cached = sessionStorage.getItem(PROFILE_CACHE_KEY);
-        const cachedAt = Number(
-          sessionStorage.getItem(PROFILE_CACHE_TS_KEY) || "0"
-        );
-        if (cached) {
-          const cachedData = JSON.parse(cached) as ProfileLite | null;
-          setData(cachedData);
-          if (Date.now() - cachedAt < CACHE_TTL_MS) {
-            return;
-          }
+        if (cached && active) {
+          applyProfile(JSON.parse(cached) as ProfileLite | null);
         }
 
         const supabase = createSupabaseBrowserClient();
         const { data: userData } = await supabase.auth.getUser();
         const userId = userData?.user?.id;
-        if (!userId) return;
+        if (!userId || !active) return;
         const { data: profile } = await supabase
           .from("profiles")
           .select("xp, level")
           .eq("id", userId)
           .maybeSingle<ProfileLite>();
-        setData(profile ?? null);
-        sessionStorage.setItem(
-          PROFILE_CACHE_KEY,
-          JSON.stringify(profile ?? null)
-        );
-        sessionStorage.setItem(PROFILE_CACHE_TS_KEY, String(Date.now()));
+        const nextProfile = profile ?? null;
+        applyProfile(nextProfile, { checkLevelUp: true });
+        sessionStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(nextProfile));
       } catch {
         // fail silently
       }
     };
     void fetchProfile();
-  }, []);
 
-  const { xp, level, progress, nextThreshold, prevThreshold } = useMemo(() => {
+    return () => {
+      active = false;
+    };
+  }, [applyProfile, pathname]);
+
+  const { xp, level, progress, nextThreshold } = useMemo(() => {
     const currentXp = data?.xp ?? 0;
     const lvl = data?.level ?? computeLevel(currentXp);
-    const prev = Math.max(0, (lvl - 1) * 50);
-    const next = lvl * 50;
+    const { prevThreshold: prev, nextThreshold: next } = getLevelThresholds(lvl);
     const prog =
       next > prev ? Math.min(1, (currentXp - prev) / (next - prev)) : 0;
     return {
@@ -69,7 +78,6 @@ export function XpBadge() {
       level: lvl,
       progress: prog,
       nextThreshold: next,
-      prevThreshold: prev,
     };
   }, [data]);
 

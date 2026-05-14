@@ -1,4 +1,5 @@
 import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
+import { computeLevel } from "@/lib/xp/level";
 
 type XpRule = {
   amount: number;
@@ -19,11 +20,6 @@ const XP_CONFIG: Record<string, XpRule> = {
 
 type XpAction = keyof typeof XP_CONFIG;
 type Client = Awaited<ReturnType<typeof createSupabaseActionClient>>;
-
-function computeLevel(xp: number) {
-  // Level 1 at 0xp, +1 level per 25xp
-  return Math.max(1, Math.floor(xp / 25) + 1);
-}
 
 function startOfToday() {
   const d = new Date();
