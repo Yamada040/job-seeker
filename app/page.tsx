@@ -118,11 +118,11 @@ export default function Home() {
     "sidebar-link-style text-sm";
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_20%_20%,#fff4dd_0%,#f2d8ad_45%,#d9ae74_100%)] text-[#412c18]">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-linear-to-b from-[#fff7e8]/80 to-transparent" />
-      <div className="pointer-events-none absolute -left-24 top-32 h-72 w-72 rounded-full bg-[#f8e7c8]/70 blur-3xl" />
-      <div className="pointer-events-none absolute -right-24 top-80 h-72 w-72 rounded-full bg-[#f2dbb4]/70 blur-3xl" />
-      <div className="pointer-events-none absolute inset-0 opacity-30 [background-image:radial-gradient(#b8844a_1px,transparent_1px)] [background-size:24px_24px]" />
+    <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_20%_20%,#ffffff_0%,#f4faff_45%,#dbeafe_100%)] text-slate-900">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-linear-to-b from-white/80 to-transparent" />
+      <div className="pointer-events-none absolute -left-24 top-32 h-72 w-72 rounded-full bg-sky-100/70 blur-3xl" />
+      <div className="pointer-events-none absolute -right-24 top-80 h-72 w-72 rounded-full bg-blue-100/70 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 opacity-30 [background-image:radial-gradient(#7dd3fc_1px,transparent_1px)] [background-size:24px_24px]" />
 
       <main className="relative z-10 mx-auto flex max-w-6xl flex-col gap-16 px-6 py-10 sm:px-10 sm:py-14">
         {/* ヘッダー */}
@@ -135,7 +135,7 @@ export default function Home() {
           <BrandLogo
             className="gap-4 font-semibold"
             iconClassName="h-16 w-16"
-            textClassName="text-3xl text-[#4a2f16]"
+            textClassName="text-3xl text-slate-900"
           />
           <div className="flex items-center gap-3 text-sm">
             <Link
@@ -148,11 +148,11 @@ export default function Home() {
         </motion.header>
 
         {/* ヒーロー */}
-        <section className="relative overflow-hidden rounded-2xl border border-[#b8844a] bg-[#f8e7c8] p-10 shadow-[0_20px_60px_rgba(116,64,0,0.18)]">
+        <section className="relative overflow-hidden rounded-2xl border border-sky-100 bg-white p-10 shadow-[0_20px_60px_rgba(14,165,233,0.12)]">
           <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-white/45" />
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-linear-to-r from-transparent via-[#9a4f00] to-transparent opacity-70" />
-          <div className="pointer-events-none absolute -right-24 -top-20 h-56 w-56 rounded-full bg-linear-to-br from-[#f2dbb4]/80 to-[#e8c38d]/50 blur-3xl" />
-          <div className="pointer-events-none absolute -left-28 bottom-[-110px] h-56 w-56 rounded-full bg-linear-to-br from-[#eed1a2]/70 to-[#f3ddb8]/30 blur-3xl" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-linear-to-r from-transparent via-sky-300 to-transparent opacity-70" />
+          <div className="pointer-events-none absolute -right-24 -top-20 h-56 w-56 rounded-full bg-linear-to-br from-sky-100/80 to-blue-100/50 blur-3xl" />
+          <div className="pointer-events-none absolute -left-28 bottom-[-110px] h-56 w-56 rounded-full bg-linear-to-br from-blue-100/70 to-sky-50/30 blur-3xl" />
           <div className="grid gap-12 lg:grid-cols-[1.2fr,0.8fr] lg:items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -160,17 +160,17 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="space-y-6"
             >
-              <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-amber-700">
-                <span className="inline-flex items-center gap-2 rounded-full border border-[#b8844a] bg-[#f2dbb4] px-3 py-1 text-[#744000]">
+              <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-sky-700">
+                <span className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-100 px-3 py-1 text-sky-700">
                   MVP BETA
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-[#b8844a] bg-[#f8e7c8] px-3 py-1 text-[#744000]">
+                <span className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white px-3 py-1 text-sky-700">
                   AI活用
-                  <SparklesIcon className="h-3 w-3 text-[#9a4f00]" />
+                  <SparklesIcon className="h-3 w-3 text-sky-500" />
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-[#b8844a] bg-[#f2dbb4] px-3 py-1 text-[#744000]">
+                <span className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-100 px-3 py-1 text-sky-700">
                   無料で始められる
-                  <CheckCircleIcon className="h-3 w-3 text-[#9a4f00]" />
+                  <CheckCircleIcon className="h-3 w-3 text-sky-500" />
                 </span>
               </div>
               
@@ -181,15 +181,15 @@ export default function Home() {
                 className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl"
               >
                 情報過多な就活を
-                <span className="bg-linear-to-r from-[#9a4f00] to-[#7a3f00] bg-clip-text text-transparent">整理</span>して
-                <span className="block text-[#6f4b25]">やるべき行動を明確にする</span>
+                <span className="bg-linear-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">整理</span>して
+                <span className="block text-slate-600">やるべき行動を明確にする</span>
               </motion.h1>
               
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
-                className="max-w-2xl text-lg leading-7 text-[#6f4b25]"
+                className="max-w-2xl text-lg leading-7 text-slate-600"
               >
                 ES・面接・企業管理が分断されると、準備の優先順位が崩れやすくなります。<br />
                 このMVPは「次に何をすべきか」を一画面で把握できるように設計しています。
