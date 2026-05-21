@@ -35,6 +35,7 @@ NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+# 本番例: NEXT_PUBLIC_SITE_URL=https://job-seeker-gray.vercel.app
 
 # AI
 AI_PROVIDER=gemini|openai
@@ -52,7 +53,7 @@ SMTP_SECURE=true
 
 Supabase Dashboard → Authentication → URL Configuration
 
-- Site URL
+- Site URL（環境ごとにどちらか1つを設定）
   - `http://localhost:3000`（ローカル）
   - `https://job-seeker-gray.vercel.app`（本番）
 - Redirect URLs
