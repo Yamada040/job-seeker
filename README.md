@@ -35,6 +35,8 @@ NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
 NEXT_PUBLIC_SITE_URL=<your-site-url>
+# 例（開発）: NEXT_PUBLIC_SITE_URL=http://localhost:3000
+# 例（本番）: NEXT_PUBLIC_SITE_URL=https://job-seeker-gray.vercel.app
 
 # AI
 AI_PROVIDER=gemini|openai
@@ -47,10 +49,6 @@ SMTP_USER=your-mail@example.com
 SMTP_PASS=your-app-password
 SMTP_SECURE=true
 ```
-
-`NEXT_PUBLIC_SITE_URL` の設定例:
-- 開発: `http://localhost:3000`
-- 本番: 実際の公開URL（例: `https://job-seeker-gray.vercel.app`）
 
 ## Supabase 認証設定
 
