@@ -49,11 +49,13 @@ SMTP_PASS=your-app-password
 SMTP_SECURE=true
 ```
 
+`NEXT_PUBLIC_SITE_URL` は、開発時は `http://localhost:3000`、本番デプロイ時は実際の公開URLに変更してください。
+
 ## Supabase 認証設定
 
 Supabase Dashboard → Authentication → URL Configuration
 
-- Site URL（環境ごとにどちらか1つを設定）
+- Site URL (環境ごとにどちらか1つを設定)
   - `http://localhost:3000`（ローカル）
   - `https://job-seeker-gray.vercel.app`（本番）
 - Redirect URLs
