@@ -34,7 +34,9 @@ npm run dev
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
-NEXT_PUBLIC_SITE_URL=... # 開発例: http://localhost:3000 / 本番例: https://job-seeker-gray.vercel.app
+NEXT_PUBLIC_SITE_URL=...
+# 開発環境の場合: http://localhost:3000
+# 本番環境の場合: https://job-seeker-gray.vercel.app
 
 # AI
 AI_PROVIDER=gemini|openai
@@ -52,7 +54,7 @@ SMTP_SECURE=true
 
 Supabase Dashboard → Authentication → URL Configuration
 
-- Site URL（1つのみ設定。開発時はローカルURL、本番デプロイ時に本番URLへ更新）
+- Site URL (1つのみ設定。開発時はローカルURL、本番デプロイ時に本番URLへ更新)
   - `http://localhost:3000`（ローカル）
   - `https://job-seeker-gray.vercel.app`（本番）
 - Redirect URLs
