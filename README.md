@@ -52,7 +52,7 @@ SMTP_SECURE=true
 
 Supabase Dashboard → Authentication → URL Configuration
 
-- Site URL (1つのみ設定。開発時はローカルURL、本番デプロイ時に本番URLへ更新。)
+- Site URL（1つのみ設定。開発時はローカルURL、本番デプロイ時に本番URLへ更新）
   - `http://localhost:3000`（ローカル）
   - `https://job-seeker-gray.vercel.app`（本番）
 - Redirect URLs
