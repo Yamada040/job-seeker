@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
-import { idAndOptionalSummarySchema } from "@/lib/validation/schemas/ai";
+import { idAndSummarySchema } from "@/lib/validation/schemas/ai";
 
 export async function POST(request: Request) {
   const supabase = await createSupabaseServerActionClient();
@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json().catch(() => null);
-  const requestValidation = idAndOptionalSummarySchema.safeParse(body);
+  const requestValidation = idAndSummarySchema.safeParse(body);
   if (!requestValidation.success)
     return NextResponse.json(
       { error: "id and summary are required" },
