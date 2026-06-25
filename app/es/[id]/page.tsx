@@ -50,7 +50,7 @@ export default async function EsDetailPage({
   const supabase = await createSupabaseReadonlyClient();
   if (!supabase) throw new Error("Supabase client unavailable");
   const { data: userData } = await supabase.auth.getUser();
-  const userId = userData?.user?.id ?? null;
+  const userId = userData.user!.id;
 
   const { data, error } = await supabase
     .from("es_entries")
