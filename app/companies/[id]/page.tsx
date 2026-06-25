@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { ArrowLeftIcon, ArrowUturnLeftIcon, HomeIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 import { updateCompany, deleteCompany } from "../actions";
@@ -13,15 +13,13 @@ import { COMPANY_FIELDS, MAX_TEXT_LEN } from "@/app/_components/form-length-guar
 export default async function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect(ROUTES.LOGIN);
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const { data, error } = await supabase
     .from("companies")
     .select("*")
     .eq("id", id)
-    .eq("user_id", userData.user.id)
+    .eq("user_id", userData.user!.id)
     .maybeSingle();
 
   if (error || !data) return notFound();

@@ -1,21 +1,10 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
-import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { ROUTES } from "@/lib/constants/routes";
 import { BrandLogo } from "@/app/_components/layout/BrandLogo";
 import { LoginClient } from "./login-client";
 
 export default async function LoginPage() {
-  const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) {
-    throw new Error("Supabase client unavailable");
-  }
-  const { data } = await supabase.auth.getUser();
-  if (data.user) {
-    return redirect(ROUTES.DASHBOARD);
-  }
-
   return (
     <div className="relative min-h-screen text-slate-900">
       <main className="mx-auto flex max-w-xl flex-col gap-6 px-6 py-12 sm:py-16">

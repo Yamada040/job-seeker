@@ -1,5 +1,4 @@
 ﻿import Link from "next/link";
-import { redirect } from "next/navigation";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 import { Database } from "@/lib/database.types";
@@ -107,8 +106,7 @@ async function getDashboardData() {
 }
 
 export default async function DashboardPage() {
-  const data = await getDashboardData().catch(() => null);
-  if (!data?.user) return redirect(ROUTES.LOGIN);
+  const data = await getDashboardData();
 
   const calendarEvents: CalendarEvent[] = [
     ...(data.calendarEvents as CalendarRow[]).map((evt) => ({

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { redirect } from "next/navigation";
 import { ArrowLeftIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
@@ -20,10 +19,8 @@ type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
 export default async function ProfilePage() {
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect(ROUTES.LOGIN);
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect(ROUTES.LOGIN);
-  const userId = userData.user.id;
+  const userId = userData.user!.id;
 
   const { data: profileData } = await supabase
     .from("profiles")
@@ -84,7 +81,7 @@ export default async function ProfilePage() {
             <label className="block space-y-2">
               <span className="text-sm font-medium text-white">メール</span>
               <input
-                value={userData.user.email ?? ""}
+                value={userData.user!.email ?? ""}
                 disabled
                 className="dq-input text-sm"
               />

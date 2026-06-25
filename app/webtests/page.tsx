@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { ArrowUturnLeftIcon, HomeIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 import { AppLayout } from "@/app/_components/layout";
@@ -23,9 +22,7 @@ type PageProps = {
 
 export default async function WebtestsPage({ searchParams }: PageProps) {
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect(ROUTES.LOGIN);
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const params = await searchParams;
   const testTypeParam = params?.test_type;
@@ -39,7 +36,7 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
   const query = supabase
     .from("webtest_questions")
     .select("id, title, test_type, category, format, difficulty, time_limit, created_at")
-    .eq("user_id", userData.user.id)
+    .eq("user_id", userData.user!.id)
     .order("created_at", { ascending: false });
 
   if (testTypeFilter) {

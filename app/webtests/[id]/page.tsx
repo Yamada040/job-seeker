@@ -16,15 +16,13 @@ export default async function WebtestDetailPage({
 }) {
   const { id } = await params;
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect(ROUTES.LOGIN);
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const { data: question } = await supabase
     .from("webtest_questions")
     .select("*")
     .eq("id", id)
-    .eq("user_id", userData.user.id)
+    .eq("user_id", userData.user!.id)
     .maybeSingle();
 
   if (!question) return redirect(ROUTES.WEBTESTS);
@@ -33,7 +31,7 @@ export default async function WebtestDetailPage({
     .from("webtest_attempts")
     .select("id,is_correct,time_spent,created_at")
     .eq("question_id", id)
-    .eq("user_id", userData.user.id)
+    .eq("user_id", userData.user!.id)
     .order("created_at", { ascending: false })
     .limit(5);
 

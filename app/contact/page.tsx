@@ -1,7 +1,4 @@
-import { redirect } from "next/navigation";
-
 import { AppLayout } from "@/app/_components/layout";
-import { ROUTES } from "@/lib/constants/routes";
 import { Database } from "@/lib/database.types";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { ContactForm } from "./_components/contact-form";
@@ -10,22 +7,19 @@ type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
 export default async function ContactPage() {
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect(ROUTES.LOGIN);
-
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect(ROUTES.LOGIN);
   const { data: profileData } = await supabase
     .from("profiles")
     .select("full_name")
-    .eq("id", userData.user.id)
+    .eq("id", userData.user!.id)
     .maybeSingle<Pick<ProfileRow, "full_name">>();
 
   const displayName =
     profileData?.full_name?.trim() ||
-    userData.user.user_metadata?.full_name ||
-    userData.user.user_metadata?.name ||
+    userData.user!.user_metadata?.full_name ||
+    userData.user!.user_metadata?.name ||
     "未設定";
-  const email = userData.user.email ?? "";
+  const email = userData.user!.email ?? "";
 
   return (
     <AppLayout

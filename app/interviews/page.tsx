@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import {
   ArrowUturnLeftIcon,
   HomeIcon,
@@ -11,16 +10,14 @@ import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 
 export default async function InterviewsListPage() {
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect(ROUTES.LOGIN);
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const { data } = await supabase
     .from("interview_logs")
     .select(
       "id, company_name, interview_title, interview_date, stage, self_review, ai_summary, created_at"
     )
-    .eq("user_id", userData.user.id)
+    .eq("user_id", userData.user!.id)
     .order("interview_date", { ascending: false });
 
   const items = data ?? [];

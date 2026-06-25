@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import {
   PlusIcon,
   ArrowUturnLeftIcon,
@@ -12,14 +11,12 @@ import { CompanyTable } from "./_components/company-table";
 
 export default async function CompaniesPage() {
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect(ROUTES.LOGIN);
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const { data, error } = await supabase
     .from("companies")
     .select("id, name, industry, stage, preference, memo, updated_at")
-    .eq("user_id", userData.user.id)
+    .eq("user_id", userData.user!.id)
     .order("updated_at", { ascending: false });
 
   if (error) throw error;
