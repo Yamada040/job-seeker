@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
-import { SupabaseClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { Database } from "@/lib/database.types";
 
@@ -14,31 +12,30 @@ const getEnv = () => {
   return { supabaseUrl, supabaseAnonKey };
 };
 
-export const createSupabaseServerReadonlyClient = async (): Promise<SupabaseClient<any>> => {
+export const createSupabaseServerReadonlyClient = async (): Promise<SupabaseClient<Database>> => {
   const { supabaseUrl, supabaseAnonKey } = getEnv();
   const cookieStore = await cookies();
-  return createServerClient<any>(supabaseUrl, supabaseAnonKey, {
+  return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value;
+      getAll() {
+        return cookieStore.getAll();
       },
     },
   });
 };
 
-export const createSupabaseServerActionClient = async (): Promise<SupabaseClient<any>> => {
+export const createSupabaseServerActionClient = async (): Promise<SupabaseClient<Database>> => {
   const { supabaseUrl, supabaseAnonKey } = getEnv();
   const cookieStore = await cookies();
-  return createServerClient<any>(supabaseUrl, supabaseAnonKey, {
+  return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value;
+      getAll() {
+        return cookieStore.getAll();
       },
-      set(name: string, value: string, options?: { path?: string }) {
-        cookieStore.set(name, value, { path: options?.path ?? "/" });
-      },
-      remove(name: string, options?: { path?: string }) {
-        cookieStore.set(name, "", { path: options?.path ?? "/", expires: new Date(0) });
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          cookieStore.set(name, value, options)
+        );
       },
     },
   });

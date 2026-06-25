@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
 import { answersPayloadSchema } from "@/lib/validation/schemas/api";
 import { awardXp } from "@/lib/xp/award-xp";
+import type { Json } from "@/lib/database.types";
 
 export async function POST(req: NextRequest) {
   const supabase = await createSupabaseServerActionClient();
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
     .from("aptitude_results")
     .insert({
       user_id: userData.user.id,
-      answers: payloadValidation.data.answers,
+      answers: payloadValidation.data.answers as Json,
     })
     .select("id")
     .maybeSingle();
