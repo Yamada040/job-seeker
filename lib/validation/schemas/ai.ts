@@ -9,13 +9,3 @@ export const idAndSummarySchema = z.object({
   id: z.string().min(1),
   summary: z.string().min(1),
 });
-
-export const idAndOptionalSummarySchema = z.object({
-  id: z.string().min(1),
-  summary: z.string().min(1),
-});
-
-export const idAndSummaryStringSchema = z.object({
-  id: z.string().min(1),
-  summary: z.string().min(1),
-});
