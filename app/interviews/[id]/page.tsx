@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { AppLayout } from "@/app/_components/layout";
 import { ROUTES } from "@/lib/constants/routes";
@@ -26,15 +26,13 @@ export default async function InterviewDetailPage({
       : undefined;
   if (!id || id === "undefined") return notFound();
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect(ROUTES.LOGIN);
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const { data: log } = await supabase
     .from("interview_logs")
     .select("*")
     .eq("id", id)
-    .eq("user_id", userData.user.id)
+    .eq("user_id", userData.user!.id)
     .maybeSingle();
 
   if (!log) return notFound();
@@ -42,7 +40,7 @@ export default async function InterviewDetailPage({
   const { data: companies } = await supabase
     .from("companies")
     .select("name")
-    .eq("user_id", userData.user.id)
+    .eq("user_id", userData.user!.id)
     .order("created_at", { ascending: false });
 
   const companyOptions =

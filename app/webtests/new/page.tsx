@@ -1,20 +1,13 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 
 import { AppLayout } from "@/app/_components/layout";
 import { ROUTES } from "@/lib/constants/routes";
-import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { createWebtestQuestion } from "../actions";
 import { FormLengthGuard } from "@/app/_components/form-length-guard";
 import { MAX_TEXT_LEN, WEBTEST_NEW_FIELDS } from "@/app/_components/form-length-guard.config";
 
 export default async function WebtestNewPage() {
-  const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect(ROUTES.LOGIN);
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect(ROUTES.LOGIN);
-
   const headerActions = (
     <div className="flex flex-wrap gap-3">
       <Link href={ROUTES.WEBTESTS} className="dq-button-secondary">

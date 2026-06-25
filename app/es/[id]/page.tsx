@@ -52,8 +52,6 @@ export default async function EsDetailPage({
   const { data: userData } = await supabase.auth.getUser();
   const userId = userData?.user?.id ?? null;
 
-  if (!userId) return redirect(ROUTES.LOGIN);
-
   const { data, error } = await supabase
     .from("es_entries")
     .select("*, ai_summary")

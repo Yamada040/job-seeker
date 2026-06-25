@@ -1,5 +1,4 @@
 ﻿import Link from "next/link";
-import { redirect } from "next/navigation";
 import {
   PlusIcon,
   ArrowUturnLeftIcon,
@@ -15,15 +14,12 @@ type EsRow = Database["public"]["Tables"]["es_entries"]["Row"];
 
 export default async function EsListPage() {
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect(ROUTES.LOGIN);
-
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const { data: esData } = await supabase
     .from("es_entries")
     .select("*")
-    .eq("user_id", userData.user.id)
+    .eq("user_id", userData.user!.id)
     .order("updated_at", { ascending: false })
     .limit(50);
   const esList: EsRow[] = esData ?? [];

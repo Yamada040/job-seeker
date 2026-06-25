@@ -116,8 +116,7 @@ async function getSummary(): Promise<Summary> {
 export default async function DeveloperDashboardPage() {
   const readonly = await createSupabaseReadonlyClient();
   const { data: userData } = await readonly.auth.getUser();
-  if (!userData.user) return redirect(ROUTES.LOGIN);
-  if (!isDeveloperUserId(userData.user.id)) return redirect(ROUTES.DASHBOARD);
+  if (!userData.user || !isDeveloperUserId(userData.user.id)) return redirect(ROUTES.DASHBOARD);
 
   const summary = await getSummary();
   const activeRate = summary.totalUsers > 0 ? Math.round((summary.activeUsers7d / summary.totalUsers) * 100) : 0;

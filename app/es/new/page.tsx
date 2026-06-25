@@ -1,22 +1,14 @@
 ﻿import Link from "next/link";
-import { redirect } from "next/navigation";
 import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
 
 import { createEs } from "../actions";
 import { ROUTES } from "@/lib/constants/routes";
 import { QuestionsEditor } from "../_components/questions-editor";
 import { AppLayout } from "@/app/_components/layout";
-import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { FormLengthGuard } from "@/app/_components/form-length-guard";
 import { ES_NEW_FIELDS, MAX_TEXT_LEN } from "@/app/_components/form-length-guard.config";
 
 export default async function NewEsPage() {
-  const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect(ROUTES.LOGIN);
-
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect(ROUTES.LOGIN);
-
   const initialQuestions = [
     { id: crypto.randomUUID(), prompt: "自己PR・強み・成果", answer_md: "" },
     { id: crypto.randomUUID(), prompt: "志望動機", answer_md: "" },

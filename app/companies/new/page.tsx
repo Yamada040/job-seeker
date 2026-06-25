@@ -1,20 +1,13 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
 
 import { createCompany } from "../actions";
 import { ROUTES } from "@/lib/constants/routes";
 import { AppLayout } from "@/app/_components/layout";
-import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { FormLengthGuard } from "@/app/_components/form-length-guard";
 import { COMPANY_FIELDS, MAX_TEXT_LEN } from "@/app/_components/form-length-guard.config";
 
 export default async function NewCompanyPage() {
-  const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect(ROUTES.LOGIN);
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect(ROUTES.LOGIN);
-
   const headerActions = (
     <div className="flex flex-wrap gap-3">
       <Link href={ROUTES.HOME} className="dq-button-secondary">

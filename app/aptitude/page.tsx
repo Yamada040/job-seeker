@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 
 import { AppLayout } from "@/app/_components/layout";
@@ -10,14 +9,12 @@ import { AptitudeAnswers } from "./types";
 
 export default async function AptitudePage() {
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect(ROUTES.LOGIN);
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect(ROUTES.LOGIN);
 
   const { data } = await supabase
     .from("aptitude_results")
     .select("*")
-    .eq("user_id", userData.user.id)
+    .eq("user_id", userData.user!.id)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
