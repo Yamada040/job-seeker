@@ -1,4 +1,7 @@
+import { cookies } from "next/headers";
 import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
+import { computeLevel } from "@/lib/xp/compute-level";
+import { LEVEL_UP_COOKIE } from "@/lib/xp/level-up-signal";
 
 type XpRule = {
   amount: number;
@@ -20,10 +23,13 @@ const XP_CONFIG: Record<string, XpRule> = {
 type XpAction = keyof typeof XP_CONFIG;
 type Client = Awaited<ReturnType<typeof createSupabaseActionClient>>;
 
-function computeLevel(xp: number) {
-  // Level 1 at 0xp, +1 level per 25xp
-  return Math.max(1, Math.floor(xp / 25) + 1);
-}
+export type AwardXpResult = {
+  awarded: boolean;
+  // レベルアップした場合は新しいレベル、しなかった場合は null
+  leveledUp: number | null;
+};
+
+const NOT_AWARDED: AwardXpResult = { awarded: false, leveledUp: null };
 
 function startOfToday() {
   const d = new Date();
@@ -31,12 +37,16 @@ function startOfToday() {
   return d;
 }
 
-export async function awardXp(userId: string, action: XpAction, opts?: { refId?: string | null; supabase?: Client }) {
+export async function awardXp(
+  userId: string,
+  action: XpAction,
+  opts?: { refId?: string | null; supabase?: Client }
+): Promise<AwardXpResult> {
   const rule = XP_CONFIG[action];
-  if (!rule) return;
+  if (!rule) return NOT_AWARDED;
 
   const supabase = opts?.supabase ?? (await createSupabaseActionClient());
-  if (!supabase) return;
+  if (!supabase) return NOT_AWARDED;
 
   // duplicate prevention by refId
   if (opts?.refId) {
@@ -47,10 +57,10 @@ export async function awardXp(userId: string, action: XpAction, opts?: { refId?:
       .eq("action", action)
       .eq("ref_id", opts.refId)
       .maybeSingle();
-    if (existing) return;
+    if (existing) return NOT_AWARDED;
   } else if (rule.requireRefId) {
     // If refId is required and not provided, skip to avoid accidental multi-grant
-    return;
+    return NOT_AWARDED;
   }
 
   // daily cap
@@ -62,7 +72,7 @@ export async function awardXp(userId: string, action: XpAction, opts?: { refId?:
       .eq("user_id", userId)
       .eq("action", action)
       .gte("created_at", since);
-    if ((count ?? 0) >= rule.dailyCap) return;
+    if ((count ?? 0) >= rule.dailyCap) return NOT_AWARDED;
   }
 
   // cooldown (days)
@@ -75,22 +85,42 @@ export async function awardXp(userId: string, action: XpAction, opts?: { refId?:
       .eq("action", action)
       .gte("created_at", since)
       .maybeSingle();
-    if (recent) return;
+    if (recent) return NOT_AWARDED;
   }
 
   const amount = rule.amount;
   const { data: profileRow } = await supabase.from("profiles").select("xp").eq("id", userId).maybeSingle();
   const currentXp = profileRow?.xp ?? 0;
   const nextXp = currentXp + amount;
-  const level = computeLevel(nextXp);
+  const prevLevel = computeLevel(currentXp);
+  const nextLevel = computeLevel(nextXp);
+  const leveledUp = nextLevel > prevLevel ? nextLevel : null;
 
-  await supabase.from("profiles").upsert({ id: userId, xp: nextXp, level }).eq("id", userId);
+  await supabase.from("profiles").upsert({ id: userId, xp: nextXp, level: nextLevel }).eq("id", userId);
   await supabase.from("xp_logs").insert({
     user_id: userId,
     xp: amount,
     action,
     ref_id: opts?.refId ?? null,
   });
+
+  if (leveledUp) {
+    // redirect() で終わる Server Action は戻り値をクライアントへ返せないため、
+    // Cookie 経由でも通知する（XpBadge が読み取り後に削除するワンショット信号）
+    try {
+      const cookieStore = await cookies();
+      cookieStore.set(LEVEL_UP_COOKIE, String(leveledUp), {
+        path: "/",
+        maxAge: 60 * 5,
+        httpOnly: false,
+        sameSite: "lax",
+      });
+    } catch {
+      // Cookie を書けないコンテキストでは戻り値のみで通知する
+    }
+  }
+
+  return { awarded: true, leveledUp };
 }
 
 export type { XpAction };

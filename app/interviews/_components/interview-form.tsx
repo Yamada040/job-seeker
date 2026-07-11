@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { AiPanel } from "@/app/_components/ai-panel";
+import { notifyXpUpdated } from "@/lib/xp/level-up-signal";
 import { InterviewQA, InterviewQuestionsPayload } from "../types";
 import { MAX_TEXT_LEN, tooLong } from "@/app/_components/validation";
 import { CompanyOption } from "./interview-fields";
@@ -232,6 +233,7 @@ export default function InterviewForm({
       if (!res.ok || !json?.id) {
         throw new Error(json?.error || "保存に失敗しました");
       }
+      notifyXpUpdated();
       setResultId(json.id);
       setPresetText(prompt);
       setPresetKey(`${Date.now()}`);

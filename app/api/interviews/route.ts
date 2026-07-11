@@ -100,7 +100,7 @@ export async function POST(request: Request) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  await awardXp(userData.user.id, "interview_log", { refId: data.id, supabase });
+  const xpResult = await awardXp(userData.user.id, "interview_log", { refId: data.id, supabase });
   revalidatePath("/dashboard");
-  return NextResponse.json({ id: data.id });
+  return NextResponse.json({ id: data.id, leveledUp: xpResult.leveledUp });
 }

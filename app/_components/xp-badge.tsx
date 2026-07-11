@@ -1,7 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/supabase-browser";
+import { computeLevel, levelThresholds } from "@/lib/xp/compute-level";
+import {
+  consumeLevelUpCookie,
+  XP_UPDATED_EVENT,
+} from "@/lib/xp/level-up-signal";
 
 type ProfileLite = {
   xp: number | null;
@@ -12,17 +17,13 @@ const PROFILE_CACHE_KEY = "profile-lite";
 const PROFILE_CACHE_TS_KEY = "profile-lite-ts";
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
-function computeLevel(xp: number) {
-  return Math.max(1, Math.floor(xp / 25) + 1);
-}
-
 export function XpBadge() {
   const [data, setData] = useState<ProfileLite | null>(null);
   const [levelUp, setLevelUp] = useState<number | null>(null);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
+  const fetchProfile = useCallback(async (force = false) => {
+    try {
+      if (!force) {
         const cached = sessionStorage.getItem(PROFILE_CACHE_KEY);
         const cachedAt = Number(
           sessionStorage.getItem(PROFILE_CACHE_TS_KEY) || "0"
@@ -34,34 +35,51 @@ export function XpBadge() {
             return;
           }
         }
-
-        const supabase = createSupabaseBrowserClient();
-        const { data: userData } = await supabase.auth.getUser();
-        const userId = userData?.user?.id;
-        if (!userId) return;
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("xp, level")
-          .eq("id", userId)
-          .maybeSingle<ProfileLite>();
-        setData(profile ?? null);
-        sessionStorage.setItem(
-          PROFILE_CACHE_KEY,
-          JSON.stringify(profile ?? null)
-        );
-        sessionStorage.setItem(PROFILE_CACHE_TS_KEY, String(Date.now()));
-      } catch {
-        // fail silently
       }
-    };
-    void fetchProfile();
+
+      const supabase = createSupabaseBrowserClient();
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData?.user?.id;
+      if (!userId) return;
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("xp, level")
+        .eq("id", userId)
+        .maybeSingle<ProfileLite>();
+      setData(profile ?? null);
+      sessionStorage.setItem(
+        PROFILE_CACHE_KEY,
+        JSON.stringify(profile ?? null)
+      );
+      sessionStorage.setItem(PROFILE_CACHE_TS_KEY, String(Date.now()));
+    } catch {
+      // fail silently
+    }
   }, []);
 
-  const { xp, level, progress, nextThreshold, prevThreshold } = useMemo(() => {
+  // XP付与直後（Server Action / API がセットした Cookie）を検知して演出を出す。
+  // マウント時（redirect で遷移してきたケース）と、同一ページ内で
+  // XP付与が完了したことを知らせるカスタムイベントの両方で確認する。
+  useEffect(() => {
+    const checkXpUpdated = (xpChanged: boolean) => {
+      const newLevel = consumeLevelUpCookie();
+      if (newLevel) {
+        setLevelUp(newLevel);
+      }
+      // XP付与後は表示中の XP/レベルも最新化する
+      void fetchProfile(xpChanged || newLevel !== null);
+    };
+
+    checkXpUpdated(false);
+    const onXpUpdated = () => checkXpUpdated(true);
+    window.addEventListener(XP_UPDATED_EVENT, onXpUpdated);
+    return () => window.removeEventListener(XP_UPDATED_EVENT, onXpUpdated);
+  }, [fetchProfile]);
+
+  const { xp, level, progress, nextThreshold } = useMemo(() => {
     const currentXp = data?.xp ?? 0;
     const lvl = data?.level ?? computeLevel(currentXp);
-    const prev = Math.max(0, (lvl - 1) * 50);
-    const next = lvl * 50;
+    const { prev, next } = levelThresholds(lvl);
     const prog =
       next > prev ? Math.min(1, (currentXp - prev) / (next - prev)) : 0;
     return {
@@ -69,7 +87,6 @@ export function XpBadge() {
       level: lvl,
       progress: prog,
       nextThreshold: next,
-      prevThreshold: prev,
     };
   }, [data]);
 
