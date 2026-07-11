@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 
 import { AiPanel } from "@/app/_components/ai-panel";
 import { notifyXpUpdated } from "@/lib/xp/level-up-signal";
@@ -24,7 +24,6 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
   const prompt = useMemo(() => buildPrompt(answers), [answers]);
   const [presetKey, setPresetKey] = useState<string | undefined>(undefined);
   const [presetText, setPresetText] = useState<string>(() => buildPrompt(defaultAnswers));
-  const [saving, setSaving] = useState(false);
 
   const toggle = (key: keyof Pick<Answers, "interests" | "strengths" | "values">, value: string) => {
     setAnswers((prev) => {
@@ -42,12 +41,11 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
     setAnswers((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSaveAnswers = async () => {
+  const [, saveAction, saving] = useActionState<null, FormData>(async () => {
     if (isMonthlyLocked) {
       alert("適性チェックは現在一回しかできません。");
-      return;
+      return null;
     }
-    setSaving(true);
     try {
       const res = await fetch("/api/aptitude/answers", {
         method: "POST",
@@ -63,10 +61,9 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
     } catch (err) {
       alert("保存に失敗しました。もう一度お試しください。");
       console.error(err);
-    } finally {
-      setSaving(false);
     }
-  };
+    return null;
+  }, null);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr]">
@@ -128,11 +125,11 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
             placeholder="選択してください"
           />
           <TextArea label="補足メモ" value={answers.otherNotes} onChange={(v) => handleChange("otherNotes", v)} />
-          <div className="flex flex-wrap gap-3">
-            <button onClick={handleSaveAnswers} disabled={saving || isMonthlyLocked} className="dq-button disabled:cursor-not-allowed disabled:opacity-60">
+          <form action={saveAction} className="flex flex-wrap gap-3">
+            <button type="submit" disabled={saving || isMonthlyLocked} className="dq-button disabled:cursor-not-allowed disabled:opacity-60">
               {isMonthlyLocked ? "実施済み" : saving ? "保存中..." : "保存する"}
             </button>
-          </div>
+          </form>
         </div>
       </div>
 

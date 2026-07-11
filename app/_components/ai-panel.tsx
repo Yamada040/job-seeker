@@ -1,11 +1,66 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useOptimistic, useReducer, useState, useTransition } from "react";
 import { CheckIcon, ClipboardDocumentIcon, CloudArrowUpIcon } from "@heroicons/react/24/outline";
 
 import { BlockingOverlay } from "./blocking-overlay";
 import { AiResponse } from "./ai-panel/types";
 import { buildCopyText, sanitizeMarkdown } from "./ai-panel/utils";
+
+type PanelState = {
+  status: "idle" | "loading" | "saving" | "error";
+  response: AiResponse | null;
+  error: string | null;
+  copied: boolean;
+  saved: boolean;
+};
+
+type PanelAction =
+  | { type: "loadStored"; response: AiResponse; saved: boolean }
+  | { type: "loadFailed"; error: string }
+  | { type: "resetForPreset" }
+  | { type: "runStart" }
+  | { type: "runSuccess"; response: AiResponse }
+  | { type: "runError"; error: string }
+  | { type: "saveStart" }
+  | { type: "saveSuccess" }
+  | { type: "saveError"; error: string }
+  | { type: "setCopied"; copied: boolean };
+
+const initialPanelState: PanelState = {
+  status: "idle",
+  response: null,
+  error: null,
+  copied: false,
+  saved: false,
+};
+
+function panelReducer(state: PanelState, action: PanelAction): PanelState {
+  switch (action.type) {
+    case "loadStored":
+      return { ...state, status: "idle", response: action.response, error: null, saved: action.saved || state.saved };
+    case "loadFailed":
+      return { ...state, status: "error", error: action.error };
+    case "resetForPreset":
+      return { ...state, status: "idle", response: null, error: null, saved: false };
+    case "runStart":
+      return { ...state, status: "loading", response: null, error: null, copied: false, saved: false };
+    case "runSuccess":
+      return { ...state, status: "idle", response: action.response };
+    case "runError":
+      return { ...state, status: "error", error: action.error };
+    case "saveStart":
+      return { ...state, status: "saving" };
+    case "saveSuccess":
+      return { ...state, status: "idle", saved: true };
+    case "saveError":
+      return { ...state, status: "error", error: action.error };
+    case "setCopied":
+      return { ...state, copied: action.copied };
+    default:
+      return state;
+  }
+}
 
 type Props = {
   kind: "es_review" | "company_analysis" | "aptitude_analysis" | "self_analysis" | "interview_review";
@@ -37,12 +92,13 @@ export function AiPanel({
   showOneShotNotice = true,
 }: Props) {
   const [input, setInput] = useState(defaultInput);
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [response, setResponse] = useState<AiResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [state, dispatch] = useReducer(panelReducer, initialPanelState);
+  const { status, response, error, copied } = state;
+  // 保存は楽観的に即時反映し、失敗時はstate.savedへ自動ロールバックする
+  const [saved, setOptimisticSaved] = useOptimistic(state.saved);
+  const [, startSaveTransition] = useTransition();
+  const loading = status === "loading";
+  const saving = status === "saving";
 
   const wordCount = useMemo(() => input.split(/\s+/).filter(Boolean).length, [input]);
 
@@ -66,25 +122,24 @@ export function AiPanel({
       try {
         const savedData = typeof initialSummary === "string" ? JSON.parse(initialSummary) : initialSummary;
         if (savedData && (savedData as AiResponse).summary) {
-          setResponse({ ...(savedData as AiResponse), provider: (savedData as AiResponse).provider || "saved" });
-          setSaved(true);
+          dispatch({
+            type: "loadStored",
+            response: { ...(savedData as AiResponse), provider: (savedData as AiResponse).provider || "saved" },
+            saved: true,
+          });
           onSaved?.();
-          setError(null);
-          setLoading(false);
           return;
         }
       } catch (err) {
         console.error("Failed to parse initialSummary:", err);
-        setError("保存済みのAI回答を読み込めませんでした。");
+        dispatch({ type: "loadFailed", error: "保存済みのAI回答を読み込めませんでした。" });
       }
     }
 
     if (cacheKey) {
       const cached = loadCache(cacheKey);
       if (cached) {
-        setResponse(cached);
-        setError(null);
-        setLoading(false);
+        dispatch({ type: "loadStored", response: cached, saved: false });
       }
     }
   }, [cacheKey, initialSummary, onSaved]);
@@ -93,9 +148,7 @@ export function AiPanel({
     if (!presetKey) return;
     if (saved && saveUrl) return;
     setInput(presetText ?? "");
-    setResponse(null);
-    setSaved(false);
-    setError(null);
+    dispatch({ type: "resetForPreset" });
   }, [presetKey, presetText, saved, saveUrl]);
 
   useEffect(() => {
@@ -111,11 +164,7 @@ export function AiPanel({
 
   const handleRun = async () => {
     if (saved && saveUrl) return;
-    setLoading(true);
-    setError(null);
-    setResponse(null);
-    setCopied(false);
-    setSaved(false);
+    dispatch({ type: "runStart" });
     try {
       const res = await fetch("/api/ai", {
         method: "POST",
@@ -126,33 +175,32 @@ export function AiPanel({
       if (!res.ok || data.error) {
         throw new Error(data.error || "AI呼び出しに失敗しました。");
       }
-      setResponse(data);
+      dispatch({ type: "runSuccess", response: data });
       if (cacheKey) saveCache(cacheKey, data);
     } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
+      dispatch({ type: "runError", error: (err as Error).message });
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!response || !saveUrl || !saveId) return;
-    setSaving(true);
-    try {
-      const res = await fetch(saveUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: saveId, summary: JSON.stringify(response) }),
-      });
-      if (!res.ok) throw new Error("保存に失敗しました。");
-      setSaved(true);
-      onSaved?.();
-    } catch (err) {
-      console.error("Save failed:", err);
-      setError("保存に失敗しました。再度お試しください。");
-    } finally {
-      setSaving(false);
-    }
+    startSaveTransition(async () => {
+      setOptimisticSaved(true);
+      dispatch({ type: "saveStart" });
+      try {
+        const res = await fetch(saveUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: saveId, summary: JSON.stringify(response) }),
+        });
+        if (!res.ok) throw new Error("保存に失敗しました。");
+        dispatch({ type: "saveSuccess" });
+        onSaved?.();
+      } catch (err) {
+        console.error("Save failed:", err);
+        dispatch({ type: "saveError", error: "保存に失敗しました。再度お試しください。" });
+      }
+    });
   };
 
   const handleCopy = async () => {
@@ -160,8 +208,8 @@ export function AiPanel({
     const text = buildCopyText(response);
     try {
       await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      dispatch({ type: "setCopied", copied: true });
+      setTimeout(() => dispatch({ type: "setCopied", copied: false }), 1500);
     } catch (err) {
       console.error("copy failed", err);
     }

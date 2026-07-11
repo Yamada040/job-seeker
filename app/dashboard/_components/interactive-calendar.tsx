@@ -2,7 +2,7 @@
 
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useMemo, useState } from "react";
+import { useActionState, useMemo, useOptimistic, useReducer, useState, useTransition } from "react";
 
 import { TYPE_LABEL } from "./calendar/constants";
 import { CalendarDayCell, CalendarEvent, CalendarFormState } from "./calendar/types";
@@ -12,25 +12,121 @@ type Props = {
   initialEvents?: CalendarEvent[];
 };
 
-export function InteractiveCalendar({ initialEvents = [] }: Props) {
-  const emptyForm: CalendarFormState = {
-    title: "",
-    company: "",
-    type: "es" as CalendarEvent["type"],
-    time: "",
-  };
+const emptyForm: CalendarFormState = {
+  title: "",
+  company: "",
+  type: "es" as CalendarEvent["type"],
+  time: "",
+};
 
+type ModalState = {
+  isModalOpen: boolean;
+  selectedDate: string;
+  editingId: string | null;
+  formState: CalendarFormState;
+  deletingId: string | null;
+};
+
+type ModalAction =
+  | { type: "openModalForDate"; date: string }
+  | { type: "closeModal" }
+  | { type: "setSelectedDate"; date: string }
+  | { type: "editPrefill"; event: CalendarEvent }
+  | { type: "resetForm" }
+  | { type: "updateForm"; patch: Partial<CalendarFormState> }
+  | { type: "saveSuccess" }
+  | { type: "deleteStart"; id: string }
+  | { type: "deleteSuccess"; id: string }
+  | { type: "deleteEnd" };
+
+function modalReducer(state: ModalState, action: ModalAction): ModalState {
+  switch (action.type) {
+    case "openModalForDate":
+      return {
+        ...state,
+        selectedDate: action.date,
+        editingId: null,
+        formState: { ...emptyForm },
+        isModalOpen: true,
+      };
+    case "closeModal":
+      return { ...state, isModalOpen: false };
+    case "setSelectedDate":
+      return { ...state, selectedDate: action.date };
+    case "editPrefill":
+      return {
+        ...state,
+        selectedDate: action.event.date,
+        formState: {
+          title: action.event.title,
+          company: action.event.company || "",
+          type: action.event.type,
+          time: action.event.time || "",
+        },
+        editingId: action.event.id,
+        isModalOpen: true,
+      };
+    case "resetForm":
+      return { ...state, formState: { ...emptyForm }, editingId: null };
+    case "updateForm":
+      return { ...state, formState: { ...state.formState, ...action.patch } };
+    case "saveSuccess":
+      return { ...state, formState: { ...emptyForm }, editingId: null };
+    case "deleteStart":
+      return { ...state, deletingId: action.id };
+    case "deleteSuccess":
+      return state.editingId === action.id
+        ? { ...state, formState: { ...emptyForm }, editingId: null }
+        : state;
+    case "deleteEnd":
+      return { ...state, deletingId: null };
+    default:
+      return state;
+  }
+}
+
+type OptimisticEventsAction =
+  | { type: "save"; event: CalendarEvent }
+  | { type: "delete"; id: string };
+
+function optimisticEventsReducer(
+  current: CalendarEvent[],
+  action: OptimisticEventsAction
+): CalendarEvent[] {
+  switch (action.type) {
+    case "save": {
+      const exists = current.some((evt) => evt.id === action.event.id);
+      if (exists) return current.map((evt) => (evt.id === action.event.id ? action.event : evt));
+      return [...current, action.event];
+    }
+    case "delete":
+      return current.filter((evt) => evt.id !== action.id);
+    default:
+      return current;
+  }
+}
+
+export function InteractiveCalendar({ initialEvents = [] }: Props) {
   const [currentMonth, setCurrentMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
   const [events, setEvents] = useState<CalendarEvent[]>(initialEvents);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string>(() => formatDateKey(new Date()));
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [formState, setFormState] = useState({ ...emptyForm });
-  const [saving, setSaving] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  // 保存・削除を楽観的に即時反映し、API失敗時はeventsへ自動ロールバックする
+  const [optimisticEvents, applyOptimisticEvents] = useOptimistic(events, optimisticEventsReducer);
+  const [, startDeleteTransition] = useTransition();
+  const [modalState, dispatch] = useReducer(
+    modalReducer,
+    null,
+    (): ModalState => ({
+      isModalOpen: false,
+      selectedDate: formatDateKey(new Date()),
+      editingId: null,
+      formState: { ...emptyForm },
+      deletingId: null,
+    })
+  );
+  const { isModalOpen, selectedDate, editingId, formState, deletingId } = modalState;
   const todayKey = formatDateKey(new Date());
   const weekdayLabel = ["日", "月", "火", "水", "木", "金", "土"];
 
@@ -67,12 +163,12 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
   }, [currentMonth]);
 
   const eventsByDate = useMemo(() => {
-    return events.reduce<Record<string, CalendarEvent[]>>((acc, evt) => {
+    return optimisticEvents.reduce<Record<string, CalendarEvent[]>>((acc, evt) => {
       const key = evt.date;
       acc[key] = acc[key] ? [...acc[key], evt] : [evt];
       return acc;
     }, {});
-  }, [events]);
+  }, [optimisticEvents]);
 
   const todayEvents = useMemo(() => {
     return (eventsByDate[todayKey] || []).slice().sort((a, b) => {
@@ -89,7 +185,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
     endOfWeek.setDate(now.getDate() + (6 - now.getDay()));
     endOfWeek.setHours(23, 59, 59, 999);
 
-    return events
+    return optimisticEvents
       .filter((evt) => {
         if (!evt.date) return false;
         const date = new Date(evt.date);
@@ -101,7 +197,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
         if (a.date !== b.date) return a.date.localeCompare(b.date);
         return (a.time || "99:99").localeCompare(b.time || "99:99");
       });
-  }, [events]);
+  }, [optimisticEvents]);
 
   const handlePrevMonth = () => {
     setCurrentMonth((prev) => {
@@ -118,15 +214,22 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
   };
 
   const openModalForDate = (date: string) => {
-    setSelectedDate(date);
-    setEditingId(null);
-    setFormState({ ...emptyForm });
-    setIsModalOpen(true);
+    dispatch({ type: "openModalForDate", date });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setSaving(true);
+  const [, submitAction, saving] = useActionState<null, FormData>(async () => {
+    // 一時ID（新規時）で即時反映し、API完了後に実データで置き換える
+    applyOptimisticEvents({
+      type: "save",
+      event: {
+        id: editingId ?? `optimistic-${Date.now()}`,
+        date: selectedDate,
+        title: formState.title || "予定",
+        company: formState.company || null,
+        type: formState.type,
+        time: formState.time || null,
+      },
+    });
     try {
       const payload = {
         date: selectedDate,
@@ -160,51 +263,42 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
         if (exists) return prev.map((evt) => (evt.id === saved.id ? saved : evt));
         return [...prev, saved];
       });
-      setFormState({ ...emptyForm });
-      setEditingId(null);
+      dispatch({ type: "saveSuccess" });
     } catch (err) {
       console.error(err);
       alert("保存に失敗しました。再度お試しください。");
-    } finally {
-      setSaving(false);
     }
-  };
+    return null;
+  }, null);
 
   const handleEditPrefill = (evt: CalendarEvent) => {
-    setSelectedDate(evt.date);
-    setFormState({
-      title: evt.title,
-      company: evt.company || "",
-      type: evt.type,
-      time: evt.time || "",
-    });
-    setEditingId(evt.id);
-    setIsModalOpen(true);
+    dispatch({ type: "editPrefill", event: evt });
   };
 
-  const handleDeleteEvent = async (evt: CalendarEvent) => {
-    if (evt.id.startsWith("es-")) return;
+  const handleDeleteEvent = (evt: CalendarEvent) => {
+    if (evt.id.startsWith("es-") || evt.id.startsWith("optimistic-")) return;
     if (!confirm("この予定を削除しますか？")) return;
 
-    setDeletingId(evt.id);
-    try {
-      const res = await fetch(`/api/calendar-events/${evt.id}`, { method: "DELETE" });
-      const json = await res.json().catch(() => null);
-      if (!res.ok || !json?.data?.id) {
-        throw new Error(json?.error ?? "削除に失敗しました");
-      }
+    startDeleteTransition(async () => {
+      // 楽観的に即時削除し、API失敗時はロールバックする
+      applyOptimisticEvents({ type: "delete", id: evt.id });
+      dispatch({ type: "deleteStart", id: evt.id });
+      try {
+        const res = await fetch(`/api/calendar-events/${evt.id}`, { method: "DELETE" });
+        const json = await res.json().catch(() => null);
+        if (!res.ok || !json?.data?.id) {
+          throw new Error(json?.error ?? "削除に失敗しました");
+        }
 
-      setEvents((prev) => prev.filter((item) => item.id !== evt.id));
-      if (editingId === evt.id) {
-        setFormState({ ...emptyForm });
-        setEditingId(null);
+        setEvents((prev) => prev.filter((item) => item.id !== evt.id));
+        dispatch({ type: "deleteSuccess", id: evt.id });
+      } catch (err) {
+        console.error(err);
+        alert("削除に失敗しました。再度お試しください。");
+      } finally {
+        dispatch({ type: "deleteEnd" });
       }
-    } catch (err) {
-      console.error(err);
-      alert("削除に失敗しました。再度お試しください。");
-    } finally {
-      setDeletingId(null);
-    }
+    });
   };
 
   return (
@@ -379,7 +473,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
               <button
                 type="button"
                 className="sidebar-link-style text-sm text-white/70"
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => dispatch({ type: "closeModal" })}
               >
                 閉じる
               </button>
@@ -388,10 +482,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
             <div className="mt-3 flex flex-wrap gap-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    setFormState({ ...emptyForm });
-                    setEditingId(null);
-                  }}
+                  onClick={() => dispatch({ type: "resetForm" })}
                   className="sidebar-link-style text-xs"
                 >
                   <PlusIcon className="h-4 w-4" />
@@ -460,14 +551,14 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
 
             <form
               className="mt-4 space-y-3 border-t border-white/20 pt-4"
-              onSubmit={handleSubmit}
+              action={submitAction}
             >
               <div className="space-y-1">
                 <label className="text-xs text-white/70">日付</label>
                 <input
                   type="date"
                   value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
+                  onChange={(e) => dispatch({ type: "setSelectedDate", date: e.target.value })}
                   className="dq-input text-sm"
                   required
                 />
@@ -478,10 +569,10 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                   <select
                     value={formState.type}
                     onChange={(e) =>
-                      setFormState((prev) => ({
-                        ...prev,
-                        type: e.target.value as CalendarEvent["type"],
-                      }))
+                      dispatch({
+                        type: "updateForm",
+                        patch: { type: e.target.value as CalendarEvent["type"] },
+                      })
                     }
                     className="dq-input text-sm"
                   >
@@ -496,7 +587,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                   <input
                     type="time"
                     value={formState.time}
-                    onChange={(e) => setFormState((prev) => ({ ...prev, time: e.target.value }))}
+                    onChange={(e) => dispatch({ type: "updateForm", patch: { time: e.target.value } })}
                     className="dq-input text-sm"
                   />
                 </div>
@@ -506,7 +597,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                 <input
                   type="text"
                   value={formState.company}
-                  onChange={(e) => setFormState((prev) => ({ ...prev, company: e.target.value }))}
+                  onChange={(e) => dispatch({ type: "updateForm", patch: { company: e.target.value } })}
                   className="dq-input text-sm"
                   placeholder="例）テック株式会社"
                 />
@@ -516,7 +607,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                 <input
                   type="text"
                   value={formState.title}
-                  onChange={(e) => setFormState((prev) => ({ ...prev, title: e.target.value }))}
+                  onChange={(e) => dispatch({ type: "updateForm", patch: { title: e.target.value } })}
                   className="dq-input text-sm"
                   placeholder="例）一次面接 / ES締切"
                   required
@@ -525,10 +616,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    setFormState({ ...emptyForm });
-                    setEditingId(null);
-                  }}
+                  onClick={() => dispatch({ type: "resetForm" })}
                   className="sidebar-link-style text-sm"
                 >
                   入力をクリア
