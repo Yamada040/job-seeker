@@ -13,8 +13,8 @@ async function fetchProfileLite(): Promise<ProfileLite | null> {
       .from("profiles")
       .select("xp, level")
       .eq("id", userId)
-      .maybeSingle<ProfileLite>();
-    return profile ?? null;
+      .maybeSingle<Pick<ProfileLite, "xp" | "level">>();
+    return profile ? { userId, ...profile } : null;
   } catch {
     // fail silently（バッジは既定表示にフォールバック）
     return null;

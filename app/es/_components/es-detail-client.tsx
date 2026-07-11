@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { TrashIcon } from "@heroicons/react/24/outline";
+import { notifyXpUpdated } from "@/lib/xp/level-up-signal";
 import { Entry, Question } from "./es-detail/types";
 import { EsAiPanel } from "./ai-es-panel";
 import { QuestionsEditor } from "./questions-editor";
@@ -39,7 +40,14 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
       {editing ? (
         <div className="grid gap-4 lg:grid-cols-[1.4fr,0.9fr]">
           <div className="rounded-xl border border-[#3f3f46] bg-[#111111] p-6">
-            <form action={handleUpdate} className="space-y-4">
+            <form
+              action={async (formData) => {
+                await handleUpdate(formData);
+                // 提出でXPが付与された場合、XpBadge にレベルアップ Cookie の確認を促す
+                notifyXpUpdated();
+              }}
+              className="space-y-4"
+            >
               <div className="space-y-2">
                 <label className="block text-xs text-white/70">
                   企業名<span className="text-rose-500">*</span>

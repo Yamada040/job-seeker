@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { AiPanel } from "@/app/_components/ai-panel";
+import { notifyXpUpdated } from "@/lib/xp/level-up-signal";
 
 type Answers = {
   strengths: string;
@@ -53,14 +54,12 @@ export default function SelfAnalysisForm({
   const prompt = useMemo(() => buildPrompt(answers), [answers]);
   const [presetKey, setPresetKey] = useState<string | undefined>(undefined);
   const [presetText, setPresetText] = useState<string>(() => buildPrompt(defaultAnswers));
-  const [saving, setSaving] = useState(false);
 
-  const handleRun = async () => {
+  const [, saveAction, saving] = useActionState<null, FormData>(async () => {
     if (isMonthlyLocked) {
       alert("自己分析は現在一回しかできません。");
-      return;
+      return null;
     }
-    setSaving(true);
     try {
       const res = await fetch("/api/self-analysis/answers", {
         method: "POST",
@@ -71,16 +70,16 @@ export default function SelfAnalysisForm({
       if (!res.ok || !json?.id) {
         throw new Error(json?.error || "保存に失敗しました");
       }
+      notifyXpUpdated();
       setResultId(json.id);
       setPresetText(prompt);
       setPresetKey(`${Date.now()}`);
     } catch (err) {
       alert("保存に失敗しました。もう一度お試しください。");
       console.error(err);
-    } finally {
-      setSaving(false);
     }
-  };
+    return null;
+  }, null);
 
   const handleChange = (key: keyof Answers, value: string) => {
     setAnswers((prev) => ({ ...prev, [key]: value }));
@@ -123,11 +122,11 @@ export default function SelfAnalysisForm({
             value={answers.future}
             onChange={(v) => handleChange("future", v)}
           />
-          <div className="flex flex-wrap gap-3">
-            <button onClick={handleRun} disabled={saving || isMonthlyLocked} className="dq-button disabled:cursor-not-allowed disabled:opacity-60">
+          <form action={saveAction} className="flex flex-wrap gap-3">
+            <button type="submit" disabled={saving || isMonthlyLocked} className="dq-button disabled:cursor-not-allowed disabled:opacity-60">
               {isMonthlyLocked ? "実施済み" : saving ? "保存中..." : "保存する"}
             </button>
-          </div>
+          </form>
         </div>
       </div>
 

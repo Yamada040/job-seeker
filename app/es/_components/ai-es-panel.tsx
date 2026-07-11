@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { AiPanel } from "@/app/_components/ai-panel";
 
@@ -28,8 +28,7 @@ export function EsAiPanel({
   defaultTitle,
 }: Props) {
   const [presetKey, setPresetKey] = useState<string | undefined>(undefined);
-  const [presetText, setPresetText] = useState<string>("");
-  const [saved, setSaved] = useState(false);
+  const [userSaved, setUserSaved] = useState(false);
 
   const aiInput = useMemo(() => {
     const meta = [
@@ -41,15 +40,8 @@ export function EsAiPanel({
     return [...meta, content].filter(Boolean).join("\n\n");
   }, [content, defaultCompanyName, defaultStatus, defaultCompanyUrl, defaultTitle]);
 
-  useEffect(() => {
-    setPresetText(aiInput);
-  }, [aiInput]);
-
-  useEffect(() => {
-    if (initialSummary) {
-      setSaved(true);
-    }
-  }, [initialSummary]);
+  // 保存済みかどうかは props（initialSummary）とユーザー操作（保存完了）からの派生値
+  const saved = userSaved || Boolean(initialSummary);
 
   return (
     <div className="space-y-3">
@@ -58,7 +50,6 @@ export function EsAiPanel({
           type="button"
           onClick={() => {
             if (saved && saveUrl) return;
-            setPresetText(aiInput);
             setPresetKey(`${Date.now()}`);
           }}
           disabled={saved && !!saveUrl}
@@ -71,7 +62,7 @@ export function EsAiPanel({
       <AiPanel
         kind="es_review"
         defaultInput={aiInput}
-        presetText={presetText}
+        presetText={aiInput}
         presetKey={presetKey}
         cacheKey={cacheKey}
         initialSummary={initialSummary}
@@ -79,7 +70,7 @@ export function EsAiPanel({
         saveId={saveId}
         title="AI添削パネル"
         hint="ボタンでES内容を転記してから送信してください。保存後は再実行できません。"
-        onSaved={() => setSaved(true)}
+        onSaved={() => setUserSaved(true)}
       />
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {
   Suspense,
   use,
@@ -9,18 +10,40 @@ import {
   useSyncExternalStore,
 } from "react";
 
+import {
+  computeLevel,
+  levelThresholds,
+  XP_PER_LEVEL,
+} from "@/lib/xp/compute-level";
+import {
+  consumeXpStatusCookie,
+  XP_UPDATED_EVENT,
+} from "@/lib/xp/level-up-signal";
+
 export type ProfileLite = {
+  userId: string | null;
   xp: number | null;
   level: number | null;
 };
 
 const PROFILE_CACHE_KEY = "profile-lite";
-
-function computeLevel(xp: number) {
-  return Math.max(1, Math.floor(xp / 25) + 1);
-}
+const profileCacheKey = (userId: string) => `profile-lite:${userId}`;
 
 const subscribeNoop = () => () => {};
+
+function cacheProfile(profile: ProfileLite | null) {
+  try {
+    sessionStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profile ?? null));
+    if (profile?.userId) {
+      sessionStorage.setItem(
+        profileCacheKey(profile.userId),
+        JSON.stringify(profile)
+      );
+    }
+  } catch {
+    // fail silently
+  }
+}
 
 function readCachedProfileRaw(): string | null {
   try {
@@ -42,15 +65,12 @@ function XpBadgeResolved({
 }) {
   const data = use(profilePromise);
 
-  useEffect(() => {
-    try {
-      sessionStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(data ?? null));
-    } catch {
-      // fail silently
-    }
-  }, [data]);
-
-  return <XpBadgeView data={data} />;
+  return (
+    <XpBadgeView
+      key={`${data?.userId ?? "guest"}:${data?.xp ?? 0}:${data?.level ?? 0}`}
+      data={data}
+    />
+  );
 }
 
 /**
@@ -75,7 +95,7 @@ function XpBadgeFallback() {
     }
   }, [raw]);
 
-  return <XpBadgeView data={cached} />;
+  return <XpBadgeStatus data={cached} />;
 }
 
 export function XpBadge({
@@ -91,63 +111,50 @@ export function XpBadge({
 }
 
 function XpBadgeView({ data }: { data: ProfileLite | null }) {
+  const [displayData, setDisplayData] = useState<ProfileLite | null>(data);
   const [levelUp, setLevelUp] = useState<number | null>(null);
 
-  const { xp, level, progress, nextThreshold } = useMemo(() => {
-    const currentXp = data?.xp ?? 0;
-    const lvl = data?.level ?? computeLevel(currentXp);
-    const prev = Math.max(0, (lvl - 1) * 50);
-    const next = lvl * 50;
-    const prog =
-      next > prev ? Math.min(1, (currentXp - prev) / (next - prev)) : 0;
-    return {
-      xp: currentXp,
-      level: lvl,
-      progress: prog,
-      nextThreshold: next,
+  useEffect(() => {
+    cacheProfile(displayData);
+  }, [displayData]);
+
+  useEffect(() => {
+    const applyXpStatus = () => {
+      const status = consumeXpStatusCookie();
+      if (!status) return;
+
+      const profile: ProfileLite = {
+        userId: data?.userId ?? null,
+        xp: status.xp,
+        level: status.level,
+      };
+      setDisplayData(profile);
+      if (status.leveledUp) {
+        setLevelUp(status.leveledUp);
+      }
     };
-  }, [data]);
+
+    applyXpStatus();
+    window.addEventListener(XP_UPDATED_EVENT, applyXpStatus);
+    return () => window.removeEventListener(XP_UPDATED_EVENT, applyXpStatus);
+  }, [data?.userId]);
 
   return (
     <>
-      {/* 1. 常駐ステータスバー：DQウィンドウ形式に戻す */}
-      <div className="flex min-w-[600px] flex-1 items-center gap-4 rounded-md px-2 py-1 text-white">
-        <div className="flex items-baseline gap-2">
-          <span className="text-[10px] font-bold tracking-widest text-white/90">
-            LEVEL
-          </span>
-          <span className="text-2xl font-bold tracking-tighter text-white">
-            Lv {level}
-          </span>
-          <span className="text-xs text-white/80">XP {xp}</span>
-        </div>
-        <div className="flex flex-1 flex-col gap-1 min-w-[180px]">
-          <div className="h-2.5 w-full border border-white bg-black/40 p-[2px]">
-            <div
-              className="h-full bg-yellow-300 transition-all duration-1000"
-              style={{ width: `${Math.round(progress * 100)}%` }}
-            />
-          </div>
-          <div className="flex justify-between text-[10px] font-bold tracking-tight text-white">
-            <span>
-              つぎの レベルまで {Math.max(0, nextThreshold - xp)} XP
-            </span>
-            <span>
-              {xp} / {nextThreshold}
-            </span>
-          </div>
-        </div>
-      </div>
+      <XpBadgeStatus data={displayData} />
 
       {/* 2. レベルアップ演出：モーダル（全画面中央） */}
       {levelUp && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
           <div className="relative aspect-video w-full max-w-[650px] overflow-hidden border-4 border-white shadow-2xl">
-            {/* 背景画像：levelup.jpg (常駐バーより鮮明に表示) */}
-            <img
-              src="/levelup.jpg"
+            {/* 背景画像：levelup.jpeg (常駐バーより鮮明に表示) */}
+            <Image
+              src="/levelup.jpeg"
               alt="Level Up Background"
-              className="absolute inset-0 h-full w-full object-cover opacity-90"
+              fill
+              sizes="(max-width: 650px) 100vw, 650px"
+              className="object-cover opacity-90"
+              priority
             />
 
             {/* DQ風メッセージウィンドウ */}
@@ -158,7 +165,7 @@ function XpBadgeView({ data }: { data: ProfileLite | null }) {
                   LEVEL UP!
                 </span>
 
-                <div className="text-center space-y-4">
+                <div className="space-y-4 text-center">
                   <p className="text-xl font-bold leading-relaxed text-white">
                     おめでとう！
                     <br />
@@ -167,7 +174,7 @@ function XpBadgeView({ data }: { data: ProfileLite | null }) {
 
                   <button
                     type="button"
-                    className="group flex items-center justify-center w-full gap-2 text-2xl font-bold text-white transition hover:text-yellow-400"
+                    className="group flex w-full items-center justify-center gap-2 text-2xl font-bold text-white transition hover:text-yellow-400"
                     onClick={() => setLevelUp(null)}
                   >
                     <span className="animate-pulse">▶</span>
@@ -180,5 +187,50 @@ function XpBadgeView({ data }: { data: ProfileLite | null }) {
         </div>
       )}
     </>
+  );
+}
+
+function XpBadgeStatus({ data }: { data: ProfileLite | null }) {
+  const { xp, level, progress, xpIntoLevel, xpToNext } = useMemo(() => {
+    const currentXp = data?.xp ?? 0;
+    // DB の level は古い計算式で保存されている可能性があるため、常に XP から導出する
+    const lvl = computeLevel(currentXp);
+    const { prev, next } = levelThresholds(lvl);
+    const into = currentXp - prev;
+    return {
+      xp: currentXp,
+      level: lvl,
+      progress: Math.min(1, into / XP_PER_LEVEL),
+      xpIntoLevel: into,
+      xpToNext: Math.max(0, next - currentXp),
+    };
+  }, [data]);
+
+  return (
+    <div className="flex min-w-[600px] flex-1 items-center gap-4 rounded-md px-2 py-1">
+      <div className="flex items-baseline gap-2">
+        <span className="text-[10px] font-bold tracking-widest text-sky-600">
+          LEVEL
+        </span>
+        <span className="theme-readable text-2xl font-bold tracking-tighter">
+          Lv {level}
+        </span>
+        <span className="theme-readable-muted text-xs">XP {xp}</span>
+      </div>
+      <div className="flex min-w-[180px] flex-1 flex-col gap-1">
+        <div className="h-2.5 w-full rounded-full border border-sky-300 bg-sky-100 p-[2px]">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-sky-400 to-sky-600"
+            style={{ width: `${Math.round(progress * 100)}%` }}
+          />
+        </div>
+        <div className="theme-readable-muted flex justify-between text-[10px] font-bold tracking-tight">
+          <span>つぎの レベルまで {xpToNext} XP</span>
+          <span>
+            {xpIntoLevel} / {XP_PER_LEVEL}
+          </span>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -55,11 +55,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  await awardXp(userData.user.id, "aptitude_complete", {
+  const xpResult = await awardXp(userData.user.id, "aptitude_complete", {
     refId: data.id,
     supabase,
   });
   revalidatePath("/dashboard");
 
-  return NextResponse.json({ id: data.id });
+  return NextResponse.json({ id: data.id, leveledUp: xpResult.leveledUp });
 }
