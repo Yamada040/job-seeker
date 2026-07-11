@@ -94,8 +94,7 @@ export function Header({
               {showBrand ? (
                 <BrandLogo
                   className="w-60 pl-16"
-                  iconClassName="h-14 w-14"
-                  textClassName="app-brand-text"
+                  logoClassName="h-14"
                 />
               ) : null}
               {leftContent ? (
