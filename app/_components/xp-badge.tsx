@@ -1,8 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { createSupabaseBrowserClient } from "@/lib/supabase/supabase-browser";
+import {
+  Suspense,
+  use,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
+
 import {
   computeLevel,
   levelThresholds,
@@ -13,141 +20,132 @@ import {
   XP_UPDATED_EVENT,
 } from "@/lib/xp/level-up-signal";
 
-type ProfileLite = {
+export type ProfileLite = {
+  userId: string | null;
   xp: number | null;
   level: number | null;
 };
 
-// ユーザー切り替え時に前のユーザーのキャッシュを拾わないよう userId でキーを分ける
+const PROFILE_CACHE_KEY = "profile-lite";
 const profileCacheKey = (userId: string) => `profile-lite:${userId}`;
 
-async function getSessionUserId(): Promise<string | null> {
-  // getSession はローカル読みのみでネットワークを伴わない
-  const supabase = createSupabaseBrowserClient();
-  const { data } = await supabase.auth.getSession();
-  return data?.session?.user?.id ?? null;
+const subscribeNoop = () => () => {};
+
+function cacheProfile(profile: ProfileLite | null) {
+  try {
+    sessionStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profile ?? null));
+    if (profile?.userId) {
+      sessionStorage.setItem(
+        profileCacheKey(profile.userId),
+        JSON.stringify(profile)
+      );
+    }
+  } catch {
+    // fail silently
+  }
 }
 
-export function XpBadge() {
-  const [data, setData] = useState<ProfileLite | null>(null);
+function readCachedProfileRaw(): string | null {
+  try {
+    return sessionStorage.getItem(PROFILE_CACHE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Server Component から渡された promise を use() で解決して表示する。
+ * 解決値は sessionStorage にキャッシュし、ページ遷移中の
+ * Suspense fallback（XpBadgeFallback）でのちらつき防止に使う。
+ */
+function XpBadgeResolved({
+  profilePromise,
+}: {
+  profilePromise: Promise<ProfileLite | null>;
+}) {
+  const data = use(profilePromise);
+
+  return (
+    <XpBadgeView
+      key={`${data?.userId ?? "guest"}:${data?.xp ?? 0}:${data?.level ?? 0}`}
+      data={data}
+    />
+  );
+}
+
+/**
+ * Suspense fallback。前回表示時の sessionStorage キャッシュがあれば
+ * それを表示してちらつきを防ぐ（初回はデフォルト表示）。
+ */
+function XpBadgeFallback() {
+  // SSR では null（デフォルト表示）、クライアントでは sessionStorage を
+  // 参照してハイドレーション不整合なく前回値を表示する。
+  const raw = useSyncExternalStore(
+    subscribeNoop,
+    readCachedProfileRaw,
+    () => null
+  );
+
+  const cached = useMemo(() => {
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as ProfileLite | null;
+    } catch {
+      return null;
+    }
+  }, [raw]);
+
+  return <XpBadgeStatus data={cached} />;
+}
+
+export function XpBadge({
+  profilePromise,
+}: {
+  profilePromise: Promise<ProfileLite | null>;
+}) {
+  return (
+    <Suspense fallback={<XpBadgeFallback />}>
+      <XpBadgeResolved profilePromise={profilePromise} />
+    </Suspense>
+  );
+}
+
+function XpBadgeView({ data }: { data: ProfileLite | null }) {
+  const [displayData, setDisplayData] = useState<ProfileLite | null>(data);
   const [levelUp, setLevelUp] = useState<number | null>(null);
 
-  // DB からの取得はセッション初回のみ。以降の XP 変動は awardXp が発行する
-  // Cookie（xp / level / leveledUp を含む）から反映するため、再フェッチしない。
-  const fetchProfile = useCallback(async () => {
-    try {
-      const userId = await getSessionUserId();
-      if (!userId) return;
-
-      const cached = sessionStorage.getItem(profileCacheKey(userId));
-      if (cached) {
-        setData(JSON.parse(cached) as ProfileLite | null);
-        return;
-      }
-
-      const supabase = createSupabaseBrowserClient();
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("xp, level")
-        .eq("id", userId)
-        .maybeSingle<ProfileLite>();
-      setData(profile ?? null);
-      sessionStorage.setItem(
-        profileCacheKey(userId),
-        JSON.stringify(profile ?? null)
-      );
-    } catch {
-      // fail silently
-    }
-  }, []);
-
-  // XP付与直後（Server Action / API がセットした Cookie）を検知し、
-  // Cookie に載っている付与後の値をそのまま表示へ反映する（DB 再取得なし）。
-  // マウント時（redirect で遷移してきたケース）と、同一ページ内で
-  // XP付与が完了したことを知らせるカスタムイベントの両方で確認する。
-  const applyXpStatus = useCallback(async () => {
-    const status = consumeXpStatusCookie();
-    if (!status) return false;
-
-    const profile: ProfileLite = { xp: status.xp, level: status.level };
-    setData(profile);
-    if (status.leveledUp) {
-      setLevelUp(status.leveledUp);
-    }
-    try {
-      const userId = await getSessionUserId();
-      if (userId) {
-        sessionStorage.setItem(
-          profileCacheKey(userId),
-          JSON.stringify(profile)
-        );
-      }
-    } catch {
-      // fail silently
-    }
-    return true;
-  }, []);
+  useEffect(() => {
+    cacheProfile(displayData);
+  }, [displayData]);
 
   useEffect(() => {
-    void (async () => {
-      const applied = await applyXpStatus();
-      if (!applied) {
-        void fetchProfile();
+    const applyXpStatus = () => {
+      const status = consumeXpStatusCookie();
+      if (!status) return;
+
+      const profile: ProfileLite = {
+        userId: data?.userId ?? null,
+        xp: status.xp,
+        level: status.level,
+      };
+      setDisplayData(profile);
+      if (status.leveledUp) {
+        setLevelUp(status.leveledUp);
       }
-    })();
-
-    const onXpUpdated = () => void applyXpStatus();
-    window.addEventListener(XP_UPDATED_EVENT, onXpUpdated);
-    return () => window.removeEventListener(XP_UPDATED_EVENT, onXpUpdated);
-  }, [applyXpStatus, fetchProfile]);
-
-  const { xp, level, progress, xpIntoLevel, xpToNext } = useMemo(() => {
-    const currentXp = data?.xp ?? 0;
-    // DB の level は古い計算式で保存されている可能性があるため、常に XP から導出する
-    const lvl = computeLevel(currentXp);
-    const { prev, next } = levelThresholds(lvl);
-    const into = currentXp - prev;
-    return {
-      xp: currentXp,
-      level: lvl,
-      progress: Math.min(1, into / XP_PER_LEVEL),
-      xpIntoLevel: into,
-      xpToNext: Math.max(0, next - currentXp),
     };
-  }, [data]);
+
+    applyXpStatus();
+    window.addEventListener(XP_UPDATED_EVENT, applyXpStatus);
+    return () => window.removeEventListener(XP_UPDATED_EVENT, applyXpStatus);
+  }, [data?.userId]);
 
   return (
     <>
-      {/* 1. 常駐ステータスバー：白基調テーマに合わせた配色 */}
-      <div className="flex min-w-[600px] flex-1 items-center gap-4 rounded-md px-2 py-1">
-        <div className="flex items-baseline gap-2">
-          <span className="text-[10px] font-bold tracking-widest text-sky-600">
-            LEVEL
-          </span>
-          <span className="theme-readable text-2xl font-bold tracking-tighter">
-            Lv {level}
-          </span>
-          <span className="theme-readable-muted text-xs">XP {xp}</span>
-        </div>
-        <div className="flex flex-1 flex-col gap-1 min-w-[180px]">
-          <div className="h-2.5 w-full rounded-full border border-sky-300 bg-sky-100 p-[2px]">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-sky-400 to-sky-600"
-              style={{ width: `${Math.round(progress * 100)}%` }}
-            />
-          </div>
-          <div className="theme-readable-muted flex justify-between text-[10px] font-bold tracking-tight">
-            <span>つぎの レベルまで {xpToNext} XP</span>
-            <span>
-              {xpIntoLevel} / {XP_PER_LEVEL}
-            </span>
-          </div>
-        </div>
-      </div>
+      <XpBadgeStatus data={displayData} />
 
       {/* 2. レベルアップ演出：モーダル（全画面中央） */}
       {levelUp && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
           <div className="relative aspect-video w-full max-w-[650px] overflow-hidden border-4 border-white shadow-2xl">
             {/* 背景画像：levelup.jpeg (常駐バーより鮮明に表示) */}
             <Image
@@ -167,7 +165,7 @@ export function XpBadge() {
                   LEVEL UP!
                 </span>
 
-                <div className="text-center space-y-4">
+                <div className="space-y-4 text-center">
                   <p className="text-xl font-bold leading-relaxed text-white">
                     おめでとう！
                     <br />
@@ -176,7 +174,7 @@ export function XpBadge() {
 
                   <button
                     type="button"
-                    className="group flex items-center justify-center w-full gap-2 text-2xl font-bold text-white transition hover:text-yellow-400"
+                    className="group flex w-full items-center justify-center gap-2 text-2xl font-bold text-white transition hover:text-yellow-400"
                     onClick={() => setLevelUp(null)}
                   >
                     <span className="animate-pulse">▶</span>
@@ -189,5 +187,50 @@ export function XpBadge() {
         </div>
       )}
     </>
+  );
+}
+
+function XpBadgeStatus({ data }: { data: ProfileLite | null }) {
+  const { xp, level, progress, xpIntoLevel, xpToNext } = useMemo(() => {
+    const currentXp = data?.xp ?? 0;
+    // DB の level は古い計算式で保存されている可能性があるため、常に XP から導出する
+    const lvl = computeLevel(currentXp);
+    const { prev, next } = levelThresholds(lvl);
+    const into = currentXp - prev;
+    return {
+      xp: currentXp,
+      level: lvl,
+      progress: Math.min(1, into / XP_PER_LEVEL),
+      xpIntoLevel: into,
+      xpToNext: Math.max(0, next - currentXp),
+    };
+  }, [data]);
+
+  return (
+    <div className="flex min-w-[600px] flex-1 items-center gap-4 rounded-md px-2 py-1">
+      <div className="flex items-baseline gap-2">
+        <span className="text-[10px] font-bold tracking-widest text-sky-600">
+          LEVEL
+        </span>
+        <span className="theme-readable text-2xl font-bold tracking-tighter">
+          Lv {level}
+        </span>
+        <span className="theme-readable-muted text-xs">XP {xp}</span>
+      </div>
+      <div className="flex min-w-[180px] flex-1 flex-col gap-1">
+        <div className="h-2.5 w-full rounded-full border border-sky-300 bg-sky-100 p-[2px]">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-sky-400 to-sky-600"
+            style={{ width: `${Math.round(progress * 100)}%` }}
+          />
+        </div>
+        <div className="theme-readable-muted flex justify-between text-[10px] font-bold tracking-tight">
+          <span>つぎの レベルまで {xpToNext} XP</span>
+          <span>
+            {xpIntoLevel} / {XP_PER_LEVEL}
+          </span>
+        </div>
+      </div>
+    </div>
   );
 }
