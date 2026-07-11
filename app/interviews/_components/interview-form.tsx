@@ -7,10 +7,6 @@ import { notifyXpUpdated } from "@/lib/xp/level-up-signal";
 import { InterviewQA, InterviewQuestionsPayload } from "../types";
 import { MAX_TEXT_LEN, tooLong } from "@/app/_components/validation";
 import { CompanyOption } from "./interview-fields";
-import { InterviewMetaFields } from "./InterviewMetaFields";
-import { InterviewQuestionsSection } from "./InterviewQuestionsSection";
-import { InterviewReflectionSection } from "./InterviewReflectionSection";
-import { InterviewSelfReviewSection } from "./InterviewSelfReviewSection";
 
 type Props = {
   mode: "create" | "update";
