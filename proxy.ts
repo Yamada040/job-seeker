@@ -5,7 +5,7 @@ import { ROUTES } from "@/lib/constants/routes";
 // 認証不要のパス
 const PUBLIC_PATHS = [ROUTES.HOME, ROUTES.LOGIN, "/auth/callback"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
