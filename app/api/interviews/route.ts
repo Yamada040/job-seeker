@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
 import { InterviewQA } from "@/app/interviews/types";
+import { interviewRequestSchema } from "@/lib/validation/schemas/interviews";
+import { MAX_TEXT_LEN, tooLong, required } from "@/app/_components/validation";
+import { awardXp } from "@/lib/xp/award-xp";
+import { revalidatePath } from "next/cache";
 
 type QuestionsInput =
   | {
@@ -52,25 +56,32 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
-  const companyName = body?.companyName as string | undefined;
-  if (!companyName) {
-    return NextResponse.json({ error: "companyName is required" }, { status: 400 });
-  }
-  const template = Boolean(body?.template);
+  const requestValidation = interviewRequestSchema.safeParse(body);
+  if (!requestValidation.success) return NextResponse.json({ error: required("企業名") }, { status: 400 });
+  const companyName = requestValidation.data.companyName.trim();
+  if (!companyName) return NextResponse.json({ error: required("企業名") }, { status: 400 });
 
-  // 任意入力に緩和。空でも保存可能にする。
-  const stage = (body?.stage as string | undefined)?.trim() || null;
-  const interviewDate = (body?.interviewDate as string | undefined) ?? null;
+  const stage = requestValidation.data.stage?.trim() || null;
+  const interviewDate = requestValidation.data.interviewDate ?? null;
+  const format = requestValidation.data.interviewFormat?.trim() || null;
+  const interviewTitle = requestValidation.data.interviewTitle?.trim() || null;
+  const template = Boolean(requestValidation.data.template);
 
-  const format = (body?.interviewFormat as string | undefined)?.trim() || null;
-  const normalized = normalizeQuestions(body?.questions as QuestionsInput);
+  if (companyName.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("企業名") }, { status: 400 });
+  if (stage && stage.length > MAX_TEXT_LEN)
+    return NextResponse.json({ error: tooLong("面接回次/ステージ") }, { status: 400 });
+  if (format && format.length > MAX_TEXT_LEN) return NextResponse.json({ error: tooLong("面接形式") }, { status: 400 });
+  if (interviewTitle && interviewTitle.length > MAX_TEXT_LEN)
+    return NextResponse.json({ error: tooLong("タイトル") }, { status: 400 });
+
+  const normalized = normalizeQuestions(requestValidation.data.questions as QuestionsInput);
   if (!normalized.items.length) {
-    return NextResponse.json({ error: "At least one question/answer is required" }, { status: 400 });
+    return NextResponse.json({ error: "少なくとも1件の質問/回答を入力してください" }, { status: 400 });
   }
 
   const reflectionText = [
-    normalized.reflection.improvement ? `改善したい点: ${normalized.reflection.improvement}` : "",
-    normalized.reflection.unexpected ? `想定外だったこと: ${normalized.reflection.unexpected}` : "",
+    normalized.reflection.improvement ? `次回改善したい点: ${normalized.reflection.improvement}` : "",
+    normalized.reflection.unexpected ? `想定外だった質問・論点: ${normalized.reflection.unexpected}` : "",
   ]
     .filter(Boolean)
     .join("\n");
@@ -78,7 +89,7 @@ export async function POST(request: Request) {
   const payload = {
     user_id: userData.user.id,
     company_name: companyName,
-    interview_title: format || body?.interviewTitle || (template ? "準備用テンプレート" : null),
+    interview_title: format || interviewTitle || (template ? "面接ログテンプレート" : null),
     interview_date: template ? null : interviewDate,
     stage: template ? "template" : stage,
     questions: { items: normalized.items, reflection: normalized.reflection },
@@ -89,5 +100,7 @@ export async function POST(request: Request) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  await awardXp(userData.user.id, "interview_log", { refId: data.id, supabase });
+  revalidatePath("/dashboard");
   return NextResponse.json({ id: data.id });
 }

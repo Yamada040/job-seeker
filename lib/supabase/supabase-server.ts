@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createServerClient } from "@supabase/ssr";
-import { SupabaseClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { Database } from "@/lib/database.types";
 
 const getEnv = () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -12,32 +12,45 @@ const getEnv = () => {
   return { supabaseUrl, supabaseAnonKey };
 };
 
-export const createSupabaseServerReadonlyClient = async (): Promise<SupabaseClient<any>> => {
+export const createSupabaseServerReadonlyClient = async (): Promise<SupabaseClient<Database>> => {
   const { supabaseUrl, supabaseAnonKey } = getEnv();
   const cookieStore = await cookies();
-  return createServerClient<any>(supabaseUrl, supabaseAnonKey, {
+  return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value;
+      getAll() {
+        return cookieStore.getAll();
       },
     },
   });
 };
 
-export const createSupabaseServerActionClient = async (): Promise<SupabaseClient<any>> => {
+export const createSupabaseServerActionClient = async (): Promise<SupabaseClient<Database>> => {
   const { supabaseUrl, supabaseAnonKey } = getEnv();
   const cookieStore = await cookies();
-  return createServerClient<any>(supabaseUrl, supabaseAnonKey, {
+  return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value;
+      getAll() {
+        return cookieStore.getAll();
       },
-      set(name: string, value: string, options?: { path?: string }) {
-        cookieStore.set(name, value, { path: options?.path ?? "/" });
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          cookieStore.set(name, value, options)
+        );
       },
-      remove(name: string, options?: { path?: string }) {
-        cookieStore.set(name, "", { path: options?.path ?? "/", expires: new Date(0) });
-      },
+    },
+  });
+};
+
+export const createSupabaseAdminClient = (): SupabaseClient<Database> => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error("Supabase URL/Service Role Key is missing. Check env.");
+  }
+  return createClient<Database>(supabaseUrl, serviceRoleKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
     },
   });
 };

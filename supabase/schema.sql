@@ -7,6 +7,11 @@ create table if not exists public.profiles (
   university text,
   faculty text,
   avatar_id text,
+  target_industry text,
+  career_axis text,
+  goal_state text,
+  xp integer default 0 not null,
+  level integer default 1 not null,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -61,7 +66,9 @@ create table if not exists public.companies (
 create table if not exists public.xp_logs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete cascade,
-  xp integer,
+  xp integer default 0 not null,
+  action text default 'action' not null,
+  ref_id uuid,
   created_at timestamptz default now()
 );
 
@@ -80,6 +87,14 @@ create table if not exists public.self_analysis_results (
   ai_summary text,
   created_at timestamptz default now()
 );
+
+create unique index if not exists aptitude_results_user_id_unique
+  on public.aptitude_results (user_id)
+  where user_id is not null;
+
+create unique index if not exists self_analysis_results_user_id_unique
+  on public.self_analysis_results (user_id)
+  where user_id is not null;
 
 alter table public.profiles enable row level security;
 alter table public.es_entries enable row level security;

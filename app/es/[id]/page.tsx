@@ -1,8 +1,12 @@
 ﻿import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
-
+import {
+  ArrowLeftIcon,
+  HomeIcon,
+  ArrowUturnLeftIcon,
+} from "@heroicons/react/24/outline";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
+import { ROUTES } from "@/lib/constants/routes";
 import { AppLayout } from "@/app/_components/layout";
 import { deleteEs, updateEs } from "../actions";
 import { EsDetailClient } from "../_components/es-detail-client";
@@ -10,15 +14,25 @@ import { EsDetailClient } from "../_components/es-detail-client";
 type Question = { id: string; prompt: string; answer_md: string };
 
 function makeId() {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function")
+    return crypto.randomUUID();
   return Math.random().toString(36).slice(2);
 }
 
 function parseQuestions(questions: unknown): Question[] {
   if (!questions) return [];
-  const parsed = typeof questions === "string" ? (() => { try { return JSON.parse(questions); } catch { return []; } })() : questions;
-  if (Array.isArray(parsed)) {
-    return parsed.map((q) => ({
+  const questionsValue =
+    typeof questions === "string"
+      ? (() => {
+          try {
+            return JSON.parse(questions);
+          } catch {
+            return [];
+          }
+        })()
+      : questions;
+  if (Array.isArray(questionsValue)) {
+    return questionsValue.map((q) => ({
       id: typeof q?.id === "string" ? q.id : makeId(),
       prompt: typeof q?.prompt === "string" ? q.prompt : "",
       answer_md: typeof q?.answer_md === "string" ? q.answer_md : "",
@@ -27,14 +41,16 @@ function parseQuestions(questions: unknown): Question[] {
   return [];
 }
 
-export default async function EsDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function EsDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const supabase = await createSupabaseReadonlyClient();
   if (!supabase) throw new Error("Supabase client unavailable");
   const { data: userData } = await supabase.auth.getUser();
-  const userId = userData?.user?.id ?? null;
-
-  if (!userId) return redirect("/login");
+  const userId = userData.user!.id;
 
   const { data, error } = await supabase
     .from("es_entries")
@@ -44,17 +60,19 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
     .maybeSingle();
 
   if (error || !data) {
-    return redirect("/es");
+    return redirect(ROUTES.ES);
   }
 
   const questions = parseQuestions(data.questions);
   const combinedContent =
     questions.length > 0
       ? questions
-          .map((q) => [q.prompt?.trim(), q.answer_md?.trim()].filter(Boolean).join("\n"))
+          .map((q) =>
+            [q.prompt?.trim(), q.answer_md?.trim()].filter(Boolean).join("\n")
+          )
           .filter(Boolean)
           .join("\n\n")
-      : data.content_md ?? "";
+      : (data.content_md ?? "");
 
   const handleUpdate = updateEs.bind(null, id);
   const handleDelete = deleteEs.bind(null, id);
@@ -65,15 +83,18 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
       headerDescription="提出済みはプレビュー、編集ボタンで編集モードに切り替え"
       headerActions={
         <div className="flex flex-wrap gap-3">
-          <Link href="/" className="mvp-button mvp-button-secondary">
+          <Link href={ROUTES.HOME} className="sidebar-link-style text-sm">
             <HomeIcon className="h-4 w-4" />
             MVPホーム
           </Link>
-          <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+          <Link
+            href={ROUTES.DASHBOARD}
+            className="sidebar-link-style text-sm"
+          >
             <ArrowUturnLeftIcon className="h-4 w-4" />
             ダッシュボードへ
           </Link>
-          <Link href="/es" className="mvp-button mvp-button-secondary">
+          <Link href={ROUTES.ES} className="sidebar-link-style text-sm">
             <ArrowLeftIcon className="h-4 w-4" />
             一覧に戻る
           </Link>

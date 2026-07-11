@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
-
 import { AppLayout } from "@/app/_components/layout";
+import { ROUTES } from "@/lib/constants/routes";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import InterviewForm from "../_components/interview-form";
 import { InterviewQuestionsPayload } from "../types";
@@ -14,20 +14,25 @@ function parseQuestions(raw: unknown): InterviewQuestionsPayload | null {
   return null;
 }
 
-export default async function InterviewDetailPage({ params }: { params: { id: string } | Promise<{ id: string }> }) {
+export default async function InterviewDetailPage({
+  params,
+}: {
+  params: { id: string } | Promise<{ id: string }>;
+}) {
   const resolvedParams = await Promise.resolve(params);
-  const id = typeof resolvedParams === "object" ? (resolvedParams as { id?: string }).id : undefined;
+  const id =
+    typeof resolvedParams === "object"
+      ? (resolvedParams as { id?: string }).id
+      : undefined;
   if (!id || id === "undefined") return notFound();
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect("/login");
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect("/login");
 
   const { data: log } = await supabase
     .from("interview_logs")
     .select("*")
     .eq("id", id)
-    .eq("user_id", userData.user.id)
+    .eq("user_id", userData.user!.id)
     .maybeSingle();
 
   if (!log) return notFound();
@@ -35,19 +40,24 @@ export default async function InterviewDetailPage({ params }: { params: { id: st
   const { data: companies } = await supabase
     .from("companies")
     .select("name")
-    .eq("user_id", userData.user.id)
+    .eq("user_id", userData.user!.id)
     .order("created_at", { ascending: false });
 
   const companyOptions =
-    companies?.filter((c) => c.name).map((c) => ({ value: c.name as string, label: c.name as string })) ?? [];
+    companies
+      ?.filter((c) => c.name)
+      .map((c) => ({ value: c.name as string, label: c.name as string })) ?? [];
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href="/interviews" className="mvp-button mvp-button-secondary">
+      <Link
+        href={ROUTES.INTERVIEWS}
+        className="dq-button-secondary"
+      >
         <ArrowUturnLeftIcon className="h-4 w-4" />
         面接ログ一覧へ
       </Link>
-      <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="dq-button-secondary">
         <HomeIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>

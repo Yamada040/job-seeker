@@ -1,28 +1,24 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { ArrowLeftIcon, HomeIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
 
 import { createCompany } from "../actions";
+import { ROUTES } from "@/lib/constants/routes";
 import { AppLayout } from "@/app/_components/layout";
-import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
+import { FormLengthGuard } from "@/app/_components/form-length-guard";
+import { COMPANY_FIELDS, MAX_TEXT_LEN } from "@/app/_components/form-length-guard.config";
 
 export default async function NewCompanyPage() {
-  const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect("/login");
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect("/login");
-
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href="/" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.HOME} className="dq-button-secondary">
         <HomeIcon className="h-4 w-4" />
         MVPホーム
       </Link>
-      <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="dq-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href="/companies" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.COMPANIES} className="dq-button-secondary">
         <ArrowLeftIcon className="h-4 w-4" />
         一覧へ戻る
       </Link>
@@ -37,8 +33,9 @@ export default async function NewCompanyPage() {
       className="flex flex-col gap-8"
     >
       <form
+        id="company-form-new"
         action={createCompany}
-        className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80"
+        className="dq-card p-8"
       >
         <div className="space-y-6">
           <label className="block space-y-2">
@@ -46,7 +43,7 @@ export default async function NewCompanyPage() {
             <input
               name="name"
               required
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              className="dq-input text-sm"
               placeholder="例）Alpha SaaS"
             />
           </label>
@@ -55,7 +52,7 @@ export default async function NewCompanyPage() {
             <span className="text-sm font-medium text-slate-700">業界</span>
             <input
               name="industry"
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              className="dq-input text-sm"
               placeholder="例）IT / コンサル / メーカー"
             />
           </label>
@@ -64,7 +61,7 @@ export default async function NewCompanyPage() {
             <span className="text-sm font-medium text-slate-700">URL</span>
             <input
               name="url"
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              className="dq-input text-sm"
               placeholder="https://example.com"
             />
           </label>
@@ -74,7 +71,7 @@ export default async function NewCompanyPage() {
               <span className="text-sm font-medium text-slate-700">マイページID</span>
               <input
                 name="mypage_id"
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                className="dq-input text-sm"
                 placeholder="ログインID"
               />
             </label>
@@ -83,7 +80,7 @@ export default async function NewCompanyPage() {
               <span className="text-sm font-medium text-slate-700">マイページURL</span>
               <input
                 name="mypage_url"
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                className="dq-input text-sm"
                 placeholder="https://mypage.example.com"
               />
             </label>
@@ -93,7 +90,7 @@ export default async function NewCompanyPage() {
             <span className="text-sm font-medium text-slate-700">ステータス</span>
             <input
               name="stage"
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              className="dq-input text-sm"
               placeholder="Screening / Document passed など"
             />
           </label>
@@ -105,7 +102,7 @@ export default async function NewCompanyPage() {
               type="number"
               min="1"
               max="5"
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              className="dq-input text-sm"
               placeholder="3"
             />
           </label>
@@ -115,26 +112,31 @@ export default async function NewCompanyPage() {
             <textarea
               name="memo"
               rows={3}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              className="dq-input text-sm"
               placeholder="興味を持った理由、応募メモ、インターン日程など"
             />
           </label>
 
           <label className="inline-flex items-center gap-2 text-sm text-slate-700">
-            <input type="checkbox" name="favorite" className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400" />
+            <input
+              type="checkbox"
+              name="favorite"
+              className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400"
+            />
             お気に入りに追加
           </label>
         </div>
 
         <div className="mt-6 flex justify-wrap gap-3">
-          <button type="submit" className="mvp-button mvp-button-primary">
+          <button type="submit" className="dq-button">
             追加する
           </button>
-          <Link href="/companies" className="mvp-button mvp-button-secondary">
+          <Link href={ROUTES.COMPANIES} className="dq-button-secondary">
             キャンセル
           </Link>
         </div>
       </form>
+      <FormLengthGuard formId="company-form-new" maxLen={MAX_TEXT_LEN} fields={COMPANY_FIELDS} />
     </AppLayout>
   );
 }

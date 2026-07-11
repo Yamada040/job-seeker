@@ -55,7 +55,9 @@ export function EsListClient({ initialItems }: Props) {
               type="button"
               onClick={() => setTab(t.value)}
               className={`rounded-full border px-3 py-1 ${
-                tab === t.value ? "border-amber-300 bg-amber-50 text-amber-700" : "border-slate-200 bg-white text-slate-700"
+                tab === t.value
+                  ? "border-white bg-black text-white"
+                  : "border-white/40 bg-black/70 text-white/70"
               }`}
             >
               {t.label}
@@ -67,7 +69,7 @@ export function EsListClient({ initialItems }: Props) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="タイトル / タグで検索"
-          className="w-full rounded-full border border-slate-200 bg-white px-4 py-2 text-xs text-slate-900 outline-none ring-0 placeholder:text-slate-500 focus:border-amber-300 sm:w-64"
+          className="w-full rounded-full border border-white/30 bg-black/70 px-4 py-2 text-xs text-white outline-none ring-0 placeholder:text-white/50 focus:border-yellow-400 sm:w-64"
         />
       </div>
 
@@ -76,26 +78,28 @@ export function EsListClient({ initialItems }: Props) {
           <Link
             key={es.id}
             href={`/es/${es.id}`}
-            className="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-slate-900 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg"
+            className="rounded-xl border border-[#3f3f46] bg-[#111111] px-4 py-4 text-white transition hover:-translate-y-0.5"
           >
             <p className="text-sm font-semibold">{es.title}</p>
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-slate-700">
-              <span className="rounded-full bg-slate-100 px-2 py-1">{STATUS_LABEL_MAP[es.status ?? ""] ?? "未設定"}</span>
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-white/70">
+              <span className="rounded-full border border-white/40 bg-black/60 px-2 py-1 text-white">
+                {STATUS_LABEL_MAP[es.status ?? ""] ?? "未設定"}
+              </span>
               {es.tags?.length ? (
                 es.tags.map((tag) => (
-                  <span key={tag} className="rounded-full bg-amber-50 px-2 py-1 text-amber-700">
+                  <span key={tag} className="rounded-full border border-yellow-300/40 bg-yellow-500/20 px-2 py-1 text-yellow-200">
                     {tag}
                   </span>
                 ))
               ) : (
-                <span className="text-slate-400">タグなし</span>
+                <span className="text-white/50">タグなし</span>
               )}
             </div>
-            <p className="mt-1 text-xs text-slate-600">更新日: {es.updated_at ? new Date(es.updated_at).toLocaleDateString() : "-"}</p>
+            <p className="mt-1 text-xs text-white/60">更新日: {es.updated_at ? new Date(es.updated_at).toLocaleDateString() : "-"}</p>
           </Link>
         ))}
         {filtered.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-6 text-sm text-slate-700 shadow-soft">
+          <div className="rounded-xl border border-[#3f3f46] bg-[#111111] px-6 py-6 text-sm text-white/80">
             該当するESがありません。フィルタやキーワードを変えてみてください。
           </div>
         ) : null}

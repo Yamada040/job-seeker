@@ -1,20 +1,20 @@
-import Image from "next/image";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { PlusIcon, BoltIcon } from "@heroicons/react/24/outline";
+﻿import Link from "next/link";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 import { Database } from "@/lib/database.types";
+import { ROUTES } from "@/lib/constants/routes";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
 import { AppLayout } from "@/app/_components/layout";
-import SignOutButton from "./_components/sign-out-button";
 import { InteractiveCalendar } from "./_components/interactive-calendar";
+import { EventListModal } from "./_components/event-list-modal";
+import { SimpleListModal } from "./_components/simple-list-modal";
+import { GoalScroll } from "./_components/goal-scroll";
 
 type EsRow = Database["public"]["Tables"]["es_entries"]["Row"];
-type CompanyRow = Database["public"]["Tables"]["companies"]["Row"];
 type CalendarRow = Database["public"]["Tables"]["calendar_events"]["Row"];
-type XpRow = Database["public"]["Tables"]["xp_logs"]["Row"];
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
-
+type InterviewRow = Database["public"]["Tables"]["interview_logs"]["Row"];
+type XpLogRow = Database["public"]["Tables"]["xp_logs"]["Row"];
 type CalendarEvent = {
   id: string;
   date: string;
@@ -24,22 +24,9 @@ type CalendarEvent = {
   time?: string | null;
 };
 
-const todayTasks = [
-  "ESを1件ドラフトしてAI添削を依頼",
-  "企業カードのステータスを2件更新",
-  "直近の面接メモを整理",
-  "気になる企業をリストアップ",
-];
-
-const kpis = [
-  { title: "ES", value: "下書き3 / 提出2", icon: "✏️" },
-  { title: "企業分析", value: "今週: 4件", icon: "🏢" },
-  { title: "選考状況", value: "面接 2 / 通過 1", icon: "✅" },
-  { title: "タスク", value: "残り 3 件", icon: "📋" },
-];
-
-const FALLBACK_XP = 0;
-const XP_NEXT_LEVEL = 180;
+function computeLevel(xp: number) {
+  return Math.max(1, Math.floor(xp / 50) + 1);
+}
 
 async function getDashboardData() {
   const supabase = await createSupabaseReadonlyClient();
@@ -49,51 +36,77 @@ async function getDashboardData() {
   const userId = userData?.user?.id ?? null;
   if (!userId) throw new Error("No user");
 
-  const [esRes, companyRes, xpRes, profileRes, calendarRes] = await Promise.all([
-    supabase
-      .from("es_entries")
-      .select("*")
-      .eq("user_id", userId)
-      .order("updated_at", { ascending: false })
-      .limit(12),
-    supabase
-      .from("companies")
-      .select("*")
-      .eq("user_id", userId)
-      .order("updated_at", { ascending: false })
-      .limit(8),
-    supabase.from("xp_logs").select("xp").eq("user_id", userId),
-    supabase
-      .from("profiles")
-      .select("full_name,avatar_id,university,faculty")
-      .eq("id", userId)
-      .maybeSingle<Pick<ProfileRow, "full_name" | "avatar_id" | "university" | "faculty">>(),
-    supabase
-      .from("calendar_events")
-      .select("*")
-      .eq("user_id", userId)
-      .order("date", { ascending: true }),
-  ]);
+  const [esRes, profileRes, calendarRes, interviewsRes, xpLogsRes] =
+    await Promise.all([
+      supabase
+        .from("es_entries")
+        .select("*")
+        .eq("user_id", userId)
+        .order("updated_at", { ascending: false })
+        .limit(12),
+      supabase
+        .from("profiles")
+        .select(
+          "full_name,avatar_id,university,faculty,target_industry,career_axis,goal_state,xp,level"
+        )
+        .eq("id", userId)
+        .maybeSingle<
+          Pick<
+            ProfileRow,
+            | "full_name"
+            | "avatar_id"
+            | "university"
+            | "faculty"
+            | "target_industry"
+            | "career_axis"
+            | "goal_state"
+            | "xp"
+            | "level"
+          >
+        >(),
+      supabase
+        .from("calendar_events")
+        .select("*")
+        .eq("user_id", userId)
+        .order("date", { ascending: true }),
+      supabase
+        .from("interview_logs")
+        .select("id, company_name, interview_date, self_review, questions")
+        .eq("user_id", userId),
+      supabase
+        .from("xp_logs")
+        .select("xp, action, created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(100),
+    ]);
 
   const esEntries = (esRes.data as EsRow[] | null) ?? [];
-  const companies = (companyRes.data as CompanyRow[] | null) ?? [];
-  const xp = ((xpRes.data as XpRow[] | null) ?? []).reduce((sum, row) => sum + (row.xp || 0), 0) || FALLBACK_XP;
+  const interviewLogs = (interviewsRes.data as InterviewRow[] | null) ?? [];
 
   return {
     esEntries,
-    companies,
-    xp,
     user: userData?.user ?? null,
-    profile: profileRes.data as (Pick<ProfileRow, "full_name" | "avatar_id" | "university" | "faculty"> | null),
+    profile: profileRes.data as Pick<
+      ProfileRow,
+      | "full_name"
+      | "avatar_id"
+      | "university"
+      | "faculty"
+      | "target_industry"
+      | "career_axis"
+      | "goal_state"
+      | "xp"
+      | "level"
+    > | null,
     calendarEvents: (calendarRes.data as CalendarRow[] | null) ?? [],
+    interviewLogs,
+    xpLogs: (xpLogsRes.data as XpLogRow[] | null) ?? [],
   };
 }
 
 export default async function DashboardPage() {
-  const data = await getDashboardData().catch(() => null);
-  if (!data?.user) return redirect("/login");
-
-  const avatarSrc = data.profile?.avatar_id ? `/avatars/${data.profile.avatar_id}.svg` : null;
+  const data = await getDashboardData();
 
   const calendarEvents: CalendarEvent[] = [
     ...(data.calendarEvents as CalendarRow[]).map((evt) => ({
@@ -104,7 +117,7 @@ export default async function DashboardPage() {
       type: (evt.type as CalendarEvent["type"]) ?? "other",
       time: evt.time ?? null,
     })),
-    ...(data.esEntries
+    ...data.esEntries
       .filter((es) => !!es.deadline)
       .map((es) => ({
         id: `es-${es.id}`,
@@ -113,13 +126,18 @@ export default async function DashboardPage() {
         company: es.company_name,
         type: "es" as const,
         time: null,
-      }))),
+      })),
   ];
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const pendingEs = [...data.esEntries]
-    .filter((es) => es.status !== "submitted" && es.deadline && new Date(es.deadline) >= today)
+    .filter(
+      (es) =>
+        es.status !== "submitted" &&
+        es.deadline &&
+        new Date(es.deadline) >= today
+    )
     .sort((a, b) => {
       if (!a.deadline && !b.deadline) return 0;
       if (!a.deadline) return 1;
@@ -127,184 +145,205 @@ export default async function DashboardPage() {
       return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
     });
 
-  const headerActions = (
-    <div className="flex flex-wrap gap-3">
-      <Link href="/" className="mvp-button mvp-button-secondary">
-        MVPホーム
+  // 面接ログ未記入: 過去の面接イベントで記録が無いものを検出
+  const interviewActions = (() => {
+    const pastInterviews = calendarEvents.filter((evt) => {
+      if (evt.type !== "interview") return false;
+      const date = evt.date ? new Date(evt.date) : null;
+      return date ? date < today : false;
+    });
+    const logs = data.interviewLogs ?? [];
+    const missing = pastInterviews.filter((evt) => {
+      const hasLog = logs.some(
+        (log) =>
+          log.company_name === evt.company && log.interview_date === evt.date
+      );
+      return !hasLog;
+    });
+    return missing.slice(0, 1).map((evt) => ({
+      title: "面接ログを記録",
+      subtitle: evt.company || evt.title,
+      href: ROUTES.INTERVIEWS,
+    }));
+  })();
+
+  const nextActions = [
+    ...pendingEs.slice(0, 2).map((es) => ({
+      title: "ESを進める",
+      subtitle: `${es.company_name || "企業名未設定"} / 締切 ${es.deadline ? new Date(es.deadline).toLocaleDateString() : "未設定"}`,
+      href: ROUTES.ES_DETAIL(es.id),
+    })),
+    ...interviewActions,
+  ].slice(0, 2);
+
+  const allXpLogs = data.xpLogs ?? [];
+  const recentXpLogs = allXpLogs.slice(0, 5);
+  const fallbackXp = recentXpLogs.reduce((sum, log) => sum + (log.xp ?? 0), 0);
+  const xp = data.profile?.xp ?? fallbackXp;
+  const level = data.profile?.level ?? computeLevel(xp);
+  const prevThreshold = Math.max(0, (level - 1) * 50);
+  const nextThreshold = level * 50;
+  const progress =
+    nextThreshold > prevThreshold
+      ? Math.min(1, (xp - prevThreshold) / (nextThreshold - prevThreshold))
+      : 0;
+  const navigationActions = (
+    <div className="flex flex-wrap items-center gap-3">
+      <Link href={ROUTES.HOME} className="dq-button">
+        ホームへ
       </Link>
-      <Link href="/es/new" className="mvp-button mvp-button-primary">
+      <Link href={ROUTES.ES_NEW} className="dq-button">
         <PlusIcon className="h-4 w-4" />
-        新しいES
+        ESを追加
       </Link>
-      <Link href="/companies/new" className="mvp-button mvp-button-primary">
+      <Link
+        href={ROUTES.COMPANIES_NEW}
+        className="dq-button"
+      >
         <PlusIcon className="h-4 w-4" />
         企業を追加
       </Link>
     </div>
   );
+  const urgentEvents = calendarEvents
+    .filter((evt) => {
+      const date = evt.date ? new Date(evt.date) : null;
+      if (!date) return false;
+      const diff = (date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+      return diff >= 0 && diff <= 7 && (evt.type === "es" || evt.type === "interview");
+    })
+    .slice(0, 4);
 
   return (
-    <AppLayout headerActions={headerActions} className="space-y-8">
-      <section className="rounded-3xl border border-white/70 bg-white/80 p-8 shadow-xl backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-          <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-600">Dashboard</p>
-            <h1 className="text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl">
-              AIとゲーミフィケーションで就活を前向きに
-            </h1>
-            <p className="max-w-2xl text-sm leading-7 text-slate-700">
-              ESドラフト・企業管理・AIフィードバックをまとめて可視化。XPで進捗を確認しながら、毎週のモチベーション維持を支援します。
-            </p>
+    <AppLayout headerActions={navigationActions} className="space-y-6">
+      <GoalScroll
+        targetIndustry={data.profile?.target_industry}
+        careerAxis={data.profile?.career_axis}
+        goalState={data.profile?.goal_state}
+      />
+
+      {/* カレンダー + サイドカラム */}
+      <section className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+        <div className="relative rounded-xl border border-[#3f3f46] bg-[#111111] p-4">
+          <span className="dq-title">クエストカレンダー</span>
+          <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">
+            ES / 面接 / インターン
           </div>
-          <div className="w-full rounded-2xl border border-slate-200 bg-white/90 p-5 text-sm shadow-soft backdrop-blur">
-            <div className="flex items-center gap-3">
-              {avatarSrc ? (
-                <Image
-                  src={avatarSrc}
-                  alt="avatar"
-                  width={56}
-                  height={56}
-                  className="h-14 w-14 rounded-2xl border border-slate-200 object-cover"
-                />
-              ) : (
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-amber-300 to-orange-500 text-lg font-bold text-slate-950 shadow">
-                  {data.user.email ? data.user.email.slice(0, 2).toUpperCase() : "LV"}
+          <div className="mt-3 rounded-2xl border border-[#3f3f46] bg-[#1a1a1a] p-3 shadow-inner">
+            <InteractiveCalendar initialEvents={calendarEvents} />
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          {/* Urgent */}
+          <EventListModal
+            events={calendarEvents}
+            trigger={
+              <div className="relative cursor-pointer rounded-xl border border-[#3f3f46] bg-[#111111] p-4 transition hover:scale-[1.02]">
+                <span className="dq-title">至急クエスト</span>
+                <div className="mt-3 space-y-3">
+                  {urgentEvents.map((evt) => (
+                    <div
+                      key={evt.id}
+                      className="group flex items-center gap-2.5 rounded-md px-2 py-2 text-xs font-bold text-white transition hover:text-yellow-400"
+                    >
+                      <span
+                        aria-hidden
+                        className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
+                      >
+                        ▶
+                      </span>
+                      <label className="cursor-pointer text-sm font-bold">
+                        {evt.company || evt.title} ({evt.date})
+                      </label>
+                    </div>
+                  ))}
+                  {urgentEvents.length === 0 && (
+                    <div className="py-2 text-center text-xs text-white/60">
+                      直近の 締切は ないようだ。
+                    </div>
+                  )}
                 </div>
-              )}
-              <div className="flex-1">
-                <p className="text-xs text-slate-600">レベル進捗</p>
-                <p className="text-sm font-semibold text-slate-900">Lv.3 / {data.xp} XP</p>
-                <p className="text-xs text-amber-700">次のレベルまで {Math.max(XP_NEXT_LEVEL - data.xp, 0)} XP</p>
               </div>
-            </div>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
-              <div
-                className="h-full rounded-full bg-linear-to-r from-amber-400 to-rose-400"
-                style={{ width: `${Math.min((data.xp / XP_NEXT_LEVEL) * 100, 100)}%` }}
-                aria-hidden
-              />
-            </div>
-            <div className="mt-4">
-              <SignOutButton />
-            </div>
-          </div>
-        </div>
-      </section>
+            }
+          />
 
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {kpis.map((item) => (
-          <div
-            key={item.title}
-            className="h-full rounded-2xl border border-white/70 bg-white/80 p-4 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80"
-          >
-            <div className="flex items-center justify-between text-sm font-semibold text-slate-900">
-              <span>{item.title}</span>
-              <span className="text-base">{item.icon}</span>
-            </div>
-            <p className="mt-2 text-sm text-amber-700">{item.value}</p>
-          </div>
-        ))}
-      </section>
+          {/* Next actions */}
+          <SimpleListModal
+            trigger={
+              <div className="relative cursor-pointer rounded-xl border border-[#3f3f46] bg-[#111111] p-4 transition hover:scale-[1.02]">
+                <span className="dq-title">次のクエスト</span>
+                <div className="mt-3 space-y-3">
+                  {nextActions.map((action) => (
+                    <Link
+                      key={`${action.title}-${action.href}-${action.subtitle}`}
+                      href={action.href}
+                      className="group flex items-center gap-2.5 rounded-md px-2 py-2 text-xs font-bold text-white transition hover:text-yellow-400"
+                    >
+                      <span
+                        aria-hidden
+                        className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
+                      >
+                        ▶
+                      </span>
+                      <label className="cursor-pointer text-sm font-bold">
+                        {action.subtitle}
+                      </label>
+                    </Link>
+                  ))}
+                  {nextActions.length === 0 && (
+                    <div className="py-2 text-center text-xs text-white/60">
+                      なすべきことは すべて おわった。
+                    </div>
+                  )}
+                </div>
+              </div>
+            }
+            items={nextActions.map((action) => ({
+              title: action.title,
+              subtitle: action.subtitle,
+              meta: action.href,
+            }))}
+            emptyText="アクションはありません。"
+          />
 
-      <section className="grid grid-cols-1 gap-6 lg:grid-cols-[1.9fr_1fr]">
-        <div className="min-h-[720px] rounded-2xl border border-white/70 bg-white/90 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-900">締切カレンダー</h2>
-            <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs text-emerald-700">
-              ES / 面接 / インターン
-            </span>
-          </div>
-          <InteractiveCalendar initialEvents={calendarEvents} />
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <article className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-900">今日のフォーカス</h2>
-              <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs text-amber-700 shadow">
-                {todayTasks.length} 件
-              </span>
-            </div>
-            <ul className="mt-4 space-y-3 text-sm text-slate-800">
-              {todayTasks.map((task) => (
-                <li
-                  key={task}
-                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow"
-                >
-                  <BoltIcon className="h-4 w-4 text-amber-500" />
-                  <span>{task}</span>
-                </li>
-              ))}
-            </ul>
-          </article>
-
-          <article className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-900">ESの最新状況</h2>
-              <Link
-                href="/es"
-                className="rounded-full border border-slate-300 px-3 py-1 text-xs text-slate-800 hover:bg-white"
-              >
-                一覧を見る
-              </Link>
-            </div>
-            <div className="mt-4 space-y-3">
-              {pendingEs.length === 0 ? (
-                <p className="text-xs text-slate-500">未来の締切を持つESがありません。</p>
-              ) : (
-                pendingEs.slice(0, 2).map((es) => (
-                  <Link
-                    key={es.id}
-                    href={`/es/${es.id}`}
-                    className="block rounded-xl border border-slate-200 bg-white px-4 py-3 shadow transition-all hover:-translate-y-1 hover:shadow-md"
-                  >
-                    <p className="text-xs font-semibold text-slate-600">{es.company_name || "企業名未設定"}</p>
-                    <p className="text-sm font-semibold text-slate-900">{es.title}</p>
-                    <div className="mt-2 flex items-center justify-between text-[11px] text-slate-700">
-                      <span className="text-slate-500">
-                        締切 {es.deadline ? new Date(es.deadline).toLocaleDateString() : "-"}
+          {/* 最近のXP獲得 */}
+          <SimpleListModal
+            trigger={
+              <div className="relative cursor-pointer rounded-xl border border-[#3f3f46] bg-[#111111] p-4 transition hover:scale-[1.02]">
+                <span className="dq-title">戦歴ログ</span>
+                <div className="mt-3 space-y-2">
+                  {recentXpLogs.map((log, idx) => (
+                    <div
+                      key={`${log.created_at}-${idx}`}
+                      className="dq-item justify-between border-b border-white/10 last:border-0"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-yellow-400">●</span>
+                        <span className="text-sm">+{log.xp} XP</span>
+                      </div>
+                      <span className="text-[10px] opacity-60">
+                        {log.action || "行動"}
                       </span>
                     </div>
-                  </Link>
-                ))
-              )}
-            </div>
-          </article>
-
-          <article className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-900">最新の企業カード</h2>
-              <Link
-                href="/companies"
-                className="rounded-full border border-slate-300 px-3 py-1 text-xs text-slate-800 hover:bg-white"
-              >
-                一覧を見る
-              </Link>
-            </div>
-            <div className="mt-4 space-y-3">
-              {data.companies.length === 0 ? (
-                <p className="text-xs text-slate-500">企業カードがありません。</p>
-              ) : (
-                data.companies.slice(0, 2).map((company) => (
-                  <Link
-                    key={company.id}
-                    href={`/companies/${company.id}`}
-                    className="block rounded-xl border border-slate-200 bg-white px-4 py-3 shadow transition-all hover:-translate-y-1 hover:shadow-md"
-                  >
-                    <p className="text-sm font-semibold text-slate-900">{company.name}</p>
-                    <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
-                      <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-800">
-                        ステータス: {company.stage || "未設定"}
-                      </span>
-                      <span className="rounded-full bg-amber-50 px-3 py-1 text-amber-800">
-                        志望度: {company.preference ?? "-"}
-                      </span>
+                  ))}
+                  {recentXpLogs.length === 0 && (
+                    <div className="py-2 text-center text-xs text-white/60">
+                      まだXPはありません。ES提出や面接ログでXPを獲得できます。
                     </div>
-                  </Link>
-                ))
-              )}
-            </div>
-          </article>
+                  )}
+                </div>
+              </div>
+            }
+            items={allXpLogs.map((log) => ({
+              title: `+${log.xp} XP`,
+              subtitle: log.action || "行動",
+              meta: log.created_at
+                ? new Date(log.created_at).toLocaleDateString()
+                : "",
+            }))}
+            emptyText="XP獲得履歴がありません。"
+          />
         </div>
       </section>
     </AppLayout>

@@ -16,7 +16,9 @@ const createQuestion = (): Question => ({
 });
 
 export function QuestionsEditor({ initialQuestions, readOnly = false }: Props) {
-  const [questions, setQuestions] = useState<Question[]>(() => (initialQuestions.length ? initialQuestions : [createQuestion()]));
+  const [questions, setQuestions] = useState<Question[]>(() =>
+    initialQuestions.length ? initialQuestions : [createQuestion()],
+  );
 
   const handleChange = (id: string, key: keyof Question, value: string) => {
     if (readOnly) return;
@@ -40,10 +42,14 @@ export function QuestionsEditor({ initialQuestions, readOnly = false }: Props) {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between text-sm text-slate-700">
+      <div className="flex items-center justify-between text-sm text-white/70">
         <span>質問カード（必要に応じて追加できます）</span>
         {!readOnly && (
-          <button type="button" onClick={handleAdd} className="mvp-button mvp-button-secondary">
+          <button
+            type="button"
+            onClick={handleAdd}
+            className="sidebar-link-style text-sm"
+          >
             カードを追加
           </button>
         )}
@@ -53,24 +59,24 @@ export function QuestionsEditor({ initialQuestions, readOnly = false }: Props) {
 
       <div className="space-y-3">
         {questions.map((q) => (
-          <div key={q.id} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-            <label className="block space-y-1 text-xs text-slate-600">
+          <div key={q.id} className="rounded-xl border border-[#3f3f46] bg-[#111111] px-4 py-3">
+            <label className="block space-y-1 text-xs text-white/70">
               質問
               <input
                 value={q.prompt}
                 onChange={(e) => handleChange(q.id, "prompt", e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                className="dq-input text-sm"
                 placeholder="例） 学生時代に力を入れたこと"
                 disabled={readOnly}
               />
             </label>
-            <label className="mt-2 block space-y-1 text-xs text-slate-600">
+            <label className="mt-2 block space-y-1 text-xs text-white/70">
               回答
               <textarea
                 value={q.answer_md}
                 onChange={(e) => handleChange(q.id, "answer_md", e.target.value)}
                 rows={5}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-300"
+                className="dq-input text-sm"
                 placeholder="回答を入力"
                 disabled={readOnly}
               />
@@ -80,7 +86,7 @@ export function QuestionsEditor({ initialQuestions, readOnly = false }: Props) {
                 <button
                   type="button"
                   onClick={() => handleRemove(q.id)}
-                  className="rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-600 transition hover:bg-slate-50"
+                  className="sidebar-link-style text-xs"
                 >
                   削除
                 </button>

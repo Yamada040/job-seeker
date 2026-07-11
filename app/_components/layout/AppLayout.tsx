@@ -1,18 +1,22 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
 import { Sidebar } from "./Sidebar";
-import { Header } from "./Header";
+import { Breadcrumbs, Header } from "./Header";
+import { XpBadge } from "../xp-badge";
 
 interface AppLayoutProps {
   children: React.ReactNode;
   headerTitle?: string;
   headerDescription?: string;
   headerActions?: React.ReactNode;
+  headerLeftContent?: React.ReactNode;
   showHeader?: boolean;
   showSidebar?: boolean;
   className?: string;
+  actionsPlacement?: "left" | "right";
 }
 
 export function AppLayout({
@@ -20,86 +24,82 @@ export function AppLayout({
   headerTitle,
   headerDescription,
   headerActions,
+  headerLeftContent,
   showHeader = true,
   showSidebar = true,
   className,
+  actionsPlacement,
 }: AppLayoutProps) {
   const pathname = usePathname();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    if (typeof window === "undefined") return true;
+    const stored = window.localStorage.getItem("sidebar-open");
+    return stored !== null ? stored === "true" : true;
+  });
+
+  useEffect(() => {
+    if (!showSidebar) return;
+    window.localStorage.setItem("sidebar-open", String(isSidebarOpen));
+  }, [isSidebarOpen, showSidebar]);
 
   // ログインとホームは素の表示
   if (pathname === "/login" || pathname === "/") {
     return <>{children}</>;
   }
 
-  return (
-    <div className="relative min-h-screen overflow-hidden text-slate-900 dark:text-slate-100 dark:bg-black">
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(255,196,38,0.12),transparent_50%),radial-gradient(circle_at_80%_10%,rgba(56,189,248,0.12),transparent_55%)] dark:bg-none" />
-      </div>
+  const leftContent = headerLeftContent ?? <XpBadge />;
+  const shouldShowSidebar = showSidebar && isSidebarOpen;
 
-      {showSidebar && <Sidebar />}
+  return (
+    <div className="relative min-h-screen overflow-hidden text-slate-900">
+      <div className="pointer-events-none absolute inset-0 -z-10" />
+
+      {shouldShowSidebar && <Sidebar />}
+        {showSidebar ? (
+          <button
+            type="button"
+            onClick={() => setIsSidebarOpen((prev) => !prev)}
+            className="fixed left-6 top-6 z-[60] flex h-10 w-10 items-center justify-center text-sky-700 transition-colors hover:text-sky-500"
+            aria-label={isSidebarOpen ? "サイドバーを閉じる" : "サイドバーを開く"}
+          >
+          <span className="flex h-4 w-4 flex-col items-center justify-between">
+            <span className="h-[2px] w-full bg-current" />
+            <span className="h-[2px] w-full bg-current" />
+            <span className="h-[2px] w-full bg-current" />
+          </span>
+        </button>
+      ) : null}
 
       <div
-        className={clsx("min-h-screen", {
-          "ml-60": showSidebar,
-          "ml-0": !showSidebar,
+        className={clsx("min-h-screen transition-[margin] duration-300", {
+          "ml-60": shouldShowSidebar,
+          "ml-0": !shouldShowSidebar,
         })}
       >
         {showHeader && (
-          <Header title={headerTitle} description={headerDescription} actions={headerActions} />
+          <Header
+            actions={headerActions}
+            leftContent={leftContent}
+            actionsPlacement={actionsPlacement ?? "left"}
+            showBrand
+          />
         )}
 
         <main
-          className={clsx("mx-auto max-w-7xl px-6 py-8 sm:px-10 sm:py-12", className)}
+          className={clsx("mx-auto max-w-7xl px-6 pb-8 pt-24 sm:px-10 sm:pb-12", className)}
         >
+          <Breadcrumbs />
+          {(headerTitle || headerDescription) && (
+            <div className="mt-4">
+              {headerTitle && <h1 className="theme-readable text-lg font-semibold">{headerTitle}</h1>}
+              {headerDescription && (
+                <p className="theme-readable-muted mt-1 text-sm">{headerDescription}</p>
+              )}
+            </div>
+          )}
           {children}
         </main>
       </div>
     </div>
-  );
-}
-
-// Convenience wrappers
-export function DashboardLayout({
-  children,
-  ...props
-}: Omit<AppLayoutProps, "headerTitle" | "headerDescription">) {
-  return (
-    <AppLayout headerTitle="ダッシュボード" headerDescription="就活の進捗を一覧で確認" {...props}>
-      {children}
-    </AppLayout>
-  );
-}
-
-export function ESLayout({
-  children,
-  ...props
-}: Omit<AppLayoutProps, "headerTitle" | "headerDescription">) {
-  return (
-    <AppLayout headerTitle="ES管理" headerDescription="エントリーシートの作成・管理" {...props}>
-      {children}
-    </AppLayout>
-  );
-}
-
-export function CompanyLayout({
-  children,
-  ...props
-}: Omit<AppLayoutProps, "headerTitle" | "headerDescription">) {
-  return (
-    <AppLayout headerTitle="企業管理" headerDescription="志望企業の情報管理・分析" {...props}>
-      {children}
-    </AppLayout>
-  );
-}
-
-export function ProfileLayout({
-  children,
-  ...props
-}: Omit<AppLayoutProps, "headerTitle" | "headerDescription">) {
-  return (
-    <AppLayout headerTitle="プロフィール" headerDescription="個人設定とアバター管理" {...props}>
-      {children}
-    </AppLayout>
   );
 }

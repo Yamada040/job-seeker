@@ -1,39 +1,40 @@
 ﻿import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { ArrowLeftIcon, ArrowUturnLeftIcon, HomeIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 import { updateCompany, deleteCompany } from "../actions";
+import { ROUTES } from "@/lib/constants/routes";
 import { CompanyAiPanel } from "../_components/company-ai-panel";
 import { AppLayout } from "@/app/_components/layout";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
+import { FormLengthGuard } from "@/app/_components/form-length-guard";
+import { COMPANY_FIELDS, MAX_TEXT_LEN } from "@/app/_components/form-length-guard.config";
 
 export default async function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createSupabaseReadonlyClient();
-  if (!supabase) return redirect("/login");
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return redirect("/login");
 
   const { data, error } = await supabase
     .from("companies")
     .select("*")
     .eq("id", id)
-    .eq("user_id", userData.user.id)
+    .eq("user_id", userData.user!.id)
     .maybeSingle();
 
   if (error || !data) return notFound();
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link href="/" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.HOME} className="dq-button-secondary">
         <HomeIcon className="h-4 w-4" />
         MVPホーム
       </Link>
-      <Link href="/dashboard" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.DASHBOARD} className="dq-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         ダッシュボードへ
       </Link>
-      <Link href="/companies" className="mvp-button mvp-button-secondary">
+      <Link href={ROUTES.COMPANIES} className="dq-button-secondary">
         <ArrowLeftIcon className="h-4 w-4" />
         一覧へ戻る
       </Link>
@@ -50,15 +51,15 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
       headerActions={headerActions}
       className="flex flex-col gap-8"
     >
-      <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-8 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-        <form action={updateCompanyAction} className="space-y-6">
+      <div className="dq-card p-8">
+        <form id="company-form" action={updateCompanyAction} className="space-y-6">
           <label className="block space-y-2">
             <span className="text-sm font-medium text-slate-700">企業名</span>
             <input
               name="name"
               defaultValue={data.name ?? ""}
               required
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              className="dq-input text-sm"
               placeholder="例）Alpha SaaS"
             />
           </label>
@@ -68,7 +69,7 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
             <input
               name="industry"
               defaultValue={data.industry ?? ""}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              className="dq-input text-sm"
               placeholder="例）IT / コンサル / メーカー"
             />
           </label>
@@ -78,7 +79,7 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
             <input
               name="url"
               defaultValue={data.url ?? ""}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              className="dq-input text-sm"
               placeholder="https://example.com"
             />
           </label>
@@ -89,7 +90,7 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
               <input
                 name="mypage_id"
                 defaultValue={data.mypage_id ?? ""}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                className="dq-input text-sm"
                 placeholder="ログインID"
               />
             </label>
@@ -99,7 +100,7 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
               <input
                 name="mypage_url"
                 defaultValue={data.mypage_url ?? ""}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+                className="dq-input text-sm"
                 placeholder="https://mypage.example.com"
               />
             </label>
@@ -110,7 +111,7 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
             <input
               name="stage"
               defaultValue={data.stage ?? ""}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              className="dq-input text-sm"
               placeholder="Screening / Document passed など"
             />
           </label>
@@ -123,7 +124,7 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
               min="1"
               max="5"
               defaultValue={data.preference ?? ""}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              className="dq-input text-sm"
               placeholder="3"
             />
           </label>
@@ -134,7 +135,7 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
               name="memo"
               rows={3}
               defaultValue={data.memo ?? ""}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-amber-300"
+              className="dq-input text-sm"
               placeholder="興味を持った理由、応募メモ、インターン日程など"
             />
           </label>
@@ -150,23 +151,24 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
           </label>
 
           <div className="flex flex-wrap gap-3">
-            <button type="submit" className="mvp-button mvp-button-primary">
+            <button type="submit" className="dq-button">
               保存する
             </button>
-            <Link href="/companies" className="mvp-button mvp-button-secondary">
+            <Link href={ROUTES.COMPANIES} className="dq-button-secondary">
               キャンセル
             </Link>
           </div>
         </form>
+        <FormLengthGuard formId="company-form" maxLen={MAX_TEXT_LEN} fields={COMPANY_FIELDS} />
       </div>
       <form action={deleteCompanyAction} className="flex justify-end">
-        <button type="submit" className="mvp-button mvp-button-secondary text-rose-600">
+        <button type="submit" className="dq-button-secondary text-rose-600">
           <TrashIcon className="h-4 w-4" />
           削除する
         </button>
       </form>
 
-      <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-md backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+      <div className="dq-card p-6">
         <CompanyAiPanel
           name={data.name}
           url={data.url}

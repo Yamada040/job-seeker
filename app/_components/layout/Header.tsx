@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { clsx } from "clsx";
-import { ThemeToggle } from "../theme-toggle";
+import { BrandLogo } from "./BrandLogo";
 
-interface BreadcrumbItem {
+export interface BreadcrumbItem {
   label: string;
   href: string;
 }
@@ -15,7 +15,10 @@ interface HeaderProps {
   title?: string;
   description?: string;
   actions?: React.ReactNode;
+  leftContent?: React.ReactNode;
   breadcrumbs?: BreadcrumbItem[];
+  actionsPlacement?: "left" | "right";
+  showBrand?: boolean;
 }
 
 function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
@@ -41,14 +44,26 @@ function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
       case "companies":
         label = "企業管理";
         break;
+      case "aptitude":
+        label = "適性チェック";
+        break;
+      case "self-analysis":
+        label = "自己分析";
+        break;
+      case "interviews":
+        label = "面接ログ";
+        break;
+      case "webtests":
+        label = "Webテスト対策";
+        break;
       case "profile":
         label = "プロフィール";
         break;
+      case "contact":
+        label = "お問い合わせ";
+        break;
       case "new":
         label = "新規作成";
-        break;
-      case "settings":
-        label = "設定";
         break;
       default:
         if (segment.length > 20) {
@@ -62,89 +77,99 @@ function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
   return breadcrumbs;
 }
 
-export function Header({ title, description, actions, breadcrumbs }: HeaderProps) {
-  const pathname = usePathname();
-  const generatedBreadcrumbs = breadcrumbs || generateBreadcrumbs(pathname);
-
+export function Header({
+  title,
+  description,
+  actions,
+  leftContent,
+  actionsPlacement = "left",
+  showBrand,
+}: HeaderProps) {
   return (
-    <header className="border-b border-white/40 bg-white/70 px-6 py-4 backdrop-blur dark:border-gray-800 dark:bg-black">
+    <header className="app-header fixed left-0 top-0 z-50 w-full border-b px-6 py-4 backdrop-blur">
       <div className="flex flex-col gap-3">
-        {generatedBreadcrumbs.length > 1 && (
-          <nav className="flex items-center space-x-1 text-sm">
-            <HomeIcon className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-            <ChevronRightIcon className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-
-            {generatedBreadcrumbs.map((item, index) => (
-              <div key={item.href} className="flex items-center space-x-1">
-                {index === generatedBreadcrumbs.length - 1 ? (
-                  <span className="font-medium text-slate-800 dark:text-slate-100">{item.label}</span>
-                ) : (
-                  <>
-                    <Link
-                      href={item.href}
-                      className="text-slate-500 transition-colors hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100"
-                    >
-                      {item.label}
-                    </Link>
-                    <ChevronRightIcon className="h-4 w-4 text-slate-300 dark:text-slate-600" />
-                  </>
-                )}
+        {actionsPlacement === "left" ? (
+          <div className="flex items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              {showBrand ? (
+                <BrandLogo
+                  className="w-60 pl-16"
+                  iconClassName="h-14 w-14"
+                  textClassName="app-brand-text"
+                />
+              ) : null}
+              {leftContent ? (
+                <div className="flex-shrink-0">{leftContent}</div>
+              ) : null}
+            </div>
+            <div className="flex-1 min-w-0">
+              {title && (
+                <h1 className="theme-readable truncate text-2xl font-semibold">
+                  {title}
+                </h1>
+              )}
+              {description && (
+                <p className="theme-readable-muted mt-1 text-sm">{description}</p>
+              )}
+            </div>
+            {actions ? (
+              <div className="header-nav-actions flex-shrink-0 flex items-center gap-2">
+                {actions}
               </div>
-            ))}
-          </nav>
+            ) : null}
+          </div>
+        ) : (
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              {title && (
+                <h1 className="theme-readable truncate text-2xl font-semibold">
+                  {title}
+                </h1>
+              )}
+              {description && (
+                <p className="theme-readable-muted mt-1 text-sm">{description}</p>
+              )}
+            </div>
+
+            <div
+              className={clsx(
+                "header-nav-actions ml-4 flex items-center gap-2"
+              )}
+            >
+              {actions}
+            </div>
+          </div>
         )}
-
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            {title && (
-              <h1 className="truncate text-2xl font-semibold text-slate-900 dark:text-slate-100">{title}</h1>
-            )}
-            {description && (
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{description}</p>
-            )}
-          </div>
-
-          <div className={clsx("ml-4 flex items-center gap-2")}>
-            <ThemeToggle />
-            {actions}
-          </div>
-        </div>
       </div>
     </header>
   );
 }
 
-export const pageHeaders = {
-  dashboard: {
-    title: "ダッシュボード",
-    description: "就活の進捗を一覧で確認",
-  },
-  es: {
-    title: "ES管理",
-    description: "エントリーシートの作成・管理",
-  },
-  "es-detail": {
-    title: "ES詳細",
-    description: "エントリーシートの編集・AI添削",
-  },
-  "es-new": {
-    title: "新しいES",
-    description: "エントリーシートを作成",
-  },
-  companies: {
-    title: "企業管理",
-    description: "志望企業の管理・分析",
-  },
-  "company-detail": {
-    title: "企業詳細",
-    description: "企業情報の確認と編集",
-  },
-  "company-new": {
-    title: "新しい企業",
-    description: "企業情報を追加",
-  },
-  profile: {
-    title: "プロフィール",
-    description: "個人設定とアバター管理",
-  },
-} as const;
+export function Breadcrumbs({ breadcrumbs }: { breadcrumbs?: BreadcrumbItem[] }) {
+  const pathname = usePathname();
+  const generatedBreadcrumbs = breadcrumbs || generateBreadcrumbs(pathname);
+
+  if (generatedBreadcrumbs.length <= 1) return null;
+
+  return (
+    <nav className="theme-readable-muted mt-4 flex items-center space-x-1 text-xs font-bold">
+      <HomeIcon className="h-4 w-4" />
+      <ChevronRightIcon className="h-4 w-4 opacity-60" />
+
+      {generatedBreadcrumbs.map((item, index) => (
+        <div key={item.href} className="flex items-center space-x-1">
+          {index === generatedBreadcrumbs.length - 1 ? (
+            <span className="theme-readable">{item.label}</span>
+          ) : (
+            <>
+              <Link href={item.href} className="transition-colors hover:text-yellow-300">
+                {item.label}
+              </Link>
+              <ChevronRightIcon className="h-4 w-4 opacity-60" />
+            </>
+          )}
+        </div>
+      ))}
+    </nav>
+  );
+}

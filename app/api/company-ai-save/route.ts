@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { idAndSummarySchema } from "@/lib/validation/schemas/ai";
 import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { id, summary } = body as { id?: string; summary?: string };
-
-    if (!id || !summary) {
+    const body = await req.json().catch(() => null);
+    const requestValidation = idAndSummarySchema.safeParse(body);
+    if (!requestValidation.success) {
       return NextResponse.json({ error: "id and summary are required" }, { status: 400 });
     }
 
@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
 
     const { error } = await supabase
       .from("companies")
-      .update({ ai_summary: summary })
-      .eq("id", id)
+      .update({ ai_summary: requestValidation.data.summary })
+      .eq("id", requestValidation.data.id)
       .eq("user_id", userData.user.id);
 
     if (error) {

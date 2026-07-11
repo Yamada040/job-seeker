@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
+import { calendarEventSchema } from "@/lib/validation/schemas/api";
 
 export async function GET() {
   const supabase = await createSupabaseServerActionClient();
@@ -28,10 +29,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
-  const { date, title, company, type, time } = body ?? {};
-
-  if (!date || !title) {
+  const body = await request.json().catch(() => null);
+  const eventValidation = calendarEventSchema.safeParse(body);
+  if (!eventValidation.success) {
     return NextResponse.json({ error: "date と title は必須です" }, { status: 400 });
   }
 
@@ -39,11 +39,11 @@ export async function POST(request: Request) {
     .from("calendar_events")
     .insert({
       user_id: userData.user.id,
-      date,
-      title,
-      company,
-      type: type ?? "other",
-      time: time ?? null,
+      date: eventValidation.data.date,
+      title: eventValidation.data.title,
+      company: eventValidation.data.company ?? null,
+      type: eventValidation.data.type ?? "other",
+      time: eventValidation.data.time ?? null,
     })
     .select()
     .maybeSingle();
