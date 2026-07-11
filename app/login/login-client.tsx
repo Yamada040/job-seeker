@@ -12,11 +12,10 @@ export function LoginClient() {
     setError(null);
     try {
       const supabase = createSupabaseBrowserClient();
-      const redirectBase = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
       const { error: signInError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${redirectBase}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
       if (signInError) throw signInError;
