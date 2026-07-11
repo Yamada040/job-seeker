@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
 import { computeLevel } from "@/lib/xp/compute-level";
-import { LEVEL_UP_COOKIE } from "@/lib/xp/level-up-signal";
+import { encodeXpStatus, XP_STATUS_COOKIE } from "@/lib/xp/level-up-signal";
 
 type XpRule = {
   amount: number;
@@ -104,20 +104,23 @@ export async function awardXp(
     ref_id: opts?.refId ?? null,
   });
 
-  if (leveledUp) {
-    // redirect() で終わる Server Action は戻り値をクライアントへ返せないため、
-    // Cookie 経由でも通知する（XpBadge が読み取り後に削除するワンショット信号）
-    try {
-      const cookieStore = await cookies();
-      cookieStore.set(LEVEL_UP_COOKIE, String(leveledUp), {
+  // redirect() で終わる Server Action は戻り値をクライアントへ返せないため、
+  // 付与後の xp / level を Cookie 経由でも通知する（XpBadge が読み取り後に削除するワンショット信号）。
+  // フロントはこの値をそのまま表示に反映するので、XP変更時の再フェッチが不要になる。
+  try {
+    const cookieStore = await cookies();
+    cookieStore.set(
+      XP_STATUS_COOKIE,
+      encodeXpStatus({ xp: nextXp, level: nextLevel, leveledUp }),
+      {
         path: "/",
         maxAge: 60 * 5,
         httpOnly: false,
         sameSite: "lax",
-      });
-    } catch {
-      // Cookie を書けないコンテキストでは戻り値のみで通知する
-    }
+      }
+    );
+  } catch {
+    // Cookie を書けないコンテキストでは戻り値のみで通知する
   }
 
   return { awarded: true, leveledUp };

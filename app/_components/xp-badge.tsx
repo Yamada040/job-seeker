@@ -8,7 +8,7 @@ import {
   XP_PER_LEVEL,
 } from "@/lib/xp/compute-level";
 import {
-  consumeLevelUpCookie,
+  consumeXpStatusCookie,
   XP_UPDATED_EVENT,
 } from "@/lib/xp/level-up-signal";
 
@@ -17,34 +17,34 @@ type ProfileLite = {
   level: number | null;
 };
 
-const PROFILE_CACHE_KEY = "profile-lite";
-const PROFILE_CACHE_TS_KEY = "profile-lite-ts";
-const CACHE_TTL_MS = 5 * 60 * 1000;
+// ユーザー切り替え時に前のユーザーのキャッシュを拾わないよう userId でキーを分ける
+const profileCacheKey = (userId: string) => `profile-lite:${userId}`;
+
+async function getSessionUserId(): Promise<string | null> {
+  // getSession はローカル読みのみでネットワークを伴わない
+  const supabase = createSupabaseBrowserClient();
+  const { data } = await supabase.auth.getSession();
+  return data?.session?.user?.id ?? null;
+}
 
 export function XpBadge() {
   const [data, setData] = useState<ProfileLite | null>(null);
   const [levelUp, setLevelUp] = useState<number | null>(null);
 
-  const fetchProfile = useCallback(async (force = false) => {
+  // DB からの取得はセッション初回のみ。以降の XP 変動は awardXp が発行する
+  // Cookie（xp / level / leveledUp を含む）から反映するため、再フェッチしない。
+  const fetchProfile = useCallback(async () => {
     try {
-      if (!force) {
-        const cached = sessionStorage.getItem(PROFILE_CACHE_KEY);
-        const cachedAt = Number(
-          sessionStorage.getItem(PROFILE_CACHE_TS_KEY) || "0"
-        );
-        if (cached) {
-          const cachedData = JSON.parse(cached) as ProfileLite | null;
-          setData(cachedData);
-          if (Date.now() - cachedAt < CACHE_TTL_MS) {
-            return;
-          }
-        }
+      const userId = await getSessionUserId();
+      if (!userId) return;
+
+      const cached = sessionStorage.getItem(profileCacheKey(userId));
+      if (cached) {
+        setData(JSON.parse(cached) as ProfileLite | null);
+        return;
       }
 
       const supabase = createSupabaseBrowserClient();
-      const { data: userData } = await supabase.auth.getUser();
-      const userId = userData?.user?.id;
-      if (!userId) return;
       const { data: profile } = await supabase
         .from("profiles")
         .select("xp, level")
@@ -52,33 +52,53 @@ export function XpBadge() {
         .maybeSingle<ProfileLite>();
       setData(profile ?? null);
       sessionStorage.setItem(
-        PROFILE_CACHE_KEY,
+        profileCacheKey(userId),
         JSON.stringify(profile ?? null)
       );
-      sessionStorage.setItem(PROFILE_CACHE_TS_KEY, String(Date.now()));
     } catch {
       // fail silently
     }
   }, []);
 
-  // XP付与直後（Server Action / API がセットした Cookie）を検知して演出を出す。
+  // XP付与直後（Server Action / API がセットした Cookie）を検知し、
+  // Cookie に載っている付与後の値をそのまま表示へ反映する（DB 再取得なし）。
   // マウント時（redirect で遷移してきたケース）と、同一ページ内で
   // XP付与が完了したことを知らせるカスタムイベントの両方で確認する。
-  useEffect(() => {
-    const checkXpUpdated = (xpChanged: boolean) => {
-      const newLevel = consumeLevelUpCookie();
-      if (newLevel) {
-        setLevelUp(newLevel);
-      }
-      // XP付与後は表示中の XP/レベルも最新化する
-      void fetchProfile(xpChanged || newLevel !== null);
-    };
+  const applyXpStatus = useCallback(async () => {
+    const status = consumeXpStatusCookie();
+    if (!status) return false;
 
-    checkXpUpdated(false);
-    const onXpUpdated = () => checkXpUpdated(true);
+    const profile: ProfileLite = { xp: status.xp, level: status.level };
+    setData(profile);
+    if (status.leveledUp) {
+      setLevelUp(status.leveledUp);
+    }
+    try {
+      const userId = await getSessionUserId();
+      if (userId) {
+        sessionStorage.setItem(
+          profileCacheKey(userId),
+          JSON.stringify(profile)
+        );
+      }
+    } catch {
+      // fail silently
+    }
+    return true;
+  }, []);
+
+  useEffect(() => {
+    void (async () => {
+      const applied = await applyXpStatus();
+      if (!applied) {
+        void fetchProfile();
+      }
+    })();
+
+    const onXpUpdated = () => void applyXpStatus();
     window.addEventListener(XP_UPDATED_EVENT, onXpUpdated);
     return () => window.removeEventListener(XP_UPDATED_EVENT, onXpUpdated);
-  }, [fetchProfile]);
+  }, [applyXpStatus, fetchProfile]);
 
   const { xp, level, progress, xpIntoLevel, xpToNext } = useMemo(() => {
     const currentXp = data?.xp ?? 0;
