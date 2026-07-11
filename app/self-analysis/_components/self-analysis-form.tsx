@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AiPanel } from "@/app/_components/ai-panel";
+import { notifyXpUpdated } from "@/lib/xp/level-up-signal";
 
 type Answers = {
   strengths: string;
@@ -71,6 +72,7 @@ export default function SelfAnalysisForm({
       if (!res.ok || !json?.id) {
         throw new Error(json?.error || "保存に失敗しました");
       }
+      notifyXpUpdated();
       setResultId(json.id);
       setPresetText(prompt);
       setPresetKey(`${Date.now()}`);
