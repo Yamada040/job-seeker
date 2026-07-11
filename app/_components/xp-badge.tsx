@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { createSupabaseBrowserClient } from "@/lib/supabase/supabase-browser";
 import {
   computeLevel,
@@ -148,11 +149,14 @@ export function XpBadge() {
       {levelUp && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="relative aspect-video w-full max-w-[650px] overflow-hidden border-4 border-white shadow-2xl">
-            {/* 背景画像：levelup.jpg (常駐バーより鮮明に表示) */}
-            <img
-              src="/levelup.jpg"
+            {/* 背景画像：levelup.jpeg (常駐バーより鮮明に表示) */}
+            <Image
+              src="/levelup.jpeg"
               alt="Level Up Background"
-              className="absolute inset-0 h-full w-full object-cover opacity-90"
+              fill
+              sizes="(max-width: 650px) 100vw, 650px"
+              className="object-cover opacity-90"
+              priority
             />
 
             {/* DQ風メッセージウィンドウ */}
