@@ -1,63 +1,99 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { createSupabaseBrowserClient } from "@/lib/supabase/supabase-browser";
+import {
+  Suspense,
+  use,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
-type ProfileLite = {
+export type ProfileLite = {
   xp: number | null;
   level: number | null;
 };
 
 const PROFILE_CACHE_KEY = "profile-lite";
-const PROFILE_CACHE_TS_KEY = "profile-lite-ts";
-const CACHE_TTL_MS = 5 * 60 * 1000;
 
 function computeLevel(xp: number) {
   return Math.max(1, Math.floor(xp / 25) + 1);
 }
 
-export function XpBadge() {
-  const [data, setData] = useState<ProfileLite | null>(null);
-  const [levelUp, setLevelUp] = useState<number | null>(null);
+const subscribeNoop = () => () => {};
+
+function readCachedProfileRaw(): string | null {
+  try {
+    return sessionStorage.getItem(PROFILE_CACHE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Server Component から渡された promise を use() で解決して表示する。
+ * 解決値は sessionStorage にキャッシュし、ページ遷移中の
+ * Suspense fallback（XpBadgeFallback）でのちらつき防止に使う。
+ */
+function XpBadgeResolved({
+  profilePromise,
+}: {
+  profilePromise: Promise<ProfileLite | null>;
+}) {
+  const data = use(profilePromise);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const cached = sessionStorage.getItem(PROFILE_CACHE_KEY);
-        const cachedAt = Number(
-          sessionStorage.getItem(PROFILE_CACHE_TS_KEY) || "0"
-        );
-        if (cached) {
-          const cachedData = JSON.parse(cached) as ProfileLite | null;
-          setData(cachedData);
-          if (Date.now() - cachedAt < CACHE_TTL_MS) {
-            return;
-          }
-        }
+    try {
+      sessionStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(data ?? null));
+    } catch {
+      // fail silently
+    }
+  }, [data]);
 
-        const supabase = createSupabaseBrowserClient();
-        const { data: userData } = await supabase.auth.getUser();
-        const userId = userData?.user?.id;
-        if (!userId) return;
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("xp, level")
-          .eq("id", userId)
-          .maybeSingle<ProfileLite>();
-        setData(profile ?? null);
-        sessionStorage.setItem(
-          PROFILE_CACHE_KEY,
-          JSON.stringify(profile ?? null)
-        );
-        sessionStorage.setItem(PROFILE_CACHE_TS_KEY, String(Date.now()));
-      } catch {
-        // fail silently
-      }
-    };
-    void fetchProfile();
-  }, []);
+  return <XpBadgeView data={data} />;
+}
 
-  const { xp, level, progress, nextThreshold, prevThreshold } = useMemo(() => {
+/**
+ * Suspense fallback。前回表示時の sessionStorage キャッシュがあれば
+ * それを表示してちらつきを防ぐ（初回はデフォルト表示）。
+ */
+function XpBadgeFallback() {
+  // SSR では null（デフォルト表示）、クライアントでは sessionStorage を
+  // 参照してハイドレーション不整合なく前回値を表示する。
+  const raw = useSyncExternalStore(
+    subscribeNoop,
+    readCachedProfileRaw,
+    () => null
+  );
+
+  const cached = useMemo(() => {
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as ProfileLite | null;
+    } catch {
+      return null;
+    }
+  }, [raw]);
+
+  return <XpBadgeView data={cached} />;
+}
+
+export function XpBadge({
+  profilePromise,
+}: {
+  profilePromise: Promise<ProfileLite | null>;
+}) {
+  return (
+    <Suspense fallback={<XpBadgeFallback />}>
+      <XpBadgeResolved profilePromise={profilePromise} />
+    </Suspense>
+  );
+}
+
+function XpBadgeView({ data }: { data: ProfileLite | null }) {
+  const [levelUp, setLevelUp] = useState<number | null>(null);
+
+  const { xp, level, progress, nextThreshold } = useMemo(() => {
     const currentXp = data?.xp ?? 0;
     const lvl = data?.level ?? computeLevel(currentXp);
     const prev = Math.max(0, (lvl - 1) * 50);
@@ -69,7 +105,6 @@ export function XpBadge() {
       level: lvl,
       progress: prog,
       nextThreshold: next,
-      prevThreshold: prev,
     };
   }, [data]);
 

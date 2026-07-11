@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Suspense, use } from "react";
 import { usePathname } from "next/navigation";
 import {
   HomeIcon,
@@ -128,27 +128,37 @@ const developerItem: NavItem = {
   description: "利用状況の分析",
 };
 
-export function Sidebar() {
-  const pathname = usePathname();
-  const [isDeveloper, setIsDeveloper] = useState(false);
+/**
+ * Server Component から渡された promise を use() で解決し、
+ * 開発者のときだけ開発者ダッシュボードへのリンクを表示する。
+ */
+function DeveloperNavLink({
+  isDeveloperPromise,
+  pathname,
+}: {
+  isDeveloperPromise: Promise<boolean>;
+  pathname: string;
+}) {
+  const isDeveloper = use(isDeveloperPromise);
+  if (!isDeveloper) return null;
 
-  useEffect(() => {
-    let mounted = true;
-    const fetchRole = async () => {
-      try {
-        const res = await fetch("/api/developer/me", { cache: "no-store" });
-        if (!res.ok) return;
-        const json = (await res.json()) as { isDeveloper?: boolean };
-        if (mounted) setIsDeveloper(Boolean(json.isDeveloper));
-      } catch {
-        if (mounted) setIsDeveloper(false);
+  return (
+    <NavLink
+      item={developerItem}
+      isActive={
+        pathname === developerItem.href ||
+        pathname.startsWith(developerItem.href + "/")
       }
-    };
-    void fetchRole();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    />
+  );
+}
+
+export function Sidebar({
+  isDeveloperPromise,
+}: {
+  isDeveloperPromise: Promise<boolean>;
+}) {
+  const pathname = usePathname();
 
   return (
     <div className="app-sidebar fixed left-0 top-20 z-40 h-[calc(100vh-5rem)] w-60 border-r backdrop-blur">
@@ -186,15 +196,12 @@ export function Sidebar() {
                 </div>
               </button>
             </form>
-            {isDeveloper ? (
-              <NavLink
-                item={developerItem}
-                isActive={
-                  pathname === developerItem.href ||
-                  pathname.startsWith(developerItem.href + "/")
-                }
+            <Suspense fallback={null}>
+              <DeveloperNavLink
+                isDeveloperPromise={isDeveloperPromise}
+                pathname={pathname}
               />
-            ) : null}
+            </Suspense>
           </div>
         </div>
       </div>
