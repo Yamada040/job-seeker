@@ -1,9 +1,5 @@
 import { AiClient, AiProvider, AiPromptKind, AiResponse } from "./types";
-
-const AI_PROVIDER = (process.env.AI_PROVIDER ?? "gemini") as AiProvider;
-const AI_KEY = process.env.AI_PROVIDER_API_KEY;
-const AI_MODEL = process.env.AI_MODEL;
-const AI_API_VERSION = process.env.AI_API_VERSION || "v1beta";
+import { AI_KEY, AI_PROVIDER, GPT_ENDPOINT, geminiEndpoint, resolvedModel } from "./config";
 
 const templates: Record<AiPromptKind, (input: string) => string> = {
   es_review: (input) =>
@@ -84,8 +80,8 @@ function missingKeyResponse(): AiResponse {
 
 async function callGemini(prompt: string): Promise<AiResponse> {
   if (!AI_KEY) return missingKeyResponse();
-  const model = AI_MODEL || "gemini-1.5-flash-latest";
-  const endpoint = `https://generativelanguage.googleapis.com/${AI_API_VERSION}/models/${model}:generateContent?key=${AI_KEY}`;
+  const model = resolvedModel("gemini");
+  const endpoint = geminiEndpoint(model);
 
   const res = await fetch(endpoint, {
     method: "POST",
@@ -98,10 +94,8 @@ async function callGemini(prompt: string): Promise<AiResponse> {
 
   if (!res.ok) {
     const bodyText = await res.text().catch(() => "");
-    return {
-      summary: `Gemini呼び出しに失敗しました (${res.status})`,
-      bulletPoints: bodyText ? [bodyText] : undefined,
-    };
+    console.error(`Gemini API error (${res.status}):`, bodyText);
+    return { summary: "AI分析中にエラーが発生しました。しばらく経ってから再試行してください。" };
   }
 
   type GeminiPart = { text?: string };
@@ -134,8 +128,8 @@ async function callGemini(prompt: string): Promise<AiResponse> {
 
 async function callGpt(prompt: string): Promise<AiResponse> {
   if (!AI_KEY) return missingKeyResponse();
-  const model = AI_MODEL || "gpt-4o-mini";
-  const endpoint = process.env.AI_ENDPOINT || "https://api.openai.com/v1/chat/completions";
+  const model = resolvedModel("gpt");
+  const endpoint = GPT_ENDPOINT;
 
   const res = await fetch(endpoint, {
     method: "POST",
@@ -158,10 +152,8 @@ async function callGpt(prompt: string): Promise<AiResponse> {
 
   if (!res.ok) {
     const bodyText = await res.text().catch(() => "");
-    return {
-      summary: `GPT呼び出しに失敗しました (${res.status})`,
-      bulletPoints: bodyText ? [bodyText] : undefined,
-    };
+    console.error(`GPT API error (${res.status}):`, bodyText);
+    return { summary: "AI分析中にエラーが発生しました。しばらく経ってから再試行してください。" };
   }
 
   type OpenAIChoice = { message?: { content?: string } };
@@ -187,7 +179,7 @@ async function callGpt(prompt: string): Promise<AiResponse> {
 }
 
 export function createAiClient(): AiClient {
-  const provider: AiProvider = AI_PROVIDER === "gpt" ? "gpt" : "gemini";
+  const provider: AiProvider = AI_PROVIDER;
   return {
     provider,
     async call(input: string, kind: AiPromptKind) {
