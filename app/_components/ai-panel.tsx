@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useMemo, useOptimistic, useReducer, useState, useTransition } from "react";
 import { CheckIcon, ClipboardDocumentIcon, CloudArrowUpIcon } from "@heroicons/react/24/outline";
 
 import { BlockingOverlay } from "./blocking-overlay";
@@ -93,7 +93,10 @@ export function AiPanel({
 }: Props) {
   const [input, setInput] = useState(defaultInput);
   const [state, dispatch] = useReducer(panelReducer, initialPanelState);
-  const { status, response, error, copied, saved } = state;
+  const { status, response, error, copied } = state;
+  // 保存は楽観的に即時反映し、失敗時はstate.savedへ自動ロールバックする
+  const [saved, setOptimisticSaved] = useOptimistic(state.saved);
+  const [, startSaveTransition] = useTransition();
   const loading = status === "loading";
   const saving = status === "saving";
 
@@ -179,22 +182,25 @@ export function AiPanel({
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!response || !saveUrl || !saveId) return;
-    dispatch({ type: "saveStart" });
-    try {
-      const res = await fetch(saveUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: saveId, summary: JSON.stringify(response) }),
-      });
-      if (!res.ok) throw new Error("保存に失敗しました。");
-      dispatch({ type: "saveSuccess" });
-      onSaved?.();
-    } catch (err) {
-      console.error("Save failed:", err);
-      dispatch({ type: "saveError", error: "保存に失敗しました。再度お試しください。" });
-    }
+    startSaveTransition(async () => {
+      setOptimisticSaved(true);
+      dispatch({ type: "saveStart" });
+      try {
+        const res = await fetch(saveUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: saveId, summary: JSON.stringify(response) }),
+        });
+        if (!res.ok) throw new Error("保存に失敗しました。");
+        dispatch({ type: "saveSuccess" });
+        onSaved?.();
+      } catch (err) {
+        console.error("Save failed:", err);
+        dispatch({ type: "saveError", error: "保存に失敗しました。再度お試しください。" });
+      }
+    });
   };
 
   const handleCopy = async () => {

@@ -2,7 +2,7 @@
 
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useActionState, useMemo, useReducer, useState } from "react";
+import { useActionState, useMemo, useOptimistic, useReducer, useState, useTransition } from "react";
 
 import { TYPE_LABEL } from "./calendar/constants";
 import { CalendarDayCell, CalendarEvent, CalendarFormState } from "./calendar/types";
@@ -85,12 +85,36 @@ function modalReducer(state: ModalState, action: ModalAction): ModalState {
   }
 }
 
+type OptimisticEventsAction =
+  | { type: "save"; event: CalendarEvent }
+  | { type: "delete"; id: string };
+
+function optimisticEventsReducer(
+  current: CalendarEvent[],
+  action: OptimisticEventsAction
+): CalendarEvent[] {
+  switch (action.type) {
+    case "save": {
+      const exists = current.some((evt) => evt.id === action.event.id);
+      if (exists) return current.map((evt) => (evt.id === action.event.id ? action.event : evt));
+      return [...current, action.event];
+    }
+    case "delete":
+      return current.filter((evt) => evt.id !== action.id);
+    default:
+      return current;
+  }
+}
+
 export function InteractiveCalendar({ initialEvents = [] }: Props) {
   const [currentMonth, setCurrentMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
   const [events, setEvents] = useState<CalendarEvent[]>(initialEvents);
+  // 保存・削除を楽観的に即時反映し、API失敗時はeventsへ自動ロールバックする
+  const [optimisticEvents, applyOptimisticEvents] = useOptimistic(events, optimisticEventsReducer);
+  const [, startDeleteTransition] = useTransition();
   const [modalState, dispatch] = useReducer(
     modalReducer,
     null,
@@ -139,12 +163,12 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
   }, [currentMonth]);
 
   const eventsByDate = useMemo(() => {
-    return events.reduce<Record<string, CalendarEvent[]>>((acc, evt) => {
+    return optimisticEvents.reduce<Record<string, CalendarEvent[]>>((acc, evt) => {
       const key = evt.date;
       acc[key] = acc[key] ? [...acc[key], evt] : [evt];
       return acc;
     }, {});
-  }, [events]);
+  }, [optimisticEvents]);
 
   const todayEvents = useMemo(() => {
     return (eventsByDate[todayKey] || []).slice().sort((a, b) => {
@@ -161,7 +185,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
     endOfWeek.setDate(now.getDate() + (6 - now.getDay()));
     endOfWeek.setHours(23, 59, 59, 999);
 
-    return events
+    return optimisticEvents
       .filter((evt) => {
         if (!evt.date) return false;
         const date = new Date(evt.date);
@@ -173,7 +197,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
         if (a.date !== b.date) return a.date.localeCompare(b.date);
         return (a.time || "99:99").localeCompare(b.time || "99:99");
       });
-  }, [events]);
+  }, [optimisticEvents]);
 
   const handlePrevMonth = () => {
     setCurrentMonth((prev) => {
@@ -194,6 +218,18 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
   };
 
   const [, submitAction, saving] = useActionState<null, FormData>(async () => {
+    // 一時ID（新規時）で即時反映し、API完了後に実データで置き換える
+    applyOptimisticEvents({
+      type: "save",
+      event: {
+        id: editingId ?? `optimistic-${Date.now()}`,
+        date: selectedDate,
+        title: formState.title || "予定",
+        company: formState.company || null,
+        type: formState.type,
+        time: formState.time || null,
+      },
+    });
     try {
       const payload = {
         date: selectedDate,
@@ -239,26 +275,30 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
     dispatch({ type: "editPrefill", event: evt });
   };
 
-  const handleDeleteEvent = async (evt: CalendarEvent) => {
-    if (evt.id.startsWith("es-")) return;
+  const handleDeleteEvent = (evt: CalendarEvent) => {
+    if (evt.id.startsWith("es-") || evt.id.startsWith("optimistic-")) return;
     if (!confirm("この予定を削除しますか？")) return;
 
-    dispatch({ type: "deleteStart", id: evt.id });
-    try {
-      const res = await fetch(`/api/calendar-events/${evt.id}`, { method: "DELETE" });
-      const json = await res.json().catch(() => null);
-      if (!res.ok || !json?.data?.id) {
-        throw new Error(json?.error ?? "削除に失敗しました");
-      }
+    startDeleteTransition(async () => {
+      // 楽観的に即時削除し、API失敗時はロールバックする
+      applyOptimisticEvents({ type: "delete", id: evt.id });
+      dispatch({ type: "deleteStart", id: evt.id });
+      try {
+        const res = await fetch(`/api/calendar-events/${evt.id}`, { method: "DELETE" });
+        const json = await res.json().catch(() => null);
+        if (!res.ok || !json?.data?.id) {
+          throw new Error(json?.error ?? "削除に失敗しました");
+        }
 
-      setEvents((prev) => prev.filter((item) => item.id !== evt.id));
-      dispatch({ type: "deleteSuccess", id: evt.id });
-    } catch (err) {
-      console.error(err);
-      alert("削除に失敗しました。再度お試しください。");
-    } finally {
-      dispatch({ type: "deleteEnd" });
-    }
+        setEvents((prev) => prev.filter((item) => item.id !== evt.id));
+        dispatch({ type: "deleteSuccess", id: evt.id });
+      } catch (err) {
+        console.error(err);
+        alert("削除に失敗しました。再度お試しください。");
+      } finally {
+        dispatch({ type: "deleteEnd" });
+      }
+    });
   };
 
   return (
