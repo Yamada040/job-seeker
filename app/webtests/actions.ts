@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
 import { webtestAnswerFormSchema, webtestQuestionFormSchema } from "@/lib/validation/schemas/forms";
 import { awardXp } from "@/lib/xp/award-xp";
+import { SAMPLE_WEBTEST_QUESTIONS } from "./sample-questions";
 
 export async function createWebtestQuestion(formData: FormData) {
   const supabase = await createSupabaseActionClient();
@@ -54,6 +55,37 @@ export async function createWebtestQuestion(formData: FormData) {
 
   revalidatePath("/webtests");
   redirect("/webtests");
+}
+
+export async function seedSampleWebtestQuestions() {
+  const supabase = await createSupabaseActionClient();
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData?.user) return redirect("/login");
+
+  const userId = userData.user.id;
+  const titles = SAMPLE_WEBTEST_QUESTIONS.map((question) => question.title);
+  const { data: existing, error: existingError } = await supabase
+    .from("webtest_questions")
+    .select("title")
+    .eq("user_id", userId)
+    .in("title", titles);
+  if (existingError) throw existingError;
+
+  const existingTitles = new Set((existing ?? []).map((question) => question.title));
+  const inserts = SAMPLE_WEBTEST_QUESTIONS.filter(
+    (question) => !existingTitles.has(question.title)
+  ).map((question) => ({
+    ...question,
+    user_id: userId,
+  }));
+
+  if (inserts.length > 0) {
+    const { error } = await supabase.from("webtest_questions").insert(inserts);
+    if (error) throw error;
+  }
+
+  revalidatePath("/webtests");
+  redirect(`/webtests?seeded=${inserts.length}`);
 }
 
 export async function submitWebtestAnswer(questionId: string, formData: FormData) {

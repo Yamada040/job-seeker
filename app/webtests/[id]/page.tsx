@@ -12,9 +12,10 @@ export default async function WebtestDetailPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Record<string, string | string[] | undefined>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { id } = await params;
+  const resolvedSearchParams = await searchParams;
   const supabase = await createSupabaseReadonlyClient();
   const { data: userData } = await supabase.auth.getUser();
 
@@ -35,7 +36,8 @@ export default async function WebtestDetailPage({
     .order("created_at", { ascending: false })
     .limit(5);
 
-  const status = typeof searchParams.status === "string" ? searchParams.status : undefined;
+  const status = typeof resolvedSearchParams.status === "string" ? resolvedSearchParams.status : undefined;
+  const hasAnswered = status === "correct" || status === "incorrect";
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
@@ -61,13 +63,43 @@ export default async function WebtestDetailPage({
       headerActions={headerActions}
       className="space-y-6"
     >
-      {status === "correct" ? (
-        <div className="dq-panel px-4 py-3 text-sm text-emerald-200">
-          正解です！
-        </div>
-      ) : status === "incorrect" ? (
-        <div className="dq-panel px-4 py-3 text-sm text-rose-200">
-          不正解です。もう一度チャレンジしましょう。
+      {hasAnswered ? (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="webtest-result-title"
+            className="dq-window w-full max-w-2xl space-y-4 p-5 shadow-2xl"
+          >
+            <div className="space-y-2">
+              <p
+                id="webtest-result-title"
+                className={status === "correct" ? "text-lg font-semibold text-emerald-200" : "text-lg font-semibold text-rose-200"}
+              >
+                {status === "correct" ? "正解です！" : "不正解です"}
+              </p>
+              <p className="text-sm text-white/70">
+                {status === "correct" ? "この調子で次の問題にも進みましょう。" : "解説を確認して、もう一度チャレンジしましょう。"}
+              </p>
+            </div>
+
+            {question.explanation ? (
+              <div className="dq-panel p-4 text-sm text-white/80">
+                <p className="text-xs font-semibold text-white/70">解説</p>
+                <p className="mt-1 whitespace-pre-line leading-6">{question.explanation}</p>
+              </div>
+            ) : (
+              <div className="dq-panel p-4 text-sm text-white/70">
+                この問題には解説が登録されていません。
+              </div>
+            )}
+
+            <div className="flex justify-end">
+              <Link href={ROUTES.WEBTEST_DETAIL(id)} className="dq-button">
+                閉じる
+              </Link>
+            </div>
+          </div>
         </div>
       ) : null}
 
@@ -124,12 +156,6 @@ export default async function WebtestDetailPage({
             </div>
           </form>
 
-          {question.explanation ? (
-            <div className="dq-panel p-4 text-sm text-white/80">
-              <p className="text-xs font-semibold text-white/70">解説</p>
-              <p className="mt-1 whitespace-pre-line leading-6">{question.explanation}</p>
-            </div>
-          ) : null}
         </div>
 
         <div className="dq-card space-y-3 p-4">

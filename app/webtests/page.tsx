@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { ArrowUturnLeftIcon, HomeIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { ArrowUturnLeftIcon, HomeIcon, PlusIcon, SparklesIcon } from "@heroicons/react/24/outline";
 
 import { AppLayout } from "@/app/_components/layout";
 import { ROUTES } from "@/lib/constants/routes";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
+import { seedSampleWebtestQuestions } from "./actions";
+import { SAMPLE_WEBTEST_QUESTIONS } from "./sample-questions";
 
 type WebtestListItem = {
   id: string;
@@ -25,6 +27,9 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
   const { data: userData } = await supabase.auth.getUser();
 
   const params = await searchParams;
+  const seededParam = params?.seeded;
+  const seededCount =
+    typeof seededParam === "string" ? Number.parseInt(seededParam, 10) : null;
   const testTypeParam = params?.test_type;
   let testTypeFilter: string | undefined;
   if (Array.isArray(testTypeParam)) {
@@ -48,6 +53,11 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
 
   const items = (data ?? []) as WebtestListItem[];
   const testTypeOptions = Array.from(new Set(items.map((q) => q.test_type).filter(Boolean))) as string[];
+  const sampleCountByType = SAMPLE_WEBTEST_QUESTIONS.reduce<Record<string, number>>((acc, question) => {
+    const key = question.test_type ?? "その他";
+    acc[key] = (acc[key] ?? 0) + 1;
+    return acc;
+  }, {});
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
@@ -73,6 +83,39 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
       headerActions={headerActions}
       className="space-y-6"
     >
+      {Number.isFinite(seededCount) ? (
+        <div className="dq-panel px-4 py-3 text-sm text-emerald-200">
+          {seededCount && seededCount > 0
+            ? `サンプル問題を${seededCount}問追加しました。`
+            : "追加できるサンプル問題はすでに登録済みです。"}
+        </div>
+      ) : null}
+
+      <div className="dq-card flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-white">サンプル問題セット</p>
+          <p className="mt-1 text-xs text-white/60">
+            未登録のサンプルだけを問題バンクに追加します。
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-white/70">
+            {Object.entries(sampleCountByType).map(([type, count]) => (
+              <span key={type} className="rounded-full border border-white/20 px-2 py-1">
+                {type}: {count}問
+              </span>
+            ))}
+            <span className="rounded-full border border-yellow-300/50 px-2 py-1 text-yellow-100">
+              合計 {SAMPLE_WEBTEST_QUESTIONS.length}問
+            </span>
+          </div>
+        </div>
+        <form action={seedSampleWebtestQuestions}>
+          <button type="submit" className="dq-button">
+            <SparklesIcon className="h-4 w-4" />
+            サンプル問題を追加
+          </button>
+        </form>
+      </div>
+
       <div className="dq-card space-y-4 p-4">
         <div className="flex flex-wrap gap-3 text-sm">
           <form
