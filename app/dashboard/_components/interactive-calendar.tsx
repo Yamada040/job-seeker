@@ -2,7 +2,7 @@
 
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useMemo, useReducer, useState } from "react";
+import { useActionState, useMemo, useReducer, useState } from "react";
 
 import { TYPE_LABEL } from "./calendar/constants";
 import { CalendarDayCell, CalendarEvent, CalendarFormState } from "./calendar/types";
@@ -24,7 +24,6 @@ type ModalState = {
   selectedDate: string;
   editingId: string | null;
   formState: CalendarFormState;
-  saving: boolean;
   deletingId: string | null;
 };
 
@@ -35,9 +34,7 @@ type ModalAction =
   | { type: "editPrefill"; event: CalendarEvent }
   | { type: "resetForm" }
   | { type: "updateForm"; patch: Partial<CalendarFormState> }
-  | { type: "saveStart" }
   | { type: "saveSuccess" }
-  | { type: "saveEnd" }
   | { type: "deleteStart"; id: string }
   | { type: "deleteSuccess"; id: string }
   | { type: "deleteEnd" };
@@ -73,12 +70,8 @@ function modalReducer(state: ModalState, action: ModalAction): ModalState {
       return { ...state, formState: { ...emptyForm }, editingId: null };
     case "updateForm":
       return { ...state, formState: { ...state.formState, ...action.patch } };
-    case "saveStart":
-      return { ...state, saving: true };
     case "saveSuccess":
       return { ...state, formState: { ...emptyForm }, editingId: null };
-    case "saveEnd":
-      return { ...state, saving: false };
     case "deleteStart":
       return { ...state, deletingId: action.id };
     case "deleteSuccess":
@@ -106,11 +99,10 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
       selectedDate: formatDateKey(new Date()),
       editingId: null,
       formState: { ...emptyForm },
-      saving: false,
       deletingId: null,
     })
   );
-  const { isModalOpen, selectedDate, editingId, formState, saving, deletingId } = modalState;
+  const { isModalOpen, selectedDate, editingId, formState, deletingId } = modalState;
   const todayKey = formatDateKey(new Date());
   const weekdayLabel = ["日", "月", "火", "水", "木", "金", "土"];
 
@@ -201,9 +193,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
     dispatch({ type: "openModalForDate", date });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    dispatch({ type: "saveStart" });
+  const [, submitAction, saving] = useActionState<null, FormData>(async () => {
     try {
       const payload = {
         date: selectedDate,
@@ -241,10 +231,9 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
     } catch (err) {
       console.error(err);
       alert("保存に失敗しました。再度お試しください。");
-    } finally {
-      dispatch({ type: "saveEnd" });
     }
-  };
+    return null;
+  }, null);
 
   const handleEditPrefill = (evt: CalendarEvent) => {
     dispatch({ type: "editPrefill", event: evt });
@@ -522,7 +511,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
 
             <form
               className="mt-4 space-y-3 border-t border-white/20 pt-4"
-              onSubmit={handleSubmit}
+              action={submitAction}
             >
               <div className="space-y-1">
                 <label className="text-xs text-white/70">日付</label>

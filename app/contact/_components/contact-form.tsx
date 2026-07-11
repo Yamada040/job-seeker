@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useRef, useState } from "react";
+import { useActionState } from "react";
 import { contactRequestSchema } from "@/lib/validation/schemas/contact";
 
 interface ContactFormProps {
@@ -8,92 +8,87 @@ interface ContactFormProps {
   email: string;
 }
 
+type SubmitValues = {
+  subject: string;
+  message: string;
+};
+
 type SubmitState =
-  | { status: "idle"; message: null }
-  | { status: "submitting"; message: null }
-  | { status: "success"; message: string }
-  | { status: "error"; message: string };
+  | { status: "success"; message: string; values: null }
+  | { status: "error"; message: string; values: SubmitValues }
+  | null;
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function ContactForm({ displayName, email }: ContactFormProps) {
-  const [submitState, setSubmitState] = useState<SubmitState>({
-    status: "idle",
-    message: null,
-  });
-  const isSubmittingRef = useRef(false);
-  const requestIdRef = useRef(0);
-  const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+  const [submitState, formAction, isPending] = useActionState<SubmitState, FormData>(
+    async (_prev, formData) => {
+      const values: SubmitValues = {
+        subject: String(formData.get("subject") ?? ""),
+        message: String(formData.get("message") ?? ""),
+      };
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (isSubmittingRef.current) return;
-    isSubmittingRef.current = true;
-    const currentRequestId = ++requestIdRef.current;
-    setSubmitState({ status: "idle", message: null });
-    const form = event.currentTarget;
-
-    const formData = new FormData(event.currentTarget);
-    const validation = contactRequestSchema.safeParse({
-      subject: formData.get("subject"),
-      message: formData.get("message"),
-    });
-
-    if (!validation.success) {
-      setSubmitState({
-        status: "error",
-        message: validation.error.issues[0]?.message ?? "入力内容を確認してください",
+      const validation = contactRequestSchema.safeParse({
+        subject: formData.get("subject"),
+        message: formData.get("message"),
       });
-      isSubmittingRef.current = false;
-      return;
-    }
 
-    setSubmitState({ status: "submitting", message: null });
-    try {
-      const [response] = await Promise.all([
-        fetch("/api/contact", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(validation.data),
-        }),
-        wait(600),
-      ]);
-      const result = (await response.json().catch(() => null)) as
-        | {
-            ok?: boolean;
-            message?: string;
-            error?: string;
-          }
-        | null;
-
-      if (!response.ok || !result?.ok) {
-        if (requestIdRef.current !== currentRequestId) return;
-        setSubmitState({
+      if (!validation.success) {
+        return {
           status: "error",
-          message: result?.error ?? "送信に失敗しました。時間をおいて再度お試しください。",
-        });
-        return;
+          message: validation.error.issues[0]?.message ?? "入力内容を確認してください",
+          values,
+        };
       }
 
-      if (requestIdRef.current !== currentRequestId) return;
-      setSubmitState({
-        status: "success",
-        message: result.message ?? "送信に成功しました。",
-      });
-      form.reset();
-    } catch {
-      if (requestIdRef.current !== currentRequestId) return;
-      setSubmitState({
-        status: "error",
-        message: "送信に失敗しました。通信環境を確認して再度お試しください。",
-      });
-    } finally {
-      isSubmittingRef.current = false;
-    }
-  };
+      try {
+        const [response] = await Promise.all([
+          fetch("/api/contact", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(validation.data),
+          }),
+          wait(600),
+        ]);
+        const result = (await response.json().catch(() => null)) as
+          | {
+              ok?: boolean;
+              message?: string;
+              error?: string;
+            }
+          | null;
+
+        if (!response.ok || !result?.ok) {
+          return {
+            status: "error",
+            message: result?.error ?? "送信に失敗しました。時間をおいて再度お試しください。",
+            values,
+          };
+        }
+
+        return {
+          status: "success",
+          message: result.message ?? "送信に成功しました。",
+          values: null,
+        };
+      } catch {
+        return {
+          status: "error",
+          message: "送信に失敗しました。通信環境を確認して再度お試しください。",
+          values,
+        };
+      }
+    },
+    null
+  );
+
+  // 送信失敗時はReactのフォーム自動リセット後もdefaultValue経由で入力値を復元する
+  const preservedValues = submitState?.status === "error" ? submitState.values : null;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form action={formAction} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block space-y-1 text-xs text-white/70">
           登録ユーザー名
@@ -117,6 +112,7 @@ export function ContactForm({ displayName, email }: ContactFormProps) {
         件名
         <input
           name="subject"
+          defaultValue={preservedValues?.subject}
           className="dq-input text-sm"
           placeholder="例）ログインについて"
           required
@@ -128,16 +124,17 @@ export function ContactForm({ displayName, email }: ContactFormProps) {
         <textarea
           name="message"
           rows={8}
+          defaultValue={preservedValues?.message}
           className="dq-input text-sm"
           placeholder="お問い合わせ内容をご記入ください"
           required
         />
       </label>
 
-      {submitState.status === "error" ? (
+      {submitState?.status === "error" ? (
         <p className="text-xs text-rose-700 dark:text-rose-300">{submitState.message}</p>
       ) : null}
-      {submitState.status === "success" ? (
+      {submitState?.status === "success" ? (
         <p className="text-xs text-emerald-700 dark:text-emerald-300">{submitState.message}</p>
       ) : null}
       <div className="flex items-center justify-between gap-4">
@@ -146,10 +143,10 @@ export function ContactForm({ displayName, email }: ContactFormProps) {
         </p>
         <button
           type="submit"
-          disabled={submitState.status === "submitting"}
+          disabled={isPending}
           className="sidebar-link-style text-sm disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {submitState.status === "submitting" ? "送信状態を確認中..." : "送信する"}
+          {isPending ? "送信状態を確認中..." : "送信する"}
         </button>
       </div>
     </form>
