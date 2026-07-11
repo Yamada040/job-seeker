@@ -3,6 +3,7 @@
 import { useActionState, useMemo, useState } from "react";
 
 import { AiPanel } from "@/app/_components/ai-panel";
+import { notifyXpUpdated } from "@/lib/xp/level-up-signal";
 import { Answers } from "../types";
 import { defaultAnswers, interestOptions, mbtiOptions, strengthOptions, valueOptions } from "./aptitude-constants";
 import { buildPrompt } from "./aptitude-utils";
@@ -53,6 +54,7 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
       });
       const json = await res.json();
       if (!res.ok || !json?.id) throw new Error(json?.error || "保存に失敗しました");
+      notifyXpUpdated();
       setResultId(json.id);
       setPresetText(prompt);
       setPresetKey(`${Date.now()}`);

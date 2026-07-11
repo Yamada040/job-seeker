@@ -24,10 +24,6 @@ type CalendarEvent = {
   time?: string | null;
 };
 
-function computeLevel(xp: number) {
-  return Math.max(1, Math.floor(xp / 50) + 1);
-}
-
 async function getDashboardData() {
   const supabase = await createSupabaseReadonlyClient();
   if (!supabase) throw new Error("Supabase client not available");
@@ -178,15 +174,6 @@ export default async function DashboardPage() {
 
   const allXpLogs = data.xpLogs ?? [];
   const recentXpLogs = allXpLogs.slice(0, 5);
-  const fallbackXp = recentXpLogs.reduce((sum, log) => sum + (log.xp ?? 0), 0);
-  const xp = data.profile?.xp ?? fallbackXp;
-  const level = data.profile?.level ?? computeLevel(xp);
-  const prevThreshold = Math.max(0, (level - 1) * 50);
-  const nextThreshold = level * 50;
-  const progress =
-    nextThreshold > prevThreshold
-      ? Math.min(1, (xp - prevThreshold) / (nextThreshold - prevThreshold))
-      : 0;
   const navigationActions = (
     <div className="flex flex-wrap items-center gap-3">
       <Link href={ROUTES.HOME} className="dq-button">

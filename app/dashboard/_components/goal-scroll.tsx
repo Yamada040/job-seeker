@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ROUTES } from "@/lib/constants/routes";
 
 type GoalScrollProps = {
@@ -17,10 +18,13 @@ export function GoalScroll({
       <div className="relative mx-auto w-[min(90%,920px)]">
         {/* 1. 縦幅を抑えた横長の巻き物コンテナ */}
         <div className="relative aspect-[16/8] w-full drop-shadow-lg sm:aspect-[2048/750]">
-          <img
+          <Image
             src="/parchment.png"
             alt="巻物"
-            className="absolute inset-0 h-full w-full object-fill opacity-95"
+            fill
+            sizes="(max-width: 920px) 90vw, 920px"
+            className="object-fill opacity-95"
+            priority
           />
 
           {/* 2. コンテンツエリア：高さを抑えて情報の密度を上げる */}
@@ -78,9 +82,12 @@ export function GoalScroll({
             </div>
 
             {/* 4. キャラクター：さらに小さく配置して邪魔にならないように */}
-            <img
+            <Image
               src="/retro-hero.svg"
               alt="勇者"
+              width={112}
+              height={112}
+              unoptimized
               className="pointer-events-none absolute -bottom-2 right-12 hidden h-28 w-28 drop-shadow-md md:block pixel-art"
               style={{ imageRendering: "pixelated" }}
             />
