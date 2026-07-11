@@ -2,7 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/supabase-browser";
-import { computeLevel, levelThresholds } from "@/lib/xp/compute-level";
+import {
+  computeLevel,
+  levelThresholds,
+  XP_PER_LEVEL,
+} from "@/lib/xp/compute-level";
 import {
   consumeLevelUpCookie,
   XP_UPDATED_EVENT,
@@ -76,46 +80,45 @@ export function XpBadge() {
     return () => window.removeEventListener(XP_UPDATED_EVENT, onXpUpdated);
   }, [fetchProfile]);
 
-  const { xp, level, progress, nextThreshold } = useMemo(() => {
+  const { xp, level, progress, xpIntoLevel, xpToNext } = useMemo(() => {
     const currentXp = data?.xp ?? 0;
-    const lvl = data?.level ?? computeLevel(currentXp);
+    // DB の level は古い計算式で保存されている可能性があるため、常に XP から導出する
+    const lvl = computeLevel(currentXp);
     const { prev, next } = levelThresholds(lvl);
-    const prog =
-      next > prev ? Math.min(1, (currentXp - prev) / (next - prev)) : 0;
+    const into = currentXp - prev;
     return {
       xp: currentXp,
       level: lvl,
-      progress: prog,
-      nextThreshold: next,
+      progress: Math.min(1, into / XP_PER_LEVEL),
+      xpIntoLevel: into,
+      xpToNext: Math.max(0, next - currentXp),
     };
   }, [data]);
 
   return (
     <>
-      {/* 1. 常駐ステータスバー：DQウィンドウ形式に戻す */}
-      <div className="flex min-w-[600px] flex-1 items-center gap-4 rounded-md px-2 py-1 text-white">
+      {/* 1. 常駐ステータスバー：白基調テーマに合わせた配色 */}
+      <div className="flex min-w-[600px] flex-1 items-center gap-4 rounded-md px-2 py-1">
         <div className="flex items-baseline gap-2">
-          <span className="text-[10px] font-bold tracking-widest text-white/90">
+          <span className="text-[10px] font-bold tracking-widest text-sky-600">
             LEVEL
           </span>
-          <span className="text-2xl font-bold tracking-tighter text-white">
+          <span className="theme-readable text-2xl font-bold tracking-tighter">
             Lv {level}
           </span>
-          <span className="text-xs text-white/80">XP {xp}</span>
+          <span className="theme-readable-muted text-xs">XP {xp}</span>
         </div>
         <div className="flex flex-1 flex-col gap-1 min-w-[180px]">
-          <div className="h-2.5 w-full border border-white bg-black/40 p-[2px]">
+          <div className="h-2.5 w-full rounded-full border border-sky-300 bg-sky-100 p-[2px]">
             <div
-              className="h-full bg-yellow-300 transition-all duration-1000"
+              className="h-full rounded-full bg-gradient-to-r from-sky-400 to-sky-600 transition-all duration-1000"
               style={{ width: `${Math.round(progress * 100)}%` }}
             />
           </div>
-          <div className="flex justify-between text-[10px] font-bold tracking-tight text-white">
+          <div className="theme-readable-muted flex justify-between text-[10px] font-bold tracking-tight">
+            <span>つぎの レベルまで {xpToNext} XP</span>
             <span>
-              つぎの レベルまで {Math.max(0, nextThreshold - xp)} XP
-            </span>
-            <span>
-              {xp} / {nextThreshold}
+              {xpIntoLevel} / {XP_PER_LEVEL}
             </span>
           </div>
         </div>
