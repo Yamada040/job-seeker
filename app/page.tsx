@@ -133,9 +133,8 @@ export default function Home() {
           className="flex items-center justify-between gap-4"
         >
           <BrandLogo
-            className="gap-4 font-semibold"
-            iconClassName="h-16 w-16"
-            textClassName="text-3xl text-slate-900"
+            className="font-semibold"
+            logoClassName="h-16"
           />
           <div className="flex items-center gap-3 text-sm">
             <Link
