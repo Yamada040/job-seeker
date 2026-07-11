@@ -131,7 +131,7 @@ export function XpBadge() {
         <div className="flex flex-1 flex-col gap-1 min-w-[180px]">
           <div className="h-2.5 w-full rounded-full border border-sky-300 bg-sky-100 p-[2px]">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-sky-400 to-sky-600 transition-all duration-1000"
+              className="h-full rounded-full bg-gradient-to-r from-sky-400 to-sky-600"
               style={{ width: `${Math.round(progress * 100)}%` }}
             />
           </div>
