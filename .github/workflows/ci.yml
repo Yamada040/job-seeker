@@ -50,19 +50,22 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-  # docs/testing/e2e-test-plan.md の「前提条件」に記載のE2E専用Supabaseプロジェクトの
-  # Secretsが未設定の間は自動でスキップする（本番用Secretsとは別名で管理し、混同を防ぐ）。
+  # docs/testing/e2e-test-plan.md の「前提条件」参照。新規Supabaseプロジェクトは作らず、
+  # build ジョブと同じ本番Supabaseの資格情報を流用し、固定のテストユーザーA/Bでログインする。
+  # E2E_TEST_SECRET が未設定の間は自動でスキップする。
   e2e:
     runs-on: ubuntu-latest
-    if: ${{ secrets.E2E_SUPABASE_URL != '' }}
+    if: ${{ secrets.E2E_TEST_SECRET != '' }}
     env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.E2E_SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.E2E_SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       E2E_TEST_MODE: "true"
       E2E_TEST_SECRET: ${{ secrets.E2E_TEST_SECRET }}
       E2E_TEST_USER_EMAIL: ${{ secrets.E2E_TEST_USER_EMAIL }}
       E2E_TEST_USER_PASSWORD: ${{ secrets.E2E_TEST_USER_PASSWORD }}
+      E2E_TEST_USER2_EMAIL: ${{ secrets.E2E_TEST_USER2_EMAIL }}
+      E2E_TEST_USER2_PASSWORD: ${{ secrets.E2E_TEST_USER2_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { expect, test } from "@playwright/test";
-import { AUTH_STORAGE_STATE } from "./global-setup";
+import { AUTH_STORAGE_STATE_A } from "./global-setup";
 
 test.describe("ログインページの導線", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
@@ -18,10 +18,10 @@ test.describe("ログインページの導線", () => {
 
 test.describe("認証済みセッションでのダッシュボード表示", () => {
   test.skip(
-    !fs.existsSync(AUTH_STORAGE_STATE),
-    "テスト用SupabaseプロジェクトのE2E環境変数が未設定のためスキップ（docs/testing/e2e-test-plan.md 参照）",
+    !fs.existsSync(AUTH_STORAGE_STATE_A),
+    "E2Eテストユーザーの環境変数が未設定のためスキップ（docs/testing/e2e-test-plan.md 参照）",
   );
-  test.use({ storageState: AUTH_STORAGE_STATE });
+  test.use({ storageState: AUTH_STORAGE_STATE_A });
 
   test("セッションが確立されていれば/dashboardが表示される", async ({ page }) => {
     await page.goto("/dashboard");

@@ -1,12 +1,9 @@
 import path from "node:path";
 import { request } from "@playwright/test";
-import { createClient } from "@supabase/supabase-js";
+import { createE2eAdminClient } from "./support/admin-client";
 
-export const AUTH_STORAGE_STATE = path.join(__dirname, ".auth/user.json");
-
-// next/headers に依存する lib/supabase/supabase-server.ts は Next.js の
-// リクエストスコープ外（PlaywrightのNodeプロセス）から読み込むと壊れやすいため、
-// ここでは admin クライアントを直接組み立てる。
+export const AUTH_STORAGE_STATE_A = path.join(__dirname, ".auth/userA.json");
+export const AUTH_STORAGE_STATE_B = path.join(__dirname, ".auth/userB.json");
 
 const REQUIRED_ENV_KEYS = [
   "NEXT_PUBLIC_SUPABASE_URL",
@@ -16,16 +13,12 @@ const REQUIRED_ENV_KEYS = [
   "E2E_TEST_SECRET",
   "E2E_TEST_USER_EMAIL",
   "E2E_TEST_USER_PASSWORD",
+  "E2E_TEST_USER2_EMAIL",
+  "E2E_TEST_USER2_PASSWORD",
 ] as const;
 
-function createAdminClient() {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-}
-
 async function ensureTestUserExists(email: string, password: string) {
-  const admin = createAdminClient();
+  const admin = createE2eAdminClient();
   const { error } = await admin.auth.admin.createUser({
     email,
     password,
@@ -37,29 +30,33 @@ async function ensureTestUserExists(email: string, password: string) {
   }
 }
 
+async function loginAndSaveState(baseURL: string, user: "a" | "b", storagePath: string) {
+  const requestContext = await request.newContext({ baseURL });
+  const response = await requestContext.post("/api/test-support/login", {
+    headers: { "x-e2e-secret": process.env.E2E_TEST_SECRET! },
+    data: { user },
+  });
+  if (!response.ok()) {
+    throw new Error(`[e2e] test-support login (${user}) failed: ${response.status()} ${await response.text()}`);
+  }
+  await requestContext.storageState({ path: storagePath });
+  await requestContext.dispose();
+}
+
 export default async function globalSetup() {
   const missing = REQUIRED_ENV_KEYS.filter((key) => !process.env[key]);
   if (missing.length > 0) {
     console.warn(
-      `[e2e] テスト用Supabaseプロジェクトの環境変数が未設定のため、認証が必要なテストはスキップされます。不足: ${missing.join(", ")}`,
+      `[e2e] E2Eテストユーザーの環境変数が未設定のため、認証が必要なテストはスキップされます。不足: ${missing.join(", ")}`,
     );
     return;
   }
 
   const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
-  const email = process.env.E2E_TEST_USER_EMAIL!;
-  const password = process.env.E2E_TEST_USER_PASSWORD!;
 
-  await ensureTestUserExists(email, password);
+  await ensureTestUserExists(process.env.E2E_TEST_USER_EMAIL!, process.env.E2E_TEST_USER_PASSWORD!);
+  await ensureTestUserExists(process.env.E2E_TEST_USER2_EMAIL!, process.env.E2E_TEST_USER2_PASSWORD!);
 
-  const requestContext = await request.newContext({ baseURL });
-  const response = await requestContext.post("/api/test-support/login", {
-    headers: { "x-e2e-secret": process.env.E2E_TEST_SECRET! },
-  });
-  if (!response.ok()) {
-    throw new Error(`[e2e] test-support login failed: ${response.status()} ${await response.text()}`);
-  }
-
-  await requestContext.storageState({ path: AUTH_STORAGE_STATE });
-  await requestContext.dispose();
+  await loginAndSaveState(baseURL, "a", AUTH_STORAGE_STATE_A);
+  await loginAndSaveState(baseURL, "b", AUTH_STORAGE_STATE_B);
 }

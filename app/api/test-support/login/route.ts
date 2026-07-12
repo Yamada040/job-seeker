@@ -17,8 +17,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Not Found" }, { status: 404 });
   }
 
-  const email = process.env.E2E_TEST_USER_EMAIL;
-  const password = process.env.E2E_TEST_USER_PASSWORD;
+  const body = await request.json().catch(() => null);
+  const user = body?.user === "b" ? "b" : "a";
+
+  const email = user === "b" ? process.env.E2E_TEST_USER2_EMAIL : process.env.E2E_TEST_USER_EMAIL;
+  const password = user === "b" ? process.env.E2E_TEST_USER2_PASSWORD : process.env.E2E_TEST_USER_PASSWORD;
   if (!email || !password) {
     return NextResponse.json({ error: "E2E test user is not configured" }, { status: 500 });
   }
