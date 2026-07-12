@@ -211,10 +211,27 @@ Supabaseへの実接続を必要としないため、既存の `.env.local` の�
 
 `.github/workflows/ci.yml` に `e2e` ジョブを追加する（既存の `lint`/`type-check`/`test`/`build` と並列）。**新規プロジェクトではなく本番Supabaseを流用するため、Supabase接続系のSecretsは `build` ジョブと同じものをそのまま使う。** `E2E_TEST_SECRET` が未設定の間は自動でスキップし、CI全体をブロックしない。
 
+**注意**: GitHub Actionsではジョブレベルの `if:` に `secrets` コンテキストを直接使えない（ワークフローファイル自体がパースエラーで即失敗する）。そのため `check-e2e-secrets` という前段のジョブでシークレットの有無をステップ内の環境変数として判定し、その `outputs` を `e2e` ジョブの `if:` から参照する形にしている。
+
 ```yaml
-e2e:
+check-e2e-secrets:
   runs-on: ubuntu-latest
-  if: ${{ secrets.E2E_TEST_SECRET != '' }}
+  outputs:
+    configured: ${{ steps.check.outputs.configured }}
+  steps:
+    - id: check
+      env:
+        E2E_TEST_SECRET: ${{ secrets.E2E_TEST_SECRET }}
+      run: |
+        if [ -n "$E2E_TEST_SECRET" ]; then
+          echo "configured=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "configured=false" >> "$GITHUB_OUTPUT"
+        fi
+e2e:
+  needs: check-e2e-secrets
+  if: needs.check-e2e-secrets.outputs.configured == 'true'
+  runs-on: ubuntu-latest
   env:
     NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
     NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}

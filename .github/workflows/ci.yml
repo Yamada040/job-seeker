@@ -53,9 +53,26 @@ jobs:
   # docs/testing/e2e-test-plan.md の「前提条件」参照。新規Supabaseプロジェクトは作らず、
   # build ジョブと同じ本番Supabaseの資格情報を流用し、固定のテストユーザーA/Bでログインする。
   # E2E_TEST_SECRET が未設定の間は自動でスキップする。
-  e2e:
+  # job-levelのif:はsecretsコンテキストを直接参照できないため、事前チェック用ジョブの
+  # outputs経由で判定する。
+  check-e2e-secrets:
     runs-on: ubuntu-latest
-    if: ${{ secrets.E2E_TEST_SECRET != '' }}
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
+    steps:
+      - id: check
+        env:
+          E2E_TEST_SECRET: ${{ secrets.E2E_TEST_SECRET }}
+        run: |
+          if [ -n "$E2E_TEST_SECRET" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          fi
+  e2e:
+    needs: check-e2e-secrets
+    if: needs.check-e2e-secrets.outputs.configured == 'true'
+    runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
