@@ -55,9 +55,7 @@ export function EsListClient({ initialItems }: Props) {
               type="button"
               onClick={() => setTab(t.value)}
               className={`rounded-full border px-3 py-1 ${
-                tab === t.value
-                  ? "border-white bg-black text-white"
-                  : "border-white/40 bg-black/70 text-white/70"
+                tab === t.value ? "border-white bg-black text-white" : "border-white/40 bg-black/70 text-white/70"
               }`}
             >
               {t.label}
@@ -87,7 +85,10 @@ export function EsListClient({ initialItems }: Props) {
               </span>
               {es.tags?.length ? (
                 es.tags.map((tag) => (
-                  <span key={tag} className="rounded-full border border-yellow-300/40 bg-yellow-500/20 px-2 py-1 text-yellow-200">
+                  <span
+                    key={tag}
+                    className="rounded-full border border-yellow-300/40 bg-yellow-500/20 px-2 py-1 text-yellow-200"
+                  >
                     {tag}
                   </span>
                 ))
@@ -95,7 +96,9 @@ export function EsListClient({ initialItems }: Props) {
                 <span className="text-white/50">タグなし</span>
               )}
             </div>
-            <p className="mt-1 text-xs text-white/60">更新日: {es.updated_at ? new Date(es.updated_at).toLocaleDateString() : "-"}</p>
+            <p className="mt-1 text-xs text-white/60">
+              更新日: {es.updated_at ? new Date(es.updated_at).toLocaleDateString() : "-"}
+            </p>
           </Link>
         ))}
         {filtered.length === 0 ? (

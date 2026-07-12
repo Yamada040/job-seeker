@@ -25,13 +25,7 @@ interface NavItem {
   description?: string;
 }
 
-function NavLink({
-  item,
-  isActive,
-}: {
-  item: NavItem;
-  isActive: boolean;
-}) {
+function NavLink({ item, isActive }: { item: NavItem; isActive: boolean }) {
   return (
     <Link
       href={item.href}
@@ -40,10 +34,7 @@ function NavLink({
         isActive ? "text-yellow-400" : "text-white hover:text-yellow-400",
       )}
     >
-      <span
-        aria-hidden
-        className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
-      >
+      <span aria-hidden className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1">
         ▶
       </span>
       <item.icon
@@ -55,9 +46,7 @@ function NavLink({
       <div className="min-w-0 flex-1">
         <div className="truncate text-xs">{item.label}</div>
         {item.description && (
-          <div className="mt-0.5 truncate text-[0.65rem] font-normal text-white/70">
-            {item.description}
-          </div>
+          <div className="mt-0.5 truncate text-[0.65rem] font-normal text-white/70">{item.description}</div>
         )}
       </div>
     </Link>
@@ -145,19 +134,12 @@ function DeveloperNavLink({
   return (
     <NavLink
       item={developerItem}
-      isActive={
-        pathname === developerItem.href ||
-        pathname.startsWith(developerItem.href + "/")
-      }
+      isActive={pathname === developerItem.href || pathname.startsWith(developerItem.href + "/")}
     />
   );
 }
 
-export function Sidebar({
-  isDeveloperPromise,
-}: {
-  isDeveloperPromise: Promise<boolean>;
-}) {
+export function Sidebar({ isDeveloperPromise }: { isDeveloperPromise: Promise<boolean> }) {
   const pathname = usePathname();
 
   return (
@@ -169,9 +151,7 @@ export function Sidebar({
               <NavLink
                 key={item.href}
                 item={item}
-                isActive={
-                  pathname === item.href || pathname.startsWith(item.href + "/")
-                }
+                isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
               />
             ))}
           </div>
@@ -197,10 +177,7 @@ export function Sidebar({
               </button>
             </form>
             <Suspense fallback={null}>
-              <DeveloperNavLink
-                isDeveloperPromise={isDeveloperPromise}
-                pathname={pathname}
-              />
+              <DeveloperNavLink isDeveloperPromise={isDeveloperPromise} pathname={pathname} />
             </Suspense>
           </div>
         </div>

@@ -31,8 +31,7 @@ export async function POST(req: NextRequest) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      const encode = (event: Record<string, unknown>) =>
-        controller.enqueue(new TextEncoder().encode(sseEvent(event)));
+      const encode = (event: Record<string, unknown>) => controller.enqueue(new TextEncoder().encode(sseEvent(event)));
 
       try {
         const result = await agenticCompanyAnalysis(input, (message) => {

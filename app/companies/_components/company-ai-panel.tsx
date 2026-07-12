@@ -24,27 +24,35 @@ type Props = {
 };
 
 const sanitizeMarkdown = (text: string): string =>
-  text.replace(/\*\*(.*?)\*\*/g, "$1").replace(/\*(.*?)\*/g, "$1").replace(/^#+\s/gm, "");
+  text
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*(.*?)\*/g, "$1")
+    .replace(/^#+\s/gm, "");
 
 type InitialState = { response: AiResponse | null; saved: boolean };
 
 function resolveInitialState(initialSummary: unknown, cacheKey?: string): InitialState {
   if (initialSummary) {
     try {
-      const parsed =
-        typeof initialSummary === "string" ? JSON.parse(initialSummary) : initialSummary;
+      const parsed = typeof initialSummary === "string" ? JSON.parse(initialSummary) : initialSummary;
       if ((parsed as AiResponse).summary) {
         return {
           response: { ...(parsed as AiResponse), provider: (parsed as AiResponse).provider ?? "saved" },
           saved: true,
         };
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
   if (cacheKey && typeof window !== "undefined") {
     const stored = sessionStorage.getItem(`ai-cache-${cacheKey}`);
     if (stored) {
-      try { return { response: JSON.parse(stored) as AiResponse, saved: false }; } catch { /* ignore */ }
+      try {
+        return { response: JSON.parse(stored) as AiResponse, saved: false };
+      } catch {
+        /* ignore */
+      }
     }
   }
   return { response: null, saved: false };
@@ -75,8 +83,8 @@ export function CompanyAiPanel({
   const [input, setInput] = useState(aiInput);
   const [isPending, startTransition] = useTransition();
   const [saving, setSaving] = useState(false);
-  const [{ response: initialResponse, saved: initialSaved }] = useState(
-    () => resolveInitialState(initialSummary, cacheKey)
+  const [{ response: initialResponse, saved: initialSaved }] = useState(() =>
+    resolveInitialState(initialSummary, cacheKey),
   );
   const [response, setResponse] = useState<AiResponse | null>(initialResponse);
   const [error, setError] = useState<string | null>(null);
@@ -181,10 +189,7 @@ export function CompanyAiPanel({
 
   const handleCopy = async () => {
     if (!response) return;
-    const text = [
-      response.summary ?? "",
-      ...(response.bulletPoints?.map((b) => `・${b}`) ?? []),
-    ].join("\n");
+    const text = [response.summary ?? "", ...(response.bulletPoints?.map((b) => `・${b}`) ?? [])].join("\n");
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -273,11 +278,7 @@ export function CompanyAiPanel({
                     <span>保存済み</span>
                   </span>
                 )}
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  className="sidebar-link-style text-[11px]"
-                >
+                <button type="button" onClick={handleCopy} className="sidebar-link-style text-[11px]">
                   {copied ? <CheckIcon className="h-4 w-4" /> : <ClipboardDocumentIcon className="h-4 w-4" />}
                   <span>{copied ? "コピー済み" : "コピー"}</span>
                 </button>

@@ -21,68 +21,63 @@ type SubmitState =
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function ContactForm({ displayName, email }: ContactFormProps) {
-  const [submitState, formAction, isPending] = useActionState<SubmitState, FormData>(
-    async (_prev, formData) => {
-      const values: SubmitValues = {
-        subject: String(formData.get("subject") ?? ""),
-        message: String(formData.get("message") ?? ""),
+  const [submitState, formAction, isPending] = useActionState<SubmitState, FormData>(async (_prev, formData) => {
+    const values: SubmitValues = {
+      subject: String(formData.get("subject") ?? ""),
+      message: String(formData.get("message") ?? ""),
+    };
+
+    const validation = contactRequestSchema.safeParse({
+      subject: formData.get("subject"),
+      message: formData.get("message"),
+    });
+
+    if (!validation.success) {
+      return {
+        status: "error",
+        message: validation.error.issues[0]?.message ?? "入力内容を確認してください",
+        values,
       };
+    }
 
-      const validation = contactRequestSchema.safeParse({
-        subject: formData.get("subject"),
-        message: formData.get("message"),
-      });
+    try {
+      const [response] = await Promise.all([
+        fetch("/api/contact", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(validation.data),
+        }),
+        wait(600),
+      ]);
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        message?: string;
+        error?: string;
+      } | null;
 
-      if (!validation.success) {
+      if (!response.ok || !result?.ok) {
         return {
           status: "error",
-          message: validation.error.issues[0]?.message ?? "入力内容を確認してください",
+          message: result?.error ?? "送信に失敗しました。時間をおいて再度お試しください。",
           values,
         };
       }
 
-      try {
-        const [response] = await Promise.all([
-          fetch("/api/contact", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(validation.data),
-          }),
-          wait(600),
-        ]);
-        const result = (await response.json().catch(() => null)) as
-          | {
-              ok?: boolean;
-              message?: string;
-              error?: string;
-            }
-          | null;
-
-        if (!response.ok || !result?.ok) {
-          return {
-            status: "error",
-            message: result?.error ?? "送信に失敗しました。時間をおいて再度お試しください。",
-            values,
-          };
-        }
-
-        return {
-          status: "success",
-          message: result.message ?? "送信に成功しました。",
-          values: null,
-        };
-      } catch {
-        return {
-          status: "error",
-          message: "送信に失敗しました。通信環境を確認して再度お試しください。",
-          values,
-        };
-      }
-    },
-    null
-  );
+      return {
+        status: "success",
+        message: result.message ?? "送信に成功しました。",
+        values: null,
+      };
+    } catch {
+      return {
+        status: "error",
+        message: "送信に失敗しました。通信環境を確認して再度お試しください。",
+        values,
+      };
+    }
+  }, null);
 
   // 送信失敗時はReactのフォーム自動リセット後もdefaultValue経由で入力値を復元する
   const preservedValues = submitState?.status === "error" ? submitState.values : null;
@@ -92,19 +87,11 @@ export function ContactForm({ displayName, email }: ContactFormProps) {
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block space-y-1 text-xs text-white/70">
           登録ユーザー名
-          <input
-            value={displayName || "未設定"}
-            disabled
-            className="dq-input text-sm"
-          />
+          <input value={displayName || "未設定"} disabled className="dq-input text-sm" />
         </label>
         <label className="block space-y-1 text-xs text-white/70">
           ログインメール
-          <input
-            value={email}
-            disabled
-            className="dq-input text-sm"
-          />
+          <input value={email} disabled className="dq-input text-sm" />
         </label>
       </div>
 
@@ -138,9 +125,7 @@ export function ContactForm({ displayName, email }: ContactFormProps) {
         <p className="text-xs text-emerald-700 dark:text-emerald-300">{submitState.message}</p>
       ) : null}
       <div className="flex items-center justify-between gap-4">
-        <p className="text-xs text-white/60">
-          送信内容には登録ユーザー名とログインメールが含まれます。
-        </p>
+        <p className="text-xs text-white/60">送信内容には登録ユーザー名とログインメールが含まれます。</p>
         <button
           type="submit"
           disabled={isPending}

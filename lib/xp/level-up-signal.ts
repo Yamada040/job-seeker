@@ -20,16 +20,12 @@ export function encodeXpStatus(status: XpStatusSignal): string {
 // クライアント専用: Cookie を読み取って削除し、XP付与結果を返す
 export function consumeXpStatusCookie(): XpStatusSignal | null {
   if (typeof document === "undefined") return null;
-  const match = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith(`${XP_STATUS_COOKIE}=`));
+  const match = document.cookie.split("; ").find((row) => row.startsWith(`${XP_STATUS_COOKIE}=`));
   if (!match) return null;
 
   document.cookie = `${XP_STATUS_COOKIE}=; path=/; max-age=0`;
   try {
-    const parsed = JSON.parse(
-      decodeURIComponent(match.slice(XP_STATUS_COOKIE.length + 1))
-    ) as Partial<XpStatusSignal>;
+    const parsed = JSON.parse(decodeURIComponent(match.slice(XP_STATUS_COOKIE.length + 1))) as Partial<XpStatusSignal>;
     if (typeof parsed.xp !== "number" || typeof parsed.level !== "number") {
       return null;
     }

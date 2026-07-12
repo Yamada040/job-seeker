@@ -73,9 +73,7 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
         </div>
 
         <div className="mt-4 space-y-4">
-          <div className="dq-panel px-3 py-2 text-xs font-semibold text-yellow-200">
-            ※ 現在は一回しかできません。
-          </div>
+          <div className="dq-panel px-3 py-2 text-xs font-semibold text-yellow-200">※ 現在は一回しかできません。</div>
           <CheckboxGroup
             label="興味のある領域（複数選択可）"
             options={interestOptions}
@@ -126,7 +124,11 @@ export default function AptitudeForm({ initialAnswers, initialSummary, initialRe
           />
           <TextArea label="補足メモ" value={answers.otherNotes} onChange={(v) => handleChange("otherNotes", v)} />
           <form action={saveAction} className="flex flex-wrap gap-3">
-            <button type="submit" disabled={saving || isMonthlyLocked} className="dq-button disabled:cursor-not-allowed disabled:opacity-60">
+            <button
+              type="submit"
+              disabled={saving || isMonthlyLocked}
+              className="dq-button disabled:cursor-not-allowed disabled:opacity-60"
+            >
               {isMonthlyLocked ? "実施済み" : saving ? "保存中..." : "保存する"}
             </button>
           </form>
@@ -185,24 +187,11 @@ function CheckboxGroup({
   );
 }
 
-function TextArea({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
+function TextArea({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <label className="block space-y-2">
       <span className="theme-readable text-sm font-medium">{label}</span>
-      <textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        rows={3}
-        className="dq-input text-sm"
-      />
+      <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3} className="dq-input text-sm" />
     </label>
   );
 }
@@ -223,11 +212,7 @@ function SelectBox({
   return (
     <label className="block space-y-2">
       <span className="theme-readable text-sm font-medium">{label}</span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="dq-input text-sm"
-      >
+      <select value={value} onChange={(e) => onChange(e.target.value)} className="dq-input text-sm">
         <option value="">{placeholder || "選択してください"}</option>
         {options.map((opt) => (
           <option key={opt} value={opt}>

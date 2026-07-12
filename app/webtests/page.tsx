@@ -75,11 +75,7 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
     >
       <div className="dq-card space-y-4 p-4">
         <div className="flex flex-wrap gap-3 text-sm">
-          <form
-            className="dq-panel flex items-center gap-2 px-3 py-2"
-            method="GET"
-            action={ROUTES.WEBTESTS}
-          >
+          <form className="dq-panel flex items-center gap-2 px-3 py-2" method="GET" action={ROUTES.WEBTESTS}>
             <span className="text-xs text-white/60">テスト形式</span>
             <select
               name="test_type"
@@ -125,7 +121,10 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
                 items.map((q) => (
                   <tr key={q.id} className="hover:bg-white/5">
                     <Td>
-                      <Link href={ROUTES.WEBTEST_DETAIL(q.id)} className="font-semibold text-yellow-200 hover:underline">
+                      <Link
+                        href={ROUTES.WEBTEST_DETAIL(q.id)}
+                        className="font-semibold text-yellow-200 hover:underline"
+                      >
                         {q.title}
                       </Link>
                     </Td>
@@ -149,4 +148,6 @@ export default async function WebtestsPage({ searchParams }: PageProps) {
 const Th = ({ children }: { children: React.ReactNode }) => (
   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-white/70">{children}</th>
 );
-const Td = ({ children }: { children: React.ReactNode }) => <td className="px-4 py-3 align-top text-white/90">{children}</td>;
+const Td = ({ children }: { children: React.ReactNode }) => (
+  <td className="px-4 py-3 align-top text-white/90">{children}</td>
+);

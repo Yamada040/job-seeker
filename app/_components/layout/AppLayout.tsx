@@ -40,11 +40,5 @@ export function AppLayout(props: AppLayoutProps) {
   const profilePromise = fetchProfileLite();
   const isDeveloperPromise = fetchIsDeveloper();
 
-  return (
-    <AppLayoutClient
-      {...props}
-      profilePromise={profilePromise}
-      isDeveloperPromise={isDeveloperPromise}
-    />
-  );
+  return <AppLayoutClient {...props} profilePromise={profilePromise} isDeveloperPromise={isDeveloperPromise} />;
 }

@@ -72,11 +72,7 @@ export function SimpleListModal({ trigger, items, emptyText = "項目があり�
                     さらに読み込む
                   </button>
                 )}
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="sidebar-link-style text-sm"
-                >
+                <button type="button" onClick={() => setOpen(false)} className="sidebar-link-style text-sm">
                   閉じる
                 </button>
               </div>

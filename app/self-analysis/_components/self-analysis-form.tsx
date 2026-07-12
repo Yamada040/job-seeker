@@ -92,9 +92,7 @@ export default function SelfAnalysisForm({
           <h2 className="theme-readable text-lg font-semibold">質問リスト</h2>
         </div>
         <div className="mt-4 space-y-3">
-          <div className="dq-panel px-3 py-2 text-xs font-semibold text-yellow-200">
-            ※ 現在は一回しかできません。
-          </div>
+          <div className="dq-panel px-3 py-2 text-xs font-semibold text-yellow-200">※ 現在は一回しかできません。</div>
           <TextArea label="強み・得意なこと" value={answers.strengths} onChange={(v) => handleChange("strengths", v)} />
           <TextArea
             label="価値観（仕事選びで譲れないこと）"
@@ -123,7 +121,11 @@ export default function SelfAnalysisForm({
             onChange={(v) => handleChange("future", v)}
           />
           <form action={saveAction} className="flex flex-wrap gap-3">
-            <button type="submit" disabled={saving || isMonthlyLocked} className="dq-button disabled:cursor-not-allowed disabled:opacity-60">
+            <button
+              type="submit"
+              disabled={saving || isMonthlyLocked}
+              className="dq-button disabled:cursor-not-allowed disabled:opacity-60"
+            >
               {isMonthlyLocked ? "実施済み" : saving ? "保存中..." : "保存する"}
             </button>
           </form>
@@ -152,12 +154,7 @@ function TextArea({ label, value, onChange }: { label: string; value: string; on
   return (
     <label className="block space-y-2">
       <span className="theme-readable text-sm font-medium">{label}</span>
-      <textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        rows={3}
-        className="dq-input text-sm"
-      />
+      <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3} className="dq-input text-sm" />
     </label>
   );
 }

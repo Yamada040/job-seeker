@@ -35,6 +35,7 @@ npm run format:check # Check formatting
 ```
 
 **Before committing**, always run:
+
 ```bash
 npm run type-check
 npm run lint
@@ -51,6 +52,7 @@ npm run format:check
 - **RLS enforcement**: All queries scoped to `user_id` at DB layer; Supabase RLS policies prevent cross-user data access
 
 **Example**:
+
 ```typescript
 // Server Component (read-only)
 const supabase = await createSupabaseReadonlyClient();
@@ -73,16 +75,21 @@ All AI calls route through `lib/ai/client.ts`:
 
 ```typescript
 const client = createAiClient();
-const result = await client.call(input, "es_review" | "company_analysis" | "aptitude_analysis" | "self_analysis" | "interview_review");
+const result = await client.call(
+  input,
+  "es_review" | "company_analysis" | "aptitude_analysis" | "self_analysis" | "interview_review",
+);
 ```
 
 **Features**:
+
 - Swappable providers: `AI_PROVIDER=gemini|gpt`
 - Prompt templates: Each `AiPromptKind` has locale-specific (Japanese) system prompts
 - Safe failure: If `AI_PROVIDER_API_KEY` is missing, returns a placeholder response
 - Rate limiting: 12 requests per 60 seconds per user (enforced in `/api/ai/route.ts`)
 
 **Available prompt types**:
+
 - `es_review`: Review ES content for structure/clarity/impact
 - `company_analysis`: Analyze company fit and desired traits
 - `aptitude_analysis`: Recommend industries/roles from self-assessment
@@ -92,6 +99,7 @@ const result = await client.call(input, "es_review" | "company_analysis" | "apti
 ### Database Schema & RLS
 
 **Core tables** (all have RLS enabled):
+
 - `profiles`: User profile, XP, level, goals
 - `es_entries`: ES drafts/submissions with Markdown, tags, AI summary
 - `companies`: Company cards with stage/preference/AI summary
@@ -105,14 +113,16 @@ const result = await client.call(input, "es_review" | "company_analysis" | "apti
 **RLS pattern**: Every table enforces `auth.uid() = user_id` for SELECT/INSERT/UPDATE/DELETE. Querying bypasses RLS only via `createSupabaseAdminClient` (service role key).
 
 **Example RLS policy**:
+
 ```sql
-CREATE POLICY "Enable read own es" ON es_entries 
+CREATE POLICY "Enable read own es" ON es_entries
   FOR SELECT USING (auth.uid() = user_id);
 ```
 
 ### Input Validation
 
 **All inputs validated with Zod** before DB/API:
+
 - `lib/validation/schemas/forms.ts`: Form input schemas
 - `lib/validation/schemas/api.ts`: API request body schemas
 - `lib/validation/schemas/ai.ts`: AI request schemas
@@ -120,8 +130,11 @@ CREATE POLICY "Enable read own es" ON es_entries
 - `lib/validation/schemas/interviews.ts`: Interview schemas
 
 **Pattern**:
+
 ```typescript
-const schema = z.object({ /* ... */ });
+const schema = z.object({
+  /* ... */
+});
 const parsed = schema.safeParse(formData);
 if (!parsed.success) return { error: "Invalid input" };
 // Safe to use parsed.data
@@ -136,6 +149,7 @@ if (!parsed.success) return { error: "Invalid input" };
 - `GET /api/developer/me`: Developer/test endpoint
 
 All Route Handlers:
+
 1. Validate user auth
 2. Validate request body with Zod
 3. Scope queries to `user_id`
@@ -144,17 +158,20 @@ All Route Handlers:
 ### UI Patterns & Styling
 
 **Tailwind v4 conventions**:
+
 - Use recommended classes (`bg-linear-to-r`, `text-balance`, `text-wrap`)
 - Avoid deprecated v3 syntax to prevent warnings
 - Theme: Light mode (`theme-light` class on `<html>`)
 
 **DQ-style UI** (Dragon Quest inspired):
+
 - `dq-window`, `dq-title`, `dq-item`: Quest log panels
 - `dq-button`, `dq-button-secondary`: Styled buttons
 - `dq-menu-item`: Menu items with hover state (left triangle `▶` moves right on hover)
 - Terminology: "クエスト", "ログ", "追加へ" (quest, log, add to)
 
 **Component organization**:
+
 - Page-level layout: `app/_components/layout.tsx` (`AppLayout`)
 - Feature-level: Co-locate components in `_components/` subdirs (e.g., `app/dashboard/_components/`)
 - Shared utilities: `lib/` (Zod schemas, Supabase clients, AI client, constants)
@@ -170,11 +187,13 @@ All Route Handlers:
 ### Common Page Flows
 
 **Dashboard (`/dashboard`)**:
+
 - Fetches: ES entries, profile, calendar events, interviews, XP logs
 - Displays: Summary cards, calendar, goal/axis editor, recent activity
 - Protected: Redirects if not logged in
 
 **ES Management** (`/es`, `/es/new`, `/es/[id]`):
+
 - Create/edit/delete with Markdown editor
 - Add questions and answers
 - AI review panel
@@ -182,18 +201,21 @@ All Route Handlers:
 - Delete also removes calendar event if present
 
 **Company Management** (`/companies`, `/companies/new`, `/companies/[id]`):
+
 - Track stage (未エントリー → 面接 → 内定 etc.)
 - Store mypage ID for tracking
 - AI company analysis panel
 - Preference/favorite flags
 
 **Login** (`/login`):
+
 - Redirects to Supabase login (Google OAuth)
 - On success, Supabase redirects to `/auth/callback` → `/dashboard`
 
 ### Development Rules (AGENTS.md)
 
 **Principles**:
+
 - **YAGNI**: Only implement what's needed now; no speculative features
 - **KISS**: Prefer simple solutions over complex ones
 - **DRY**: Extract duplicated logic into shared utils/components
@@ -201,6 +223,7 @@ All Route Handlers:
 - **Validation**: Never trust user input; always validate with Zod
 
 **Implementation specifics**:
+
 - Respect Server/Client Component boundaries (no mixing concerns)
 - Validate all form/API inputs before DB access
 - Use `createSupabaseReadonlyClient` in Server Components (no cookie mutation)
@@ -211,6 +234,7 @@ All Route Handlers:
 - Directory structure: Group by feature/responsibility, not by type
 
 **UI consistency**:
+
 - Use DQ-window/button classes as base
 - Left-triangle hover effect for menu items (no boxed buttons)
 - Quest/log terminology
@@ -218,6 +242,7 @@ All Route Handlers:
 ### Environment Variables
 
 **Required**:
+
 ```env
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
@@ -244,10 +269,12 @@ SMTP_SECURE=true
 ### Supabase Auth Configuration
 
 **Local development** (`http://localhost:3000`):
+
 - Site URL: `http://localhost:3000`
 - Redirect URL: `http://localhost:3000/auth/callback`, `http://localhost:3000/dashboard`
 
 **Production** (`https://job-seeker-gray.vercel.app`):
+
 - Site URL: `https://job-seeker-gray.vercel.app`
 - Redirect URL: `https://job-seeker-gray.vercel.app/auth/callback`, `https://job-seeker-gray.vercel.app/dashboard`
 
@@ -256,6 +283,7 @@ Configure in Supabase Dashboard → Authentication → URL Configuration.
 ### Page Structure
 
 **Layout hierarchy**:
+
 - `/` — Home (MVP intro, login/signup links)
 - `/login` — Google OAuth entry point
 - `/auth/callback` — OAuth callback handler, exchanges code for session
@@ -287,6 +315,7 @@ All protected pages: If `auth.getUser()` fails, redirect to `/login`.
 ### Known Patterns & Pitfalls
 
 **Avoid**:
+
 - Writing auth logic in Server Components (use Route Handlers for session mutation)
 - Mixing Supabase clients (readonly in Server Components, action client in Route Handlers)
 - Skipping Zod validation on any user input
@@ -294,6 +323,7 @@ All protected pages: If `auth.getUser()` fails, redirect to `/login`.
 - Querying without `user_id` scope (breaks RLS intent)
 
 **Do**:
+
 - Run `npm run type-check` after edits
 - Validate async/await in Route Handlers (await `supabase.auth.getUser()`)
 - Scope all DB queries to `user_id` via `.eq("user_id", userId)`
@@ -304,6 +334,7 @@ All protected pages: If `auth.getUser()` fails, redirect to `/login`.
 ## Cursor Rules
 
 See `AGENTS.md` for comprehensive Codex guidelines. Key excerpts:
+
 - Follow existing code structure and naming conventions
 - Respect App Router basics: Server/Client responsibilities
 - Auth queries must be `user_id`-scoped; unauth → redirect to `/login`

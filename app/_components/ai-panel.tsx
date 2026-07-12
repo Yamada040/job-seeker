@@ -289,11 +289,7 @@ export function AiPanel({
                     <span>保存済み</span>
                   </span>
                 )}
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  className="sidebar-link-style text-[11px]"
-                >
+                <button type="button" onClick={handleCopy} className="sidebar-link-style text-[11px]">
                   {copied ? <CheckIcon className="h-4 w-4" /> : <ClipboardDocumentIcon className="h-4 w-4" />}
                   <span>{copied ? "コピー済み" : "コピー"}</span>
                 </button>

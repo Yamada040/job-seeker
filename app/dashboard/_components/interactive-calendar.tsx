@@ -75,9 +75,7 @@ function modalReducer(state: ModalState, action: ModalAction): ModalState {
     case "deleteStart":
       return { ...state, deletingId: action.id };
     case "deleteSuccess":
-      return state.editingId === action.id
-        ? { ...state, formState: { ...emptyForm }, editingId: null }
-        : state;
+      return state.editingId === action.id ? { ...state, formState: { ...emptyForm }, editingId: null } : state;
     case "deleteEnd":
       return { ...state, deletingId: null };
     default:
@@ -85,14 +83,9 @@ function modalReducer(state: ModalState, action: ModalAction): ModalState {
   }
 }
 
-type OptimisticEventsAction =
-  | { type: "save"; event: CalendarEvent }
-  | { type: "delete"; id: string };
+type OptimisticEventsAction = { type: "save"; event: CalendarEvent } | { type: "delete"; id: string };
 
-function optimisticEventsReducer(
-  current: CalendarEvent[],
-  action: OptimisticEventsAction
-): CalendarEvent[] {
+function optimisticEventsReducer(current: CalendarEvent[], action: OptimisticEventsAction): CalendarEvent[] {
   switch (action.type) {
     case "save": {
       const exists = current.some((evt) => evt.id === action.event.id);
@@ -124,7 +117,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
       editingId: null,
       formState: { ...emptyForm },
       deletingId: null,
-    })
+    }),
   );
   const { isModalOpen, selectedDate, editingId, formState, deletingId } = modalState;
   const todayKey = formatDateKey(new Date());
@@ -331,10 +324,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
           onClick={() => openModalForDate(formatDateKey(new Date()))}
           className="group inline-flex items-center gap-2 px-2 py-1 text-sm font-bold text-white transition hover:text-yellow-400"
         >
-          <span
-            aria-hidden
-            className="text-[0.7rem] transition-transform group-hover:translate-x-1"
-          >
+          <span aria-hidden className="text-[0.7rem] transition-transform group-hover:translate-x-1">
             ▶
           </span>
           <PlusIcon className="h-4 w-4" />
@@ -349,7 +339,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
             className={clsx(
               "rounded-lg border border-[#3f3f46] bg-[#1a1a1a] py-2 shadow-sm",
               idx === 0 && "text-rose-300",
-              idx === 6 && "text-sky-300"
+              idx === 6 && "text-sky-300",
             )}
           >
             {d}
@@ -371,10 +361,8 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
               className={clsx(
                 "h-14 rounded-lg border text-center text-sm font-bold shadow-sm transition",
                 "bg-[#161616] hover:-translate-y-0.5 hover:bg-[#202020] hover:shadow-md",
-                inCurrentMonth
-                  ? "border-[#3f3f46]"
-                  : "border-dashed border-[#3f3f46] text-white/40 opacity-70",
-                isToday && "border-2 border-yellow-400 ring-1 ring-yellow-300/70"
+                inCurrentMonth ? "border-[#3f3f46]" : "border-dashed border-[#3f3f46] text-white/40 opacity-70",
+                isToday && "border-2 border-yellow-400 ring-1 ring-yellow-300/70",
               )}
             >
               <span
@@ -382,7 +370,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                   "inline-flex h-full items-center justify-center",
                   inCurrentMonth ? "" : "opacity-60",
                   weekday === 0 && "text-rose-300",
-                  weekday === 6 && "text-sky-300"
+                  weekday === 6 && "text-sky-300",
                 )}
               >
                 {day}
@@ -404,10 +392,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                   onClick={() => handleEditPrefill(evt)}
                   className="group flex w-full items-start gap-2.5 rounded-md px-2 py-2 text-left text-xs font-bold text-white transition hover:text-yellow-400"
                 >
-                  <span
-                    aria-hidden
-                    className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
-                  >
+                  <span aria-hidden className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1">
                     ▶
                   </span>
                   <span className="min-w-0 flex-1">
@@ -439,10 +424,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                     onClick={() => handleEditPrefill(evt)}
                     className="group flex w-full items-start gap-2.5 rounded-md px-2 py-2 text-left text-xs font-bold text-white transition hover:text-yellow-400"
                   >
-                    <span
-                      aria-hidden
-                      className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1"
-                    >
+                    <span aria-hidden className="shrink-0 text-[0.7rem] transition-transform group-hover:translate-x-1">
                       ▶
                     </span>
                     <span className="min-w-0 flex-1">
@@ -480,14 +462,14 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
             </div>
 
             <div className="mt-3 flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => dispatch({ type: "resetForm" })}
-                  className="sidebar-link-style text-xs"
-                >
-                  <PlusIcon className="h-4 w-4" />
-                  新しい予定を追加
-                </button>
+              <button
+                type="button"
+                onClick={() => dispatch({ type: "resetForm" })}
+                className="sidebar-link-style text-xs"
+              >
+                <PlusIcon className="h-4 w-4" />
+                新しい予定を追加
+              </button>
             </div>
 
             <div className="mt-4 space-y-2 rounded-lg border border-[#3f3f46] bg-[#1a1a1a] p-3 text-sm">
@@ -498,10 +480,9 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                     className={clsx(
                       "rounded-lg border px-3 py-2 text-white",
                       evt.type === "es" && "border-rose-300/40 bg-rose-900/30 text-rose-100",
-                      evt.type === "interview" &&
-                        "border-indigo-300/40 bg-indigo-900/30 text-indigo-100",
+                      evt.type === "interview" && "border-indigo-300/40 bg-indigo-900/30 text-indigo-100",
                       evt.type === "intern" && "border-emerald-300/40 bg-emerald-900/30 text-emerald-100",
-                      evt.type === "other" && "border-white/20 bg-black/40 text-white/90"
+                      evt.type === "other" && "border-white/20 bg-black/40 text-white/90",
                     )}
                   >
                     <p className="text-xs font-semibold">{TYPE_LABEL[evt.type]}</p>
@@ -511,10 +492,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                     </p>
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
                       {evt.id.startsWith("es-") ? (
-                        <a
-                          href={`/es/${evt.id.replace("es-", "")}`}
-                          className="sidebar-link-style text-[11px]"
-                        >
+                        <a href={`/es/${evt.id.replace("es-", "")}`} className="sidebar-link-style text-[11px]">
                           ES詳細へ
                         </a>
                       ) : null}
@@ -549,10 +527,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
               )}
             </div>
 
-            <form
-              className="mt-4 space-y-3 border-t border-white/20 pt-4"
-              action={submitAction}
-            >
+            <form className="mt-4 space-y-3 border-t border-white/20 pt-4" action={submitAction}>
               <div className="space-y-1">
                 <label className="text-xs text-white/70">日付</label>
                 <input
@@ -621,11 +596,7 @@ export function InteractiveCalendar({ initialEvents = [] }: Props) {
                 >
                   入力をクリア
                 </button>
-                <button
-                  type="submit"
-                  className="sidebar-link-style text-sm"
-                  disabled={saving}
-                >
+                <button type="submit" className="sidebar-link-style text-sm" disabled={saving}>
                   <PlusIcon className="h-4 w-4" />
                   {saving ? "保存中..." : editingId ? "予定を更新" : "予定を保存"}
                 </button>

@@ -32,50 +32,38 @@ async function getDashboardData() {
   const userId = userData?.user?.id ?? null;
   if (!userId) throw new Error("No user");
 
-  const [esRes, profileRes, calendarRes, interviewsRes, xpLogsRes] =
-    await Promise.all([
-      supabase
-        .from("es_entries")
-        .select("*")
-        .eq("user_id", userId)
-        .order("updated_at", { ascending: false })
-        .limit(12),
-      supabase
-        .from("profiles")
-        .select(
-          "full_name,avatar_id,university,faculty,target_industry,career_axis,goal_state,xp,level"
-        )
-        .eq("id", userId)
-        .maybeSingle<
-          Pick<
-            ProfileRow,
-            | "full_name"
-            | "avatar_id"
-            | "university"
-            | "faculty"
-            | "target_industry"
-            | "career_axis"
-            | "goal_state"
-            | "xp"
-            | "level"
-          >
-        >(),
-      supabase
-        .from("calendar_events")
-        .select("*")
-        .eq("user_id", userId)
-        .order("date", { ascending: true }),
-      supabase
-        .from("interview_logs")
-        .select("id, company_name, interview_date, self_review, questions")
-        .eq("user_id", userId),
-      supabase
-        .from("xp_logs")
-        .select("xp, action, created_at")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
-        .limit(100),
-    ]);
+  const [esRes, profileRes, calendarRes, interviewsRes, xpLogsRes] = await Promise.all([
+    supabase.from("es_entries").select("*").eq("user_id", userId).order("updated_at", { ascending: false }).limit(12),
+    supabase
+      .from("profiles")
+      .select("full_name,avatar_id,university,faculty,target_industry,career_axis,goal_state,xp,level")
+      .eq("id", userId)
+      .maybeSingle<
+        Pick<
+          ProfileRow,
+          | "full_name"
+          | "avatar_id"
+          | "university"
+          | "faculty"
+          | "target_industry"
+          | "career_axis"
+          | "goal_state"
+          | "xp"
+          | "level"
+        >
+      >(),
+    supabase.from("calendar_events").select("*").eq("user_id", userId).order("date", { ascending: true }),
+    supabase
+      .from("interview_logs")
+      .select("id, company_name, interview_date, self_review, questions")
+      .eq("user_id", userId),
+    supabase
+      .from("xp_logs")
+      .select("xp, action, created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(100),
+  ]);
 
   const esEntries = (esRes.data as EsRow[] | null) ?? [];
   const interviewLogs = (interviewsRes.data as InterviewRow[] | null) ?? [];
@@ -128,12 +116,7 @@ export default async function DashboardPage() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const pendingEs = [...data.esEntries]
-    .filter(
-      (es) =>
-        es.status !== "submitted" &&
-        es.deadline &&
-        new Date(es.deadline) >= today
-    )
+    .filter((es) => es.status !== "submitted" && es.deadline && new Date(es.deadline) >= today)
     .sort((a, b) => {
       if (!a.deadline && !b.deadline) return 0;
       if (!a.deadline) return 1;
@@ -150,10 +133,7 @@ export default async function DashboardPage() {
     });
     const logs = data.interviewLogs ?? [];
     const missing = pastInterviews.filter((evt) => {
-      const hasLog = logs.some(
-        (log) =>
-          log.company_name === evt.company && log.interview_date === evt.date
-      );
+      const hasLog = logs.some((log) => log.company_name === evt.company && log.interview_date === evt.date);
       return !hasLog;
     });
     return missing.slice(0, 1).map((evt) => ({
@@ -183,10 +163,7 @@ export default async function DashboardPage() {
         <PlusIcon className="h-4 w-4" />
         ESを追加
       </Link>
-      <Link
-        href={ROUTES.COMPANIES_NEW}
-        className="dq-button"
-      >
+      <Link href={ROUTES.COMPANIES_NEW} className="dq-button">
         <PlusIcon className="h-4 w-4" />
         企業を追加
       </Link>
@@ -246,9 +223,7 @@ export default async function DashboardPage() {
                     </div>
                   ))}
                   {urgentEvents.length === 0 && (
-                    <div className="py-2 text-center text-xs text-white/60">
-                      直近の 締切は ないようだ。
-                    </div>
+                    <div className="py-2 text-center text-xs text-white/60">直近の 締切は ないようだ。</div>
                   )}
                 </div>
               </div>
@@ -273,15 +248,11 @@ export default async function DashboardPage() {
                       >
                         ▶
                       </span>
-                      <label className="cursor-pointer text-sm font-bold">
-                        {action.subtitle}
-                      </label>
+                      <label className="cursor-pointer text-sm font-bold">{action.subtitle}</label>
                     </Link>
                   ))}
                   {nextActions.length === 0 && (
-                    <div className="py-2 text-center text-xs text-white/60">
-                      なすべきことは すべて おわった。
-                    </div>
+                    <div className="py-2 text-center text-xs text-white/60">なすべきことは すべて おわった。</div>
                   )}
                 </div>
               </div>
@@ -309,9 +280,7 @@ export default async function DashboardPage() {
                         <span className="text-[10px] text-yellow-400">●</span>
                         <span className="text-sm">+{log.xp} XP</span>
                       </div>
-                      <span className="text-[10px] opacity-60">
-                        {log.action || "行動"}
-                      </span>
+                      <span className="text-[10px] opacity-60">{log.action || "行動"}</span>
                     </div>
                   ))}
                   {recentXpLogs.length === 0 && (
@@ -325,9 +294,7 @@ export default async function DashboardPage() {
             items={allXpLogs.map((log) => ({
               title: `+${log.xp} XP`,
               subtitle: log.action || "行動",
-              meta: log.created_at
-                ? new Date(log.created_at).toLocaleDateString()
-                : "",
+              meta: log.created_at ? new Date(log.created_at).toLocaleDateString() : "",
             }))}
             emptyText="XP獲得履歴がありません。"
           />

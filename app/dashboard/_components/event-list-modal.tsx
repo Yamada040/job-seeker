@@ -58,19 +58,14 @@ export function EventListModal({ events, trigger }: Props) {
 
             <div className="mt-4 max-h-[70vh] overflow-y-auto space-y-2">
               {visible.map((evt) => (
-                <div
-                  key={evt.id}
-                  className="rounded-lg border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-sm"
-                >
+                <div key={evt.id} className="rounded-lg border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-sm">
                   <div className="flex items-center justify-between text-xs text-white/60">
                     <span className="font-semibold">
                       {evt.type === "es" ? "ES締切" : evt.type === "interview" ? "面接" : "予定"}
                     </span>
                     <span>{evt.date || "未設定"}</span>
                   </div>
-                  <p className="mt-1 text-sm font-semibold text-white">
-                    {evt.company || evt.title || "件名未設定"}
-                  </p>
+                  <p className="mt-1 text-sm font-semibold text-white">{evt.company || evt.title || "件名未設定"}</p>
                   <p className="text-xs text-white/60">{evt.title}</p>
                 </div>
               ))}
@@ -96,11 +91,7 @@ export function EventListModal({ events, trigger }: Props) {
                     さらに読み込む
                   </button>
                 )}
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="sidebar-link-style text-sm"
-                >
+                <button type="button" onClick={() => setOpen(false)} className="sidebar-link-style text-sm">
                   閉じる
                 </button>
               </div>

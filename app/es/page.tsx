@@ -1,9 +1,5 @@
 ﻿import Link from "next/link";
-import {
-  PlusIcon,
-  ArrowUturnLeftIcon,
-  HomeIcon,
-} from "@heroicons/react/24/outline";
+import { PlusIcon, ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { Database } from "@/lib/database.types";
 import { ROUTES } from "@/lib/constants/routes";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
@@ -51,9 +47,7 @@ export default async function EsListPage() {
       <div className="rounded-xl border border-[#3f3f46] bg-[#111111] p-6">
         <div className="flex flex-col gap-2">
           <p className="text-sm font-semibold text-yellow-200">ES一覧</p>
-          <p className="text-sm text-white/70">
-            下書きと提出済みをタブレス表示。
-          </p>
+          <p className="text-sm text-white/70">下書きと提出済みをタブレス表示。</p>
         </div>
         <div className="mt-4 rounded-lg border border-[#3f3f46] bg-[#1a1a1a] p-4">
           <EsListClient initialItems={esList} />
