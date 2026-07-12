@@ -50,3 +50,30 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+  # docs/testing/e2e-test-plan.md の「前提条件」に記載のE2E専用Supabaseプロジェクトの
+  # Secretsが未設定の間は自動でスキップする（本番用Secretsとは別名で管理し、混同を防ぐ）。
+  e2e:
+    runs-on: ubuntu-latest
+    if: ${{ secrets.E2E_SUPABASE_URL != '' }}
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.E2E_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.E2E_SUPABASE_SERVICE_ROLE_KEY }}
+      E2E_TEST_MODE: "true"
+      E2E_TEST_SECRET: ${{ secrets.E2E_TEST_SECRET }}
+      E2E_TEST_USER_EMAIL: ${{ secrets.E2E_TEST_USER_EMAIL }}
+      E2E_TEST_USER_PASSWORD: ${{ secrets.E2E_TEST_USER_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
