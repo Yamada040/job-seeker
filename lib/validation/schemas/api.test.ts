@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { answersPayloadSchema, calendarEventSchema } from "./api";
+import { ANSWER_VALUE_MAX_LENGTH, ANSWERS_MAX_KEYS, answersPayloadSchema, calendarEventSchema } from "./api";
 
 describe("answersPayloadSchema", () => {
   it("accepts a record with arbitrary keys/values", () => {
@@ -9,6 +9,22 @@ describe("answersPayloadSchema", () => {
 
   it("rejects a missing answers field", () => {
     expect(() => answersPayloadSchema.parse({})).toThrow();
+  });
+
+  it("rejects too many answer keys", () => {
+    const answers = Object.fromEntries(Array.from({ length: ANSWERS_MAX_KEYS + 1 }, (_, index) => [`q${index}`, "a"]));
+
+    expect(() => answersPayloadSchema.parse({ answers })).toThrow(`回答は${ANSWERS_MAX_KEYS}項目以内`);
+  });
+
+  it("rejects oversized answer values", () => {
+    expect(() =>
+      answersPayloadSchema.parse({
+        answers: {
+          q1: "a".repeat(ANSWER_VALUE_MAX_LENGTH + 1),
+        },
+      }),
+    ).toThrow(`回答は1項目あたり${ANSWER_VALUE_MAX_LENGTH}文字以内`);
   });
 });
 
