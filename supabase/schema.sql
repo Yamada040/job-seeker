@@ -148,6 +148,17 @@ create table if not exists public.interview_logs (
 
 alter table public.interview_logs enable row level security;
 
+-- APIレート制限（in-memory Mapからの移行。サーバーレス環境でインスタンス間の状態を共有するため）
+create table if not exists public.api_rate_limits (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  bucket text not null,
+  window_start timestamptz not null default now(),
+  count integer not null default 0,
+  primary key (user_id, bucket)
+);
+
+alter table public.api_rate_limits enable row level security;
+
 do $$
 begin
   -- profiles
@@ -358,5 +369,22 @@ begin
     select 1 from pg_policies where schemaname='public' and tablename='webtest_attempts' and policyname='Enable delete own webtest attempts'
   ) then
     create policy "Enable delete own webtest attempts" on public.webtest_attempts for delete using (auth.uid() = user_id);
+  end if;
+
+  -- api_rate_limits
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='api_rate_limits' and policyname='Enable read own rate limits'
+  ) then
+    create policy "Enable read own rate limits" on public.api_rate_limits for select using (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='api_rate_limits' and policyname='Enable insert own rate limits'
+  ) then
+    create policy "Enable insert own rate limits" on public.api_rate_limits for insert with check (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname='public' and tablename='api_rate_limits' and policyname='Enable update own rate limits'
+  ) then
+    create policy "Enable update own rate limits" on public.api_rate_limits for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
   end if;
 end$$;

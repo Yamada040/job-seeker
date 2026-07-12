@@ -3,35 +3,10 @@ import { createAiClient } from "@/lib/ai/client";
 import { AiPromptKind } from "@/lib/ai/types";
 import { aiRequestSchema } from "@/lib/validation/schemas/ai";
 import { createSupabaseServerActionClient } from "@/lib/supabase/supabase-server";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 12;
-
-const aiRateLimitStore = new Map<string, { count: number; resetAt: number }>();
-
-function checkAiRateLimit(userId: string) {
-  const now = Date.now();
-  const current = aiRateLimitStore.get(userId);
-
-  if (!current || current.resetAt <= now) {
-    aiRateLimitStore.set(userId, {
-      count: 1,
-      resetAt: now + RATE_LIMIT_WINDOW_MS,
-    });
-    return { allowed: true as const, retryAfterSec: 0 };
-  }
-
-  if (current.count >= RATE_LIMIT_MAX_REQUESTS) {
-    return {
-      allowed: false as const,
-      retryAfterSec: Math.ceil((current.resetAt - now) / 1000),
-    };
-  }
-
-  current.count += 1;
-  aiRateLimitStore.set(userId, current);
-  return { allowed: true as const, retryAfterSec: 0 };
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,7 +16,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const rateLimit = checkAiRateLimit(userData.user.id);
+    const rateLimit = await checkRateLimit(supabase, userData.user.id, "ai", {
+      windowMs: RATE_LIMIT_WINDOW_MS,
+      maxRequests: RATE_LIMIT_MAX_REQUESTS,
+    });
     if (!rateLimit.allowed) {
       return NextResponse.json(
         { error: "Too many requests. Please try again later." },
