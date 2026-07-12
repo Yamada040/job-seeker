@@ -62,13 +62,9 @@ export default async function WebtestDetailPage({
       className="space-y-6"
     >
       {status === "correct" ? (
-        <div className="dq-panel px-4 py-3 text-sm text-emerald-200">
-          正解です！
-        </div>
+        <div className="dq-panel px-4 py-3 text-sm text-emerald-200">正解です！</div>
       ) : status === "incorrect" ? (
-        <div className="dq-panel px-4 py-3 text-sm text-rose-200">
-          不正解です。もう一度チャレンジしましょう。
-        </div>
+        <div className="dq-panel px-4 py-3 text-sm text-rose-200">不正解です。もう一度チャレンジしましょう。</div>
       ) : null}
 
       <div className="grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
@@ -86,11 +82,7 @@ export default async function WebtestDetailPage({
             <div className="space-y-2">
               <label className="text-sm font-semibold text-white">解答</label>
               {Array.isArray(question.choices) ? (
-                <select
-                  name="answer"
-                  className="dq-input text-sm"
-                  required
-                >
+                <select name="answer" className="dq-input text-sm" required>
                   <option value="">選択してください</option>
                   {(question.choices as string[]).map((c, idx) => (
                     <option key={`${idx}-${c}`} value={c}>
@@ -99,23 +91,12 @@ export default async function WebtestDetailPage({
                   ))}
                 </select>
               ) : (
-                <input
-                  name="answer"
-                  required
-                  className="dq-input text-sm"
-                  placeholder="解答を入力"
-                />
+                <input name="answer" required className="dq-input text-sm" placeholder="解答を入力" />
               )}
             </div>
             <div className="space-y-2">
               <label className="text-xs text-white/70">解答時間（秒） 任意</label>
-              <input
-                type="number"
-                name="time_spent"
-                min={0}
-                className="dq-input text-sm"
-                placeholder="60"
-              />
+              <input type="number" name="time_spent" min={0} className="dq-input text-sm" placeholder="60" />
             </div>
             <div className="pt-2 flex justify-start">
               <button type="submit" className="dq-button">
@@ -139,15 +120,13 @@ export default async function WebtestDetailPage({
               <p className="text-white/60">まだ解答履歴がありません。</p>
             ) : (
               attempts!.map((a) => (
-                <div
-                  key={a.id}
-                  className="dq-panel flex items-center justify-between px-3 py-2"
-                >
+                <div key={a.id} className="dq-panel flex items-center justify-between px-3 py-2">
                   <span className={a.is_correct ? "text-emerald-200" : "text-rose-200"}>
                     {a.is_correct ? "正解" : "不正解"}
                   </span>
                   <span className="text-white/60">
-                    {a.time_spent ? `${a.time_spent}s` : "-"} / {a.created_at ? new Date(a.created_at).toLocaleDateString() : "-"}
+                    {a.time_spent ? `${a.time_spent}s` : "-"} /{" "}
+                    {a.created_at ? new Date(a.created_at).toLocaleDateString() : "-"}
                   </span>
                 </div>
               ))

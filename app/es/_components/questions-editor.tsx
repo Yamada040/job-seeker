@@ -45,11 +45,7 @@ export function QuestionsEditor({ initialQuestions, readOnly = false }: Props) {
       <div className="flex items-center justify-between text-sm text-white/70">
         <span>質問カード（必要に応じて追加できます）</span>
         {!readOnly && (
-          <button
-            type="button"
-            onClick={handleAdd}
-            className="sidebar-link-style text-sm"
-          >
+          <button type="button" onClick={handleAdd} className="sidebar-link-style text-sm">
             カードを追加
           </button>
         )}
@@ -83,11 +79,7 @@ export function QuestionsEditor({ initialQuestions, readOnly = false }: Props) {
             </label>
             {!readOnly && (
               <div className="mt-3 flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => handleRemove(q.id)}
-                  className="sidebar-link-style text-xs"
-                >
+                <button type="button" onClick={() => handleRemove(q.id)} className="sidebar-link-style text-xs">
                   削除
                 </button>
               </div>

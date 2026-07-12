@@ -9,10 +9,7 @@ export default async function LoginPage() {
     <div className="relative min-h-screen text-slate-900">
       <main className="mx-auto flex max-w-xl flex-col gap-6 px-6 py-12 sm:py-16">
         <div className="flex items-center justify-between gap-3">
-          <BrandLogo
-            className="text-lg font-semibold"
-            logoClassName="h-10"
-          />
+          <BrandLogo className="text-lg font-semibold" logoClassName="h-10" />
           <Link href={ROUTES.HOME} className="text-sm text-sky-700 hover:underline">
             ホームへ戻る
           </Link>

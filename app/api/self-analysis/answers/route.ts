@@ -26,17 +26,11 @@ export async function POST(req: NextRequest) {
     .maybeSingle();
 
   if (existingError) {
-    return NextResponse.json(
-      { error: existingError.message ?? "failed to check existing result" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: existingError.message ?? "failed to check existing result" }, { status: 500 });
   }
 
   if (existing?.id) {
-    return NextResponse.json(
-      { error: "自己分析は現在1回のみ実行できます。" },
-      { status: 409 }
-    );
+    return NextResponse.json({ error: "自己分析は現在1回のみ実行できます。" }, { status: 409 });
   }
 
   const { data, error } = await supabase

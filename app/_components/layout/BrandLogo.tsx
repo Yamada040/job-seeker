@@ -6,10 +6,7 @@ type BrandLogoProps = {
   logoClassName?: string;
 };
 
-export function BrandLogo({
-  className,
-  logoClassName,
-}: BrandLogoProps) {
+export function BrandLogo({ className, logoClassName }: BrandLogoProps) {
   return (
     <div className={clsx("flex items-center", className)}>
       <Image

@@ -50,24 +50,18 @@ export async function POST(req: NextRequest) {
           headers: {
             "Retry-After": String(rateLimit.retryAfterSec),
           },
-        }
+        },
       );
     }
 
     const body = await req.json().catch(() => null);
     const requestValidation = aiRequestSchema.safeParse(body);
     if (!requestValidation.success) {
-      return NextResponse.json(
-        { error: "input and kind are required (input max: 8000 chars)" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "input and kind are required (input max: 8000 chars)" }, { status: 400 });
     }
 
     const client = createAiClient();
-    const result = await client.call(
-      requestValidation.data.input,
-      requestValidation.data.kind as AiPromptKind
-    );
+    const result = await client.call(requestValidation.data.input, requestValidation.data.kind as AiPromptKind);
 
     return NextResponse.json({ provider: client.provider, ...result });
   } catch (error) {

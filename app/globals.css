@@ -11,7 +11,6 @@
   --app-sidebar-border: rgba(148, 163, 184, 0.22);
 }
 
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -24,7 +23,14 @@ body {
     radial-gradient(circle at top left, rgba(186, 230, 253, 0.45), transparent 28%),
     linear-gradient(180deg, #ffffff 0%, #f8fbff 54%, #eef7ff 100%);
   color: var(--foreground);
-  font-family: "魔導太丸ゴシック", "Hiragino Maru Gothic ProN", "Yu Gothic UI", "Yu Gothic", system-ui, -apple-system, sans-serif;
+  font-family:
+    "魔導太丸ゴシック",
+    "Hiragino Maru Gothic ProN",
+    "Yu Gothic UI",
+    "Yu Gothic",
+    system-ui,
+    -apple-system,
+    sans-serif;
   min-height: 100vh;
 }
 
@@ -179,15 +185,18 @@ html.theme-light [class~="from-amber-900/40"] {
 }
 
 html.theme-light [class~="via-amber-50/90"] {
-  --tw-gradient-stops: var(--tw-gradient-from), rgba(240, 249, 255, 0.9) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+  --tw-gradient-stops:
+    var(--tw-gradient-from), rgba(240, 249, 255, 0.9) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
 }
 
 html.theme-light [class~="via-orange-400"] {
-  --tw-gradient-stops: var(--tw-gradient-from), #7dd3fc var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+  --tw-gradient-stops:
+    var(--tw-gradient-from), #7dd3fc var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
 }
 
 html.theme-light [class~="via-orange-500/40"] {
-  --tw-gradient-stops: var(--tw-gradient-from), rgba(56, 189, 248, 0.4) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+  --tw-gradient-stops:
+    var(--tw-gradient-from), rgba(56, 189, 248, 0.4) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
 }
 
 html.theme-light [class~="to-orange-100"] {
@@ -484,7 +493,9 @@ html.theme-light [class~="accent-amber-300"] {
   height: 1.65rem;
   border-radius: 9999px;
   background: #f5efe2;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .theme-switch-text {
@@ -535,7 +546,6 @@ html.theme-light .theme-readable-muted {
   color: #475569 !important;
 }
 
-
 .shadow-soft {
   box-shadow: 0 20px 55px rgba(15, 23, 42, 0.09);
 }
@@ -545,7 +555,6 @@ html.theme-light .theme-readable-muted {
   border: 1px solid rgba(226, 232, 240, 0.7);
   backdrop-filter: blur(14px);
 }
-
 
 /* MVP Style Button */
 .mvp-button {
@@ -584,10 +593,6 @@ html.theme-light .theme-readable-muted {
   color: #334155;
 }
 
-
-
-
-
 /* MVP Background Decorations */
 .mvp-bg {
   position: relative;
@@ -609,7 +614,6 @@ html.theme-light .theme-readable-muted {
   pointer-events: none;
   z-index: -1;
 }
-
 
 .pixel-art {
   image-rendering: pixelated;
@@ -900,7 +904,5 @@ html.theme-light .dq-input::placeholder {
 }
 
 /* Form Elements Dark Mode */
-
-
 
 /* Dark mode specific overrides for glassmorphism */

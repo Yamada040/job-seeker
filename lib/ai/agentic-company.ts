@@ -57,9 +57,7 @@ type GeminiContent = { role: "user" | "model"; parts: GeminiPart[] };
 type GeminiRawResponse = {
   candidates?: {
     content?: {
-      parts?: Array<
-        { text?: string } | { functionCall?: { name: string; args: Record<string, string> } }
-      >;
+      parts?: Array<{ text?: string } | { functionCall?: { name: string; args: Record<string, string> } }>;
     };
   }[];
 };
@@ -102,10 +100,7 @@ async function callGeminiWithTools(contents: GeminiContent[]): Promise<{
   return { text: "Geminiから回答を取得できませんでした。" };
 }
 
-async function runGeminiAgenticLoop(
-  input: string,
-  onProgress: AgenticProgressCallback
-): Promise<AiResponse> {
+async function runGeminiAgenticLoop(input: string, onProgress: AgenticProgressCallback): Promise<AiResponse> {
   const contents: GeminiContent[] = [
     { role: "user", parts: [{ text: `以下の情報をもとに企業分析を行ってください:\n\n${input}` }] },
   ];
@@ -129,7 +124,9 @@ async function runGeminiAgenticLoop(
       const searchOutput = await tavilySearch(query);
       contents.push({
         role: "user",
-        parts: [{ functionResponse: { name: "search_web", response: { result: formatSearchResults(searchOutput.results) } } }],
+        parts: [
+          { functionResponse: { name: "search_web", response: { result: formatSearchResults(searchOutput.results) } } },
+        ],
       });
 
       searchCount++;
@@ -201,10 +198,7 @@ async function callGptWithTools(messages: GptMessage[]): Promise<{
   return { text: message?.content ?? "GPTから回答を取得できませんでした。" };
 }
 
-async function runGptAgenticLoop(
-  input: string,
-  onProgress: AgenticProgressCallback
-): Promise<AiResponse> {
+async function runGptAgenticLoop(input: string, onProgress: AgenticProgressCallback): Promise<AiResponse> {
   const messages: GptMessage[] = [
     { role: "system", content: SYSTEM_PROMPT },
     { role: "user", content: `以下の情報をもとに企業分析を行ってください:\n\n${input}` },
@@ -252,10 +246,7 @@ async function runGptAgenticLoop(
 
 // ---- Public API ------------------------------------------------------------
 
-export async function agenticCompanyAnalysis(
-  input: string,
-  onProgress: AgenticProgressCallback
-): Promise<AiResponse> {
+export async function agenticCompanyAnalysis(input: string, onProgress: AgenticProgressCallback): Promise<AiResponse> {
   if (!AI_KEY) {
     return {
       summary: "AI_PROVIDER_API_KEY を .env.local に設定してください。",

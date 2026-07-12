@@ -18,9 +18,7 @@ export async function POST(request: Request) {
     hasSignOutError = true;
   }
 
-  const redirectPath = hasSignOutError
-    ? `${ROUTES.HOME}?logout=failed`
-    : ROUTES.LOGIN;
+  const redirectPath = hasSignOutError ? `${ROUTES.HOME}?logout=failed` : ROUTES.LOGIN;
 
   return NextResponse.redirect(new URL(redirectPath, request.url));
 }

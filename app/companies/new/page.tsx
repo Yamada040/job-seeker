@@ -32,79 +32,43 @@ export default async function NewCompanyPage() {
       headerActions={headerActions}
       className="flex flex-col gap-8"
     >
-      <form
-        id="company-form-new"
-        action={createCompany}
-        className="dq-card p-8"
-      >
+      <form id="company-form-new" action={createCompany} className="dq-card p-8">
         <div className="space-y-6">
           <label className="block space-y-2">
             <span className="text-sm font-medium text-slate-700">企業名</span>
-            <input
-              name="name"
-              required
-              className="dq-input text-sm"
-              placeholder="例）Alpha SaaS"
-            />
+            <input name="name" required className="dq-input text-sm" placeholder="例）Alpha SaaS" />
           </label>
 
           <label className="block space-y-2">
             <span className="text-sm font-medium text-slate-700">業界</span>
-            <input
-              name="industry"
-              className="dq-input text-sm"
-              placeholder="例）IT / コンサル / メーカー"
-            />
+            <input name="industry" className="dq-input text-sm" placeholder="例）IT / コンサル / メーカー" />
           </label>
 
           <label className="block space-y-2">
             <span className="text-sm font-medium text-slate-700">URL</span>
-            <input
-              name="url"
-              className="dq-input text-sm"
-              placeholder="https://example.com"
-            />
+            <input name="url" className="dq-input text-sm" placeholder="https://example.com" />
           </label>
 
           <div className="grid gap-4 md:grid-cols-2">
             <label className="block space-y-2">
               <span className="text-sm font-medium text-slate-700">マイページID</span>
-              <input
-                name="mypage_id"
-                className="dq-input text-sm"
-                placeholder="ログインID"
-              />
+              <input name="mypage_id" className="dq-input text-sm" placeholder="ログインID" />
             </label>
 
             <label className="block space-y-2">
               <span className="text-sm font-medium text-slate-700">マイページURL</span>
-              <input
-                name="mypage_url"
-                className="dq-input text-sm"
-                placeholder="https://mypage.example.com"
-              />
+              <input name="mypage_url" className="dq-input text-sm" placeholder="https://mypage.example.com" />
             </label>
           </div>
 
           <label className="block space-y-2">
             <span className="text-sm font-medium text-slate-700">ステータス</span>
-            <input
-              name="stage"
-              className="dq-input text-sm"
-              placeholder="Screening / Document passed など"
-            />
+            <input name="stage" className="dq-input text-sm" placeholder="Screening / Document passed など" />
           </label>
 
           <label className="block space-y-2">
             <span className="text-sm font-medium text-slate-700">志望度（1-5）</span>
-            <input
-              name="preference"
-              type="number"
-              min="1"
-              max="5"
-              className="dq-input text-sm"
-              placeholder="3"
-            />
+            <input name="preference" type="number" min="1" max="5" className="dq-input text-sm" placeholder="3" />
           </label>
 
           <label className="block space-y-2">

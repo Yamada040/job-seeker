@@ -14,16 +14,9 @@ function parseQuestions(raw: unknown): InterviewQuestionsPayload | null {
   return null;
 }
 
-export default async function InterviewDetailPage({
-  params,
-}: {
-  params: { id: string } | Promise<{ id: string }>;
-}) {
+export default async function InterviewDetailPage({ params }: { params: { id: string } | Promise<{ id: string }> }) {
   const resolvedParams = await Promise.resolve(params);
-  const id =
-    typeof resolvedParams === "object"
-      ? (resolvedParams as { id?: string }).id
-      : undefined;
+  const id = typeof resolvedParams === "object" ? (resolvedParams as { id?: string }).id : undefined;
   if (!id || id === "undefined") return notFound();
   const supabase = await createSupabaseReadonlyClient();
   const { data: userData } = await supabase.auth.getUser();
@@ -44,16 +37,11 @@ export default async function InterviewDetailPage({
     .order("created_at", { ascending: false });
 
   const companyOptions =
-    companies
-      ?.filter((c) => c.name)
-      .map((c) => ({ value: c.name as string, label: c.name as string })) ?? [];
+    companies?.filter((c) => c.name).map((c) => ({ value: c.name as string, label: c.name as string })) ?? [];
 
   const headerActions = (
     <div className="flex flex-wrap gap-3">
-      <Link
-        href={ROUTES.INTERVIEWS}
-        className="dq-button-secondary"
-      >
+      <Link href={ROUTES.INTERVIEWS} className="dq-button-secondary">
         <ArrowUturnLeftIcon className="h-4 w-4" />
         面接ログ一覧へ
       </Link>

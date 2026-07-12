@@ -8,11 +8,7 @@ type GoalScrollProps = {
   goalState?: string | null;
 };
 
-export function GoalScroll({
-  targetIndustry,
-  careerAxis,
-  goalState,
-}: GoalScrollProps) {
+export function GoalScroll({ targetIndustry, careerAxis, goalState }: GoalScrollProps) {
   return (
     <section className="relative pb-6 pt-6">
       <div className="relative mx-auto w-[min(90%,920px)]">
@@ -74,9 +70,7 @@ export function GoalScroll({
                 href={ROUTES.PROFILE}
                 className="group flex items-center whitespace-nowrap text-[clamp(0.55rem,1.2vw,0.75rem)] font-black text-[#111111] transition-colors hover:text-[#000000]"
               >
-                <span className="mr-1 inline-block transition-transform group-hover:translate-x-1">
-                  ▶
-                </span>
+                <span className="mr-1 inline-block transition-transform group-hover:translate-x-1">▶</span>
                 目標・軸を編集する
               </Link>
             </div>

@@ -91,52 +91,23 @@ export function Header({
         {actionsPlacement === "left" ? (
           <div className="flex items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              {showBrand ? (
-                <BrandLogo
-                  className="w-60 pl-16"
-                  logoClassName="h-14"
-                />
-              ) : null}
-              {leftContent ? (
-                <div className="flex-shrink-0">{leftContent}</div>
-              ) : null}
+              {showBrand ? <BrandLogo className="w-60 pl-16" logoClassName="h-14" /> : null}
+              {leftContent ? <div className="flex-shrink-0">{leftContent}</div> : null}
             </div>
             <div className="flex-1 min-w-0">
-              {title && (
-                <h1 className="theme-readable truncate text-2xl font-semibold">
-                  {title}
-                </h1>
-              )}
-              {description && (
-                <p className="theme-readable-muted mt-1 text-sm">{description}</p>
-              )}
+              {title && <h1 className="theme-readable truncate text-2xl font-semibold">{title}</h1>}
+              {description && <p className="theme-readable-muted mt-1 text-sm">{description}</p>}
             </div>
-            {actions ? (
-              <div className="header-nav-actions flex-shrink-0 flex items-center gap-2">
-                {actions}
-              </div>
-            ) : null}
+            {actions ? <div className="header-nav-actions flex-shrink-0 flex items-center gap-2">{actions}</div> : null}
           </div>
         ) : (
           <div className="flex items-center justify-between gap-3">
             <div className="flex-1 min-w-0">
-              {title && (
-                <h1 className="theme-readable truncate text-2xl font-semibold">
-                  {title}
-                </h1>
-              )}
-              {description && (
-                <p className="theme-readable-muted mt-1 text-sm">{description}</p>
-              )}
+              {title && <h1 className="theme-readable truncate text-2xl font-semibold">{title}</h1>}
+              {description && <p className="theme-readable-muted mt-1 text-sm">{description}</p>}
             </div>
 
-            <div
-              className={clsx(
-                "header-nav-actions ml-4 flex items-center gap-2"
-              )}
-            >
-              {actions}
-            </div>
+            <div className={clsx("header-nav-actions ml-4 flex items-center gap-2")}>{actions}</div>
           </div>
         )}
       </div>

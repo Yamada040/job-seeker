@@ -30,8 +30,7 @@ export async function createCompany(formData: FormData) {
     favorite: formData.get("favorite"),
   });
   if (!companyValidation.success) throw new Error(required("企業名"));
-  const { name, industry, url, mypage_id, mypage_url, memo, stage, preference, favorite } =
-    companyValidation.data;
+  const { name, industry, url, mypage_id, mypage_url, memo, stage, preference, favorite } = companyValidation.data;
 
   checkLen(name ?? null, "企業名");
   checkLen(industry ?? null, "業界");
@@ -53,11 +52,7 @@ export async function createCompany(formData: FormData) {
     favorite,
   };
 
-  const { data, error } = await supabase
-    .from("companies")
-    .insert(payload)
-    .select("id")
-    .single();
+  const { data, error } = await supabase.from("companies").insert(payload).select("id").single();
   if (error || !data?.id) throw error || new Error("作成に失敗しました");
 
   await awardXp(userData.user.id, "company_new", { refId: data.id, supabase });
@@ -84,8 +79,7 @@ export async function updateCompany(id: string, formData: FormData) {
     favorite: formData.get("favorite"),
   });
   if (!companyValidation.success) throw new Error(required("企業名"));
-  const { name, industry, url, mypage_id, mypage_url, memo, stage, preference, favorite } =
-    companyValidation.data;
+  const { name, industry, url, mypage_id, mypage_url, memo, stage, preference, favorite } = companyValidation.data;
 
   checkLen(name ?? null, "企業名");
   checkLen(industry ?? null, "業界");
@@ -106,11 +100,7 @@ export async function updateCompany(id: string, formData: FormData) {
     favorite,
   };
 
-  const { error } = await supabase
-    .from("companies")
-    .update(payload)
-    .eq("id", id)
-    .eq("user_id", userData.user.id);
+  const { error } = await supabase.from("companies").update(payload).eq("id", id).eq("user_id", userData.user.id);
   if (error) throw error;
 
   revalidatePath(`/companies/${id}`);
@@ -123,11 +113,7 @@ export async function deleteCompany(id: string) {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return redirect("/login");
 
-  const { error } = await supabase
-    .from("companies")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", userData.user.id);
+  const { error } = await supabase.from("companies").delete().eq("id", id).eq("user_id", userData.user.id);
   if (error) throw error;
 
   revalidatePath("/companies");

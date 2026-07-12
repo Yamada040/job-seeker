@@ -18,20 +18,14 @@ export async function proxy(request: NextRequest) {
         },
         setAll(cookiesToSet, headers) {
           // リクエストとレスポンス両方に Cookie をセット（JWT リフレッシュ時に必要）
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
+          cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
           // CDN キャッシュ防止ヘッダー（v0.10.0+）
-          Object.entries(headers ?? {}).forEach(([key, value]) =>
-            response.headers.set(key, value)
-          );
+          Object.entries(headers ?? {}).forEach(([key, value]) => response.headers.set(key, value));
         },
       },
-    }
+    },
   );
 
   // セッションリフレッシュ（全リクエストで実行）
@@ -56,7 +50,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
 };

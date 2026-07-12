@@ -4,10 +4,7 @@ import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
-import {
-  esFormSchema,
-  esQuestionsSchema,
-} from "@/lib/validation/schemas/forms";
+import { esFormSchema, esQuestionsSchema } from "@/lib/validation/schemas/forms";
 import { awardXp } from "@/lib/xp/award-xp";
 
 type Question = { id: string; prompt: string; answer_md: string };
@@ -92,11 +89,7 @@ export async function createEs(formData: FormData) {
     tags: tags.length ? tags : null,
   };
 
-  const { data, error } = await supabase
-    .from("es_entries")
-    .insert(payload)
-    .select("id")
-    .single();
+  const { data, error } = await supabase.from("es_entries").insert(payload).select("id").single();
   if (error || !data?.id) throw error || new Error("作成に失敗しました");
 
   if (nextStatus === "submitted") {
@@ -178,11 +171,7 @@ export async function deleteEs(id: string) {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) throw new Error("Not authenticated");
 
-  const { error } = await supabase
-    .from("es_entries")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", userData.user.id);
+  const { error } = await supabase.from("es_entries").delete().eq("id", id).eq("user_id", userData.user.id);
   if (error) throw error;
   revalidatePath("/es");
   redirect("/es");

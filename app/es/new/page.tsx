@@ -51,65 +51,37 @@ export default async function NewEsPage() {
         >
           <div className="space-y-2">
             <label className="block text-xs text-white/70">企業名</label>
-            <input
-              name="company_name"
-              className="dq-input text-sm"
-              placeholder="例）Alpha SaaS"
-            />
+            <input name="company_name" className="dq-input text-sm" placeholder="例）Alpha SaaS" />
           </div>
 
           <div className="space-y-2">
             <label className="block text-xs text-white/70">タイトル*</label>
-            <input
-              name="title"
-              required
-              className="dq-input text-sm"
-              placeholder="例）Alpha SaaS 新卒向けES"
-            />
+            <input name="title" required className="dq-input text-sm" placeholder="例）Alpha SaaS 新卒向けES" />
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
             <label className="block space-y-1 text-xs text-white/70">
               職種 / 募集枠
-              <input
-                name="selection_status"
-                className="dq-input text-sm"
-                placeholder="書類選考用エンジニア枠 など"
-              />
+              <input name="selection_status" className="dq-input text-sm" placeholder="書類選考用エンジニア枠 など" />
             </label>
             <label className="block space-y-1 text-xs text-white/70">
               企業ホームページURL
-              <input
-                name="company_url"
-                className="dq-input text-sm"
-                placeholder="https://example.com"
-              />
+              <input name="company_url" className="dq-input text-sm" placeholder="https://example.com" />
             </label>
             <label className="block space-y-1 text-xs text-white/70">
               メモ
-              <input
-                name="memo"
-                className="dq-input text-sm"
-                placeholder="選考メモや提出状況など"
-              />
+              <input name="memo" className="dq-input text-sm" placeholder="選考メモや提出状況など" />
             </label>
             <label className="block space-y-1 text-xs text-white/70">
               締切日（任意）
-              <input
-                type="date"
-                name="deadline"
-                className="dq-input text-sm"
-              />
+              <input type="date" name="deadline" className="dq-input text-sm" />
             </label>
           </div>
 
           <QuestionsEditor initialQuestions={initialQuestions} />
 
           <div className="flex justify-wrap gap-3">
-            <button
-              type="submit"
-              className="sidebar-link-style text-sm"
-            >
+            <button type="submit" className="sidebar-link-style text-sm">
               下書きとして保存
             </button>
             <Link href={ROUTES.ES} className="sidebar-link-style text-sm">

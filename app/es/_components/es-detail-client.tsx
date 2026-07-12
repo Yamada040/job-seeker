@@ -65,12 +65,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
                 <label className="block text-xs text-white/70">
                   ESタイトル<span className="text-rose-500">*</span>
                 </label>
-                <input
-                  name="title"
-                  defaultValue={entry.title ?? ""}
-                  required
-                  className="dq-input text-sm"
-                />
+                <input name="title" defaultValue={entry.title ?? ""} required className="dq-input text-sm" />
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
@@ -85,12 +80,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
                 </label>
                 <label className="block space-y-1 text-xs text-white/70">
                   締切日
-                  <input
-                    name="deadline"
-                    type="date"
-                    defaultValue={entry.deadline ?? ""}
-                    className="dq-input text-sm"
-                  />
+                  <input name="deadline" type="date" defaultValue={entry.deadline ?? ""} className="dq-input text-sm" />
                 </label>
               </div>
 
@@ -132,27 +122,13 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
               <input type="hidden" name="questions_json" value={JSON.stringify(questions)} />
 
               <div className="flex flex-wrap gap-3">
-                <button
-                  type="submit"
-                  name="intent"
-                  value="submit"
-                  className="sidebar-link-style text-sm"
-                >
+                <button type="submit" name="intent" value="submit" className="sidebar-link-style text-sm">
                   提出として保存
                 </button>
-                <button
-                  type="submit"
-                  name="intent"
-                  value="save"
-                  className="sidebar-link-style text-sm"
-                >
+                <button type="submit" name="intent" value="save" className="sidebar-link-style text-sm">
                   下書きを保存
                 </button>
-                <button
-                  type="button"
-                  className="sidebar-link-style text-sm"
-                  onClick={() => setEditing(false)}
-                >
+                <button type="button" className="sidebar-link-style text-sm" onClick={() => setEditing(false)}>
                   プレビューへ
                 </button>
               </div>
@@ -188,30 +164,42 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
             <div className="space-y-4 text-sm text-white/90">
               <div>
                 <p className="text-xs text-white/70">企業名</p>
-                <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">{entry.company_name || "-"}</p>
+                <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">
+                  {entry.company_name || "-"}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-white/70">タイトル</p>
-                <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">{entry.title || "-"}</p>
+                <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">
+                  {entry.title || "-"}
+                </p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <p className="text-xs text-white/70">職種 / 募集枠</p>
-                  <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">{entry.selection_status || "-"}</p>
+                  <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">
+                    {entry.selection_status || "-"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-white/70">締切日</p>
-                  <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">{entry.deadline || "-"}</p>
+                  <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">
+                    {entry.deadline || "-"}
+                  </p>
                 </div>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <p className="text-xs text-white/70">企業URL</p>
-                  <p className="break-all rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">{entry.company_url || "-"}</p>
+                  <p className="break-all rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">
+                    {entry.company_url || "-"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-white/70">メモ</p>
-                  <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">{entry.memo || "-"}</p>
+                  <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">
+                    {entry.memo || "-"}
+                  </p>
                 </div>
               </div>
               <div className="space-y-2">
@@ -222,11 +210,7 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
               </div>
               <div className="flex flex-wrap gap-2">
                 {entry.status === "submitted" && (
-                  <button
-                    type="button"
-                    onClick={() => setEditing(true)}
-                    className="sidebar-link-style text-sm"
-                  >
+                  <button type="button" onClick={() => setEditing(true)} className="sidebar-link-style text-sm">
                     編集する
                   </button>
                 )}

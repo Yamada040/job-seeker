@@ -9,13 +9,7 @@ type Props = {
   items: CompanyRow[];
 };
 
-const STAGES = [
-  "すべて",
-  "未エントリー",
-  "書類提出",
-  "面接中",
-  "カジュアル面談",
-] as const;
+const STAGES = ["すべて", "未エントリー", "書類提出", "面接中", "カジュアル面談"] as const;
 
 export function CompanyListClient({ items }: Props) {
   const [stage, setStage] = useState<(typeof STAGES)[number]>("すべて");
@@ -72,11 +66,7 @@ export function CompanyListClient({ items }: Props) {
 
       <div className="grid gap-3 sm:grid-cols-2">
         {filtered.map((c) => (
-          <a
-            key={c.id}
-            href={`/companies/${c.id}`}
-            className="dq-card p-4 transition hover:-translate-y-0.5"
-          >
+          <a key={c.id} href={`/companies/${c.id}`} className="dq-card p-4 transition hover:-translate-y-0.5">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-white">{c.name}</p>
               {c.favorite ? (

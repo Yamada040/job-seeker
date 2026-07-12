@@ -1,24 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import {
-  Suspense,
-  use,
-  useEffect,
-  useMemo,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { Suspense, use, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
-import {
-  computeLevel,
-  levelThresholds,
-  XP_PER_LEVEL,
-} from "@/lib/xp/compute-level";
-import {
-  consumeXpStatusCookie,
-  XP_UPDATED_EVENT,
-} from "@/lib/xp/level-up-signal";
+import { computeLevel, levelThresholds, XP_PER_LEVEL } from "@/lib/xp/compute-level";
+import { consumeXpStatusCookie, XP_UPDATED_EVENT } from "@/lib/xp/level-up-signal";
 
 export type ProfileLite = {
   userId: string | null;
@@ -35,10 +21,7 @@ function cacheProfile(profile: ProfileLite | null) {
   try {
     sessionStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profile ?? null));
     if (profile?.userId) {
-      sessionStorage.setItem(
-        profileCacheKey(profile.userId),
-        JSON.stringify(profile)
-      );
+      sessionStorage.setItem(profileCacheKey(profile.userId), JSON.stringify(profile));
     }
   } catch {
     // fail silently
@@ -58,19 +41,10 @@ function readCachedProfileRaw(): string | null {
  * 解決値は sessionStorage にキャッシュし、ページ遷移中の
  * Suspense fallback（XpBadgeFallback）でのちらつき防止に使う。
  */
-function XpBadgeResolved({
-  profilePromise,
-}: {
-  profilePromise: Promise<ProfileLite | null>;
-}) {
+function XpBadgeResolved({ profilePromise }: { profilePromise: Promise<ProfileLite | null> }) {
   const data = use(profilePromise);
 
-  return (
-    <XpBadgeView
-      key={`${data?.userId ?? "guest"}:${data?.xp ?? 0}:${data?.level ?? 0}`}
-      data={data}
-    />
-  );
+  return <XpBadgeView key={`${data?.userId ?? "guest"}:${data?.xp ?? 0}:${data?.level ?? 0}`} data={data} />;
 }
 
 /**
@@ -80,11 +54,7 @@ function XpBadgeResolved({
 function XpBadgeFallback() {
   // SSR では null（デフォルト表示）、クライアントでは sessionStorage を
   // 参照してハイドレーション不整合なく前回値を表示する。
-  const raw = useSyncExternalStore(
-    subscribeNoop,
-    readCachedProfileRaw,
-    () => null
-  );
+  const raw = useSyncExternalStore(subscribeNoop, readCachedProfileRaw, () => null);
 
   const cached = useMemo(() => {
     if (!raw) return null;
@@ -98,11 +68,7 @@ function XpBadgeFallback() {
   return <XpBadgeStatus data={cached} />;
 }
 
-export function XpBadge({
-  profilePromise,
-}: {
-  profilePromise: Promise<ProfileLite | null>;
-}) {
+export function XpBadge({ profilePromise }: { profilePromise: Promise<ProfileLite | null> }) {
   return (
     <Suspense fallback={<XpBadgeFallback />}>
       <XpBadgeResolved profilePromise={profilePromise} />
@@ -209,12 +175,8 @@ function XpBadgeStatus({ data }: { data: ProfileLite | null }) {
   return (
     <div className="flex min-w-[600px] flex-1 items-center gap-4 rounded-md px-2 py-1">
       <div className="flex items-baseline gap-2">
-        <span className="text-[10px] font-bold tracking-widest text-sky-600">
-          LEVEL
-        </span>
-        <span className="theme-readable text-2xl font-bold tracking-tighter">
-          Lv {level}
-        </span>
+        <span className="text-[10px] font-bold tracking-widest text-sky-600">LEVEL</span>
+        <span className="theme-readable text-2xl font-bold tracking-tighter">Lv {level}</span>
         <span className="theme-readable-muted text-xs">XP {xp}</span>
       </div>
       <div className="flex min-w-[180px] flex-1 flex-col gap-1">

@@ -39,7 +39,7 @@ export async function POST(request: Request) {
   if (!validation.success) {
     return NextResponse.json(
       { ok: false, code: "INVALID_INPUT", error: validation.error.issues[0]?.message ?? "入力内容を確認してください" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
   if (!transporter) {
     return NextResponse.json(
       { ok: false, code: "SMTP_ENV_MISSING", error: "メール送信設定が未完了です。環境変数を確認してください。" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     if (info.rejected?.length) {
       return NextResponse.json(
         { ok: false, code: "SMTP_REJECTED", error: "送信に失敗しました。時間をおいて再度お試しください。" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
     console.error("Failed to send contact email", error);
     return NextResponse.json(
       { ok: false, code: "SMTP_SEND_FAILED", error: "送信に失敗しました。時間をおいて再度お試しください。" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

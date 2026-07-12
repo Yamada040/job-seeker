@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { 
-  ArrowRightIcon, 
-  SparklesIcon, 
-  ShieldCheckIcon, 
+import {
+  ArrowRightIcon,
+  SparklesIcon,
+  ShieldCheckIcon,
   ChartBarIcon,
   PencilSquareIcon,
   BuildingOffice2Icon,
@@ -14,7 +14,7 @@ import {
   LifebuoyIcon,
   RocketLaunchIcon,
   TrophyIcon,
-  BoltIcon
+  BoltIcon,
 } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 
@@ -26,19 +26,19 @@ const features = [
     icon: PencilSquareIcon,
     title: "AI ES添削",
     description: "GPT・Geminiによる高品質な添削で、通過率の高いエントリーシートを作成",
-    benefit: "伝わるESに磨き上げる"
+    benefit: "伝わるESに磨き上げる",
   },
   {
     icon: BuildingOffice2Icon,
     title: "企業管理",
     description: "選考状況、志望度、メモを一元管理。進捗を見える化して効率的に就活",
-    benefit: "抜け漏れを防いで前進できる"
+    benefit: "抜け漏れを防いで前進できる",
   },
   {
     icon: ChartBarIcon,
     title: "進捗可視化",
     description: "ゲーム感覚でタスクをこなし、XPとレベルで成長を実感できる仕組み",
-    benefit: "迷わず次の行動に移れる"
+    benefit: "迷わず次の行動に移れる",
   },
 ];
 
@@ -46,24 +46,24 @@ const steps = [
   {
     step: "01",
     title: "ログイン",
-    description: "Google認証でログインして、すぐに利用を開始できます。"
+    description: "Google認証でログインして、すぐに利用を開始できます。",
   },
   {
-    step: "02", 
+    step: "02",
     title: "企業・ES登録",
-    description: "志望企業とエントリーシートを登録して管理開始。"
+    description: "志望企業とエントリーシートを登録して管理開始。",
   },
   {
     step: "03",
     title: "AI活用で効率化",
-    description: "添削機能で質を向上、進捗管理で確実に内定獲得へ。"
+    description: "添削機能で質を向上、進捗管理で確実に内定獲得へ。",
   },
 ];
 
 const acquisitionPoints = [
   "登録後すぐに使える。初期設定は最小限",
   "就活タスクを1画面で整理できる",
-  "ES・企業管理・面接ログを横断して管理"
+  "ES・企業管理・面接ログを横断して管理",
 ];
 
 const attractionBadges = [
@@ -75,47 +75,43 @@ const attractionBadges = [
 const mvpQuickGuide = [
   "このMVPは、就活の情報整理を助けるためのツールです。",
   "ログイン後は、自己分析・適性チェックで軸を整理してから、企業管理・ES管理・面接ログに進むと使いやすくなります。",
-  "迷ったらダッシュボードの次アクションを確認し、今日やることを1つずつ進めればOKです。"
+  "迷ったらダッシュボードの次アクションを確認し、今日やることを1つずつ進めればOKです。",
 ];
 
 const mvpContext = [
   {
     icon: ExclamationTriangleIcon,
     title: "就活の現状",
-    description:
-      "締切・面接・企業研究が同時に進み、何から手を付けるべきか見失いやすい状態になりがちです。"
+    description: "締切・面接・企業研究が同時に進み、何から手を付けるべきか見失いやすい状態になりがちです。",
   },
   {
     icon: ClipboardDocumentCheckIcon,
     title: "今やるべきこと",
-    description:
-      "応募先の優先順位付け、ESの改善、面接ログの振り返りを継続して、選考ごとの勝率を上げる必要があります。"
+    description: "応募先の優先順位付け、ESの改善、面接ログの振り返りを継続して、選考ごとの勝率を上げる必要があります。",
   },
   {
     icon: LifebuoyIcon,
     title: "ここでのサポート",
-    description:
-      "ES添削・企業/進捗管理・面接ログ整理を1つに集約し、次にやるべき行動を迷わないように支援します。"
+    description: "ES添削・企業/進捗管理・面接ログ整理を1つに集約し、次にやるべき行動を迷わないように支援します。",
   },
 ];
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6 }
+  transition: { duration: 0.6 },
 };
 
 const staggerChildren = {
   animate: {
     transition: {
-      staggerChildren: 0.1
-    }
-  }
+      staggerChildren: 0.1,
+    },
+  },
 };
 
 export default function Home() {
-  const navLinkClass =
-    "sidebar-link-style text-sm";
+  const navLinkClass = "sidebar-link-style text-sm";
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_20%_20%,#ffffff_0%,#f4faff_45%,#dbeafe_100%)] text-slate-900">
@@ -132,15 +128,9 @@ export default function Home() {
           transition={{ duration: 0.6 }}
           className="flex items-center justify-between gap-4"
         >
-          <BrandLogo
-            className="font-semibold"
-            logoClassName="h-16"
-          />
+          <BrandLogo className="font-semibold" logoClassName="h-16" />
           <div className="flex items-center gap-3 text-sm">
-            <Link
-              href={ROUTES.LOGIN}
-              className={navLinkClass}
-            >
+            <Link href={ROUTES.LOGIN} className={navLinkClass}>
               ログイン
             </Link>
           </div>
@@ -172,7 +162,7 @@ export default function Home() {
                   <CheckCircleIcon className="h-3 w-3 text-sky-500" />
                 </span>
               </div>
-              
+
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -183,34 +173,29 @@ export default function Home() {
                 <span className="bg-linear-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">整理</span>して
                 <span className="block text-slate-600">やるべき行動を明確にする</span>
               </motion.h1>
-              
+
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
                 className="max-w-2xl text-lg leading-7 text-slate-600"
               >
-                ES・面接・企業管理が分断されると、準備の優先順位が崩れやすくなります。<br />
+                ES・面接・企業管理が分断されると、準備の優先順位が崩れやすくなります。
+                <br />
                 このMVPは「次に何をすべきか」を一画面で把握できるように設計しています。
               </motion.p>
-              
+
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.8 }}
                 className="flex flex-wrap gap-4"
               >
-                <Link
-                  href={ROUTES.LOGIN}
-                  className={navLinkClass}
-                >
+                <Link href={ROUTES.LOGIN} className={navLinkClass}>
                   ログイン
                   <ArrowRightIcon className="h-4 w-4" />
                 </Link>
-                <Link
-                  href="#features"
-                  className={navLinkClass}
-                >
+                <Link href="#features" className={navLinkClass}>
                   機能を見る
                 </Link>
               </motion.div>
@@ -296,12 +281,8 @@ export default function Home() {
         <section className="space-y-6">
           <motion.div {...fadeInUp} className="space-y-2 text-center">
             <div className="mx-auto h-1 w-28 rounded-full bg-linear-to-r from-transparent via-[#b8844a] to-transparent" />
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#744000]">
-              MVP Overview
-            </p>
-            <h2 className="text-3xl font-bold text-[#412c18]">
-              就活の現状と、ここで支援すること
-            </h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#744000]">MVP Overview</p>
+            <h2 className="text-3xl font-bold text-[#412c18]">就活の現状と、ここで支援すること</h2>
           </motion.div>
 
           <motion.div
@@ -329,10 +310,7 @@ export default function Home() {
 
         {/* 機能セクション */}
         <section id="features" className="space-y-8">
-          <motion.div
-            {...fadeInUp}
-            className="text-center space-y-3"
-          >
+          <motion.div {...fadeInUp} className="text-center space-y-3">
             <div className="mx-auto h-1 w-28 rounded-full bg-linear-to-r from-transparent via-[#b8844a] to-transparent" />
             <h2 className="text-3xl font-bold text-[#412c18]">就活を変える3つの機能</h2>
             <p className="mx-auto max-w-2xl text-lg text-[#6f4b25]">
@@ -370,15 +348,10 @@ export default function Home() {
 
         {/* 始め方セクション */}
         <section className="space-y-8">
-          <motion.div
-            {...fadeInUp}
-            className="text-center space-y-3"
-          >
+          <motion.div {...fadeInUp} className="text-center space-y-3">
             <div className="mx-auto h-1 w-28 rounded-full bg-linear-to-r from-transparent via-[#b8844a] to-transparent" />
             <h2 className="text-3xl font-bold text-[#412c18]">簡単3ステップで始める</h2>
-            <p className="text-lg text-[#6f4b25]">
-              面倒な設定は一切不要。今すぐ就活効率化を体験してください
-            </p>
+            <p className="text-lg text-[#6f4b25]">面倒な設定は一切不要。今すぐ就活効率化を体験してください</p>
           </motion.div>
 
           <motion.div
@@ -399,7 +372,7 @@ export default function Home() {
                 </div>
                 <h3 className="mb-2 text-lg font-semibold text-[#412c18]">{step.title}</h3>
                 <p className="text-sm text-[#6f4b25]">{step.description}</p>
-                
+
                 {index < steps.length - 1 && (
                   <div className="absolute -right-3 top-1/2 hidden md:block">
                     <ArrowRightIcon className="h-6 w-6 text-[#9a4f00]" />
@@ -416,18 +389,11 @@ export default function Home() {
           className="rounded-2xl border border-[#b8844a] bg-[#f8e7c8] p-10 text-center shadow-[0_12px_34px_rgba(116,64,0,0.14)]"
         >
           <div className="mx-auto max-w-2xl space-y-6">
-            <h2 className="text-3xl font-bold text-[#412c18]">
-              今すぐ就活を効率化しませんか？
-            </h2>
-            <p className="text-lg text-[#6f4b25]">
-              無料で始められます。面倒な設定は不要で、登録後すぐに利用可能です。
-            </p>
+            <h2 className="text-3xl font-bold text-[#412c18]">今すぐ就活を効率化しませんか？</h2>
+            <p className="text-lg text-[#6f4b25]">無料で始められます。面倒な設定は不要で、登録後すぐに利用可能です。</p>
             <div className="flex flex-wrap justify-center gap-4">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Link
-                  href={ROUTES.LOGIN}
-                  className={navLinkClass}
-                >
+                <Link href={ROUTES.LOGIN} className={navLinkClass}>
                   ログイン
                 </Link>
               </motion.div>
@@ -447,22 +413,23 @@ export default function Home() {
           <div className="mt-4 grid gap-3 text-center text-sm text-[#6f4b25] md:grid-cols-3">
             <div>
               <strong className="text-[#412c18]">暗号化通信</strong>
-              <br />全ての通信はSSLで保護
+              <br />
+              全ての通信はSSLで保護
             </div>
             <div>
               <strong className="text-[#412c18]">データ保護</strong>
-              <br />個人情報は厳格に管理
+              <br />
+              個人情報は厳格に管理
             </div>
             <div>
               <strong className="text-[#412c18]">セキュア認証</strong>
-              <br />Google認証で安全ログイン
+              <br />
+              Google認証で安全ログイン
             </div>
           </div>
         </motion.section>
 
-        <footer className="pb-2 text-center text-xs text-[#6f4b25]">
-          © 2026 就活copilot. All rights reserved.
-        </footer>
+        <footer className="pb-2 text-center text-xs text-[#6f4b25]">© 2026 就活copilot. All rights reserved.</footer>
       </main>
     </div>
   );

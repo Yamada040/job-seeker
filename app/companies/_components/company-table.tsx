@@ -89,8 +89,8 @@ export function CompanyTable({ items }: { items: Company[] }) {
               filtered.map((c) => (
                 <tr key={c.id} className="hover:bg-white/5">
                   <Td className="truncate">
-                    <Link 
-                      href={ROUTES.COMPANY_DETAIL(c.id)} 
+                    <Link
+                      href={ROUTES.COMPANY_DETAIL(c.id)}
                       className="font-semibold text-yellow-200 hover:underline block truncate"
                       title={c.name}
                     >
@@ -123,7 +123,9 @@ export function CompanyTable({ items }: { items: Company[] }) {
 }
 
 const Th = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-  <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-white/70 ${className}`}>{children}</th>
+  <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-white/70 ${className}`}>
+    {children}
+  </th>
 );
 const Td = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
   <td className={`px-4 py-3 align-top text-white/90 ${className}`}>{children}</td>

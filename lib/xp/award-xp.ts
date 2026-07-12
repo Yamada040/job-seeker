@@ -40,7 +40,7 @@ function startOfToday() {
 export async function awardXp(
   userId: string,
   action: XpAction,
-  opts?: { refId?: string | null; supabase?: Client }
+  opts?: { refId?: string | null; supabase?: Client },
 ): Promise<AwardXpResult> {
   const rule = XP_CONFIG[action];
   if (!rule) return NOT_AWARDED;
@@ -109,16 +109,12 @@ export async function awardXp(
   // フロントはこの値をそのまま表示に反映するので、XP変更時の再フェッチが不要になる。
   try {
     const cookieStore = await cookies();
-    cookieStore.set(
-      XP_STATUS_COOKIE,
-      encodeXpStatus({ xp: nextXp, level: nextLevel, leveledUp }),
-      {
-        path: "/",
-        maxAge: 60 * 5,
-        httpOnly: false,
-        sameSite: "lax",
-      }
-    );
+    cookieStore.set(XP_STATUS_COOKIE, encodeXpStatus({ xp: nextXp, level: nextLevel, leveledUp }), {
+      path: "/",
+      maxAge: 60 * 5,
+      httpOnly: false,
+      sameSite: "lax",
+    });
   } catch {
     // Cookie を書けないコンテキストでは戻り値のみで通知する
   }

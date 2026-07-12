@@ -1,9 +1,5 @@
 import Link from "next/link";
-import {
-  PlusIcon,
-  ArrowUturnLeftIcon,
-  HomeIcon,
-} from "@heroicons/react/24/outline";
+import { PlusIcon, ArrowUturnLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { AppLayout } from "@/app/_components/layout";
 import { ROUTES } from "@/lib/constants/routes";
 import { createSupabaseReadonlyClient } from "@/lib/supabase/supabase-server";
@@ -31,17 +27,11 @@ export default async function CompaniesPage() {
             <HomeIcon className="h-4 w-4" />
             MVPホーム
           </Link>
-          <Link
-            href={ROUTES.DASHBOARD}
-            className="dq-button-secondary"
-          >
+          <Link href={ROUTES.DASHBOARD} className="dq-button-secondary">
             <ArrowUturnLeftIcon className="h-4 w-4" />
             ダッシュボードへ
           </Link>
-          <Link
-            href={ROUTES.COMPANIES_NEW}
-            className="dq-button"
-          >
+          <Link href={ROUTES.COMPANIES_NEW} className="dq-button">
             <PlusIcon className="h-4 w-4" />
             企業を追加
           </Link>

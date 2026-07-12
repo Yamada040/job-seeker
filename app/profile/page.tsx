@@ -62,11 +62,7 @@ export default async function ProfilePage() {
       headerActions={headerActions}
       className="flex flex-col gap-8"
     >
-      <form
-        id="profile-form"
-        action={updateProfile}
-        className="dq-card p-8"
-      >
+      <form id="profile-form" action={updateProfile} className="dq-card p-8">
         <div className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
             <label className="block space-y-2">
@@ -80,11 +76,7 @@ export default async function ProfilePage() {
             </label>
             <label className="block space-y-2">
               <span className="text-sm font-medium text-white">メール</span>
-              <input
-                value={userData.user!.email ?? ""}
-                disabled
-                className="dq-input text-sm"
-              />
+              <input value={userData.user!.email ?? ""} disabled className="dq-input text-sm" />
             </label>
           </div>
 
@@ -150,7 +142,9 @@ export default async function ProfilePage() {
                 <label
                   key={opt.id}
                   className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-4 transition-colors ${
-                  profile.avatar_id === opt.id ? "border-white bg-black text-white" : "border-white/40 bg-black/70 text-white hover:text-yellow-400"
+                    profile.avatar_id === opt.id
+                      ? "border-white bg-black text-white"
+                      : "border-white/40 bg-black/70 text-white hover:text-yellow-400"
                   }`}
                 >
                   <input
@@ -172,10 +166,18 @@ export default async function ProfilePage() {
               ))}
               <label
                 className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-4 transition-colors ${
-                  !profile.avatar_id ? "border-white bg-black text-white" : "border-white/40 bg-black/70 text-white hover:text-yellow-400"
+                  !profile.avatar_id
+                    ? "border-white bg-black text-white"
+                    : "border-white/40 bg-black/70 text-white hover:text-yellow-400"
                 }`}
               >
-                <input type="radio" name="avatar_id" value="" defaultChecked={!profile.avatar_id} className="h-4 w-4 accent-amber-300" />
+                <input
+                  type="radio"
+                  name="avatar_id"
+                  value=""
+                  defaultChecked={!profile.avatar_id}
+                  className="h-4 w-4 accent-amber-300"
+                />
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/30 bg-black/70 text-xs text-white">
                   なし
                 </div>
