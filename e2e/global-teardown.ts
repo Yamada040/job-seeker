@@ -1,13 +1,10 @@
-import { createClient } from "@supabase/supabase-js";
-import { createE2eAdminClient } from "./support/admin-client";
+import { createE2eAdminClient, createE2eAnonClient } from "./support/admin-client";
 
 // 各テストは自前でクリーンアップするが、途中失敗などで取りこぼした場合の保険として、
 // 全テスト終了後にテストユーザーA/Bが所有する es_entries を丸ごと掃除する。
 // この2アカウントはE2E専用のため、中身を全削除しても実ユーザーへの影響はない。
 async function resolveUserId(email: string, password: string): Promise<string | null> {
-  const anon = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  const anon = createE2eAnonClient();
   const { data, error } = await anon.auth.signInWithPassword({ email, password });
   if (error || !data.user) return null;
   return data.user.id;
