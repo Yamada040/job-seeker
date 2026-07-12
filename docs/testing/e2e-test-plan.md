@@ -209,7 +209,12 @@ Supabaseへの実接続を必要としないため、既存の `.env.local` の�
 
 ## 6. CI組み込み
 
-`.github/workflows/ci.yml` に `e2e` ジョブを追加する（既存の `lint`/`type-check`/`test`/`build` と並列）。**新規プロジェクトではなく本番Supabaseを流用するため、Supabase接続系のSecretsは `build` ジョブと同じものをそのまま使う。** `E2E_TEST_SECRET` が未設定の間は自動でスキップし、CI全体をブロックしない。
+Issue #94（静的チェックの集約・テストジョブの分離）に合わせて、CIは2ワークフローに分割している。
+
+- `.github/workflows/checks.yml`: テスト以外の静的チェック（`checks` = lint/type-check/format:checkを1ジョブに集約）と `build`
+- `.github/workflows/test.yml`: テスト専用（`unit` = Vitest単体テスト、`check-e2e-secrets` + `e2e` = 今回のPlaywright）
+
+`e2e` ジョブは `test.yml` に追加する。**新規プロジェクトではなく本番Supabaseを流用するため、Supabase接続系のSecretsは `checks.yml` の `build` ジョブと同じものをそのまま使う。** `E2E_TEST_SECRET` が未設定の間は自動でスキップし、CI全体をブロックしない。
 
 **注意**: GitHub Actionsではジョブレベルの `if:` に `secrets` コンテキストを直接使えない（ワークフローファイル自体がパースエラーで即失敗する）。そのため `check-e2e-secrets` という前段のジョブでシークレットの有無をステップ内の環境変数として判定し、その `outputs` を `e2e` ジョブの `if:` から参照する形にしている。
 

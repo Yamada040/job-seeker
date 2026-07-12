@@ -92,7 +92,7 @@ jsdom                      # DOM/Cookie/windowに依存するテスト用環境
 "test:coverage": "vitest run --coverage"
 ```
 
-`.github/workflows/ci.yml` に `test` ジョブ（既存の `lint`/`type-check`/`build` と同じ構成で `npm run test` を実行）を追加済み。CIの静的チェック集約・テストジョブ分離の詳細検討はIssue #94で別途扱う。
+`.github/workflows/test.yml` に `unit` ジョブとして追加済み。Issue #94（静的チェックの集約・テストジョブの分離）に沿って、CIは `checks.yml`（lint/type-check/format:check を1ジョブに集約 + build）と `test.yml`（unit + e2e）の2ワークフローに分割している。
 
 ### 4.4 ディレクトリ・命名規則
 
@@ -344,5 +344,5 @@ flowchart TD
 - [x] Phase 2（Zodスキーマ）のテストが全て実装され green（5ファイル）
 - [x] Phase 3（DIモックが必要なロジック）のテストが全て実装され green（4ファイル）
 - [x] `npm run type-check` / `npm run lint` / `npm run format:check`（変更ファイル）が通る
-- [x] CI（`.github/workflows/ci.yml`）に `test` ジョブを追加
+- [x] CI（`.github/workflows/test.yml`）に `unit` ジョブを追加
 - [x] 本設計書のPhase 1〜3が実装内容と乖離していないこと（乖離があれば本ドキュメントを更新する）

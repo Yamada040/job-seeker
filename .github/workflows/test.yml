@@ -1,30 +1,10 @@
-name: CI
+name: Test
 
 on:
   pull_request:
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - run: npm run lint
-  type-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - run: npm run type-check
-  test:
+  unit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,22 +14,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test
-  build:
-    runs-on: ubuntu-latest
-    env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      AI_PROVIDER: ${{ secrets.AI_PROVIDER }}
-      AI_PROVIDER_API_KEY: ${{ secrets.AI_PROVIDER_API_KEY }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - run: npm run build
+
   # docs/testing/e2e-test-plan.md の「前提条件」参照。新規Supabaseプロジェクトは作らず、
   # build ジョブと同じ本番Supabaseの資格情報を流用し、固定のテストユーザーA/Bでログインする。
   # E2E_TEST_SECRET が未設定の間は自動でスキップする。
@@ -69,6 +34,7 @@ jobs:
           else
             echo "configured=false" >> "$GITHUB_OUTPUT"
           fi
+
   e2e:
     needs: check-e2e-secrets
     if: needs.check-e2e-secrets.outputs.configured == 'true'
