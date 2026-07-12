@@ -7,8 +7,6 @@ import { Database } from "@/lib/database.types";
 
 export const runtime = "nodejs";
 
-const CONTACT_TO_EMAIL = "syuuto20030912@gmail.com";
-
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
 function createSmtpTransport() {
@@ -57,7 +55,8 @@ export async function POST(request: Request) {
   const senderEmail = userData.user.email ?? "unknown";
 
   const transporter = createSmtpTransport();
-  if (!transporter) {
+  const contactToEmail = process.env.CONTACT_TO_EMAIL;
+  if (!transporter || !contactToEmail) {
     return NextResponse.json(
       { ok: false, code: "SMTP_ENV_MISSING", error: "メール送信設定が未完了です。環境変数を確認してください。" },
       { status: 500 },
@@ -67,7 +66,7 @@ export async function POST(request: Request) {
   try {
     const info = await transporter.sendMail({
       from: `"就活copilot" <${process.env.SMTP_USER}>`,
-      to: CONTACT_TO_EMAIL,
+      to: contactToEmail,
       replyTo: senderEmail,
       subject: `[就活copilot お問い合わせ] ${validation.data.subject}`,
       text: [

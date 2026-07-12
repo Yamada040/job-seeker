@@ -15,7 +15,10 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   const payloadValidation = answersPayloadSchema.safeParse(body);
   if (!payloadValidation.success) {
-    return NextResponse.json({ error: "answers is required" }, { status: 400 });
+    return NextResponse.json(
+      { error: payloadValidation.error.issues[0]?.message ?? "answers is required" },
+      { status: 400 },
+    );
   }
 
   const { data: existing, error: existingError } = await supabase

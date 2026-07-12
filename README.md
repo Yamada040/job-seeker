@@ -91,6 +91,7 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=465
 SMTP_USER=your-mail@example.com
 SMTP_PASS=your-app-password
+CONTACT_TO_EMAIL=contact-destination@example.com
 SMTP_SECURE=true
 ```
 
@@ -152,5 +153,5 @@ Next.js 認証コールバック: `app/auth/callback/route.ts` で `exchangeCode
 
 - Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 - AI: `AI_PROVIDER_API_KEY`（Gemini/GPT に応じて設定）, `AI_PROVIDER`
-- Contact: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`（必要なら `SMTP_SECURE`）
+- Contact: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `CONTACT_TO_EMAIL`（必要なら `SMTP_SECURE`）
 - SEO: `NEXT_PUBLIC_SITE_URL`

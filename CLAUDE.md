@@ -263,6 +263,7 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=465
 SMTP_USER=your-mail@example.com
 SMTP_PASS=your-app-password
+CONTACT_TO_EMAIL=contact-destination@example.com
 SMTP_SECURE=true
 ```
 
