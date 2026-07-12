@@ -24,8 +24,11 @@ async function ensureTestUserExists(email: string, password: string) {
     password,
     email_confirm: true,
   });
-  // ユーザーが既に存在する場合のエラーは無視する（冪等にするため）
-  if (error && !/already registered|already exists/i.test(error.message)) {
+  // ユーザーが既に存在する場合のエラーは無視する（冪等にするため）。
+  // Supabaseの実際のメッセージは "A user with this email address has already been
+  // registered" のように "already" と "registered" の間に語が挟まるため、
+  // 隣接一致ではなく緩めのパターンで判定する。
+  if (error && !/already.*(registered|exists)/i.test(error.message)) {
     throw error;
   }
 }
