@@ -273,6 +273,22 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["interview_logs"]["Insert"]>;
         Relationships: [];
       };
+      api_rate_limits: {
+        Row: {
+          user_id: string;
+          bucket: string;
+          window_start: string;
+          count: number;
+        };
+        Insert: {
+          user_id: string;
+          bucket: string;
+          window_start?: string;
+          count?: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["api_rate_limits"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

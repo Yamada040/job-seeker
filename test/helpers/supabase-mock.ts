@@ -4,7 +4,7 @@ export type MockQueryResult = { data?: unknown; count?: number | null };
 
 export type SupabaseCallRecord = {
   table: string;
-  method: "select" | "eq" | "gte" | "maybeSingle" | "upsert" | "insert";
+  method: "select" | "eq" | "gte" | "maybeSingle" | "upsert" | "insert" | "update";
   args: unknown[];
 };
 
@@ -52,6 +52,10 @@ export function createSupabaseMock(resultsQueue: MockQueryResult[] = []) {
       },
       insert: (...args: unknown[]) => {
         record("insert", args);
+        return query;
+      },
+      update: (...args: unknown[]) => {
+        record("update", args);
         return query;
       },
       then: (resolve: (value: MockQueryResult) => void, reject: (reason: unknown) => void) => {
