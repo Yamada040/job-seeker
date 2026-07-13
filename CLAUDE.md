@@ -268,7 +268,7 @@ if (!parsed.success) return { error: "Invalid input" };
 - Supabaseログイン（Google OAuth）へリダイレクトする
 - 成功すると Supabase が `/auth/callback` → `/dashboard` へリダイレクトする
 
-### 開発ルール（AGENTS.md）
+### 開発ルール
 
 **原則**:
 
@@ -423,15 +423,6 @@ Supabaseダッシュボード → Authentication → URL Configuration で設定
 - 並列クエリには `Promise.all()` を使う
 - 型付きのSupabase行をコンポーネントへ渡し、型安全性を保つ
 
-## Cursor Rules
+## 他ツール向けの参照
 
-包括的なCodexガイドラインは `AGENTS.md` を参照。要点の抜粋:
-
-- 既存のコード構造・命名規則に従う
-- App Routerの基本（Server/Clientの責務）を尊重する
-- 認証クエリは `user_id` にスコープする。未認証は `/login` へリダイレクトする
-- すべての入力にZodバリデーションを行う
-- AI呼び出しは `lib/ai/` ラッパー経由。キー未設定時は安全に失敗する
-- Tailwind v4の推奨クラスを優先する（`bg-linear-to-*` など）
-- DQ UIテーマ: `dq-window`, `dq-button`、三角ホバー効果のメニュー項目
-- コンポーネントは200行を超えたら分割し、責務ごとにグルーピングする
+`AGENTS.md`（Codex/Cursor等が参照する規約ファイル）はこのファイルを `@CLAUDE.md` で参照する形にしており、内容はここに一本化されている。二重メンテナンスを避けるため、開発ルールの追記・変更は本ファイルにのみ行うこと。
