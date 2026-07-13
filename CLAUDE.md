@@ -1,77 +1,83 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+このファイルは、このリポジトリで作業する際にClaude Code（claude.ai/code）へ向けたガイダンスを提供する。
 
-## Project Overview
+## プロジェクト概要
 
-**就活copilot** is a Next.js + Supabase MVP for Japanese job seekers. It centralizes ES (employment statement) creation, company management, interview logs, and self-analysis tools in one dashboard with AI-assisted review and gamification (XP/leveling).
+**就活copilot** は、日本の就活生向けのNext.js + Supabase製MVP。ES（エントリーシート）作成、企業管理、面接ログ、自己分析ツールを1つのダッシュボードに集約し、AIによる添削とゲーミフィケーション（XP/レベリング）を提供する。
 
-**Core purpose**: Eliminate friction by consolidating fragmented job-hunting workflows into a single, unified interface. The app's value lies not in pushing users to work harder, but in removing the "friction time" that delays progress.
+**中核の目的**: 分断された就活タスクを1つの統合されたインターフェースに集約し、摩擦（フリクション）を取り除くこと。このアプリの価値は「もっと頑張らせること」ではなく、進捗を妨げる「フリクションタイム」を取り除くことにある。
 
-## Tech Stack
+## 技術スタック
 
-- **Framework**: Next.js 16 (App Router) + TypeScript + React 19
-- **Styling**: Tailwind CSS v4 (prioritize recommended classes like `bg-linear-to-*`)
-- **Backend**: Supabase (Auth/Postgres/Storage with RLS)
-- **Auth**: Supabase Auth (Google OAuth)
-- **AI**: Provider-agnostic wrapper (`lib/ai/client.ts`) — swaps between Gemini and GPT via `AI_PROVIDER` env var
-- **Validation**: Zod (all inputs validated before DB/API)
-- **Animations**: Framer Motion
-- **Hosting**: Vercel (free tier)
-- **Email**: Nodemailer (SMTP)
+- **フレームワーク**: Next.js 16（App Router）+ TypeScript + React 19
+- **スタイリング**: Tailwind CSS v4（`bg-linear-to-*` など推奨クラスを優先）
+- **バックエンド**: Supabase（Auth/Postgres/Storage、RLS有効）
+- **認証**: Supabase Auth（Google OAuth）
+- **AI**: プロバイダー非依存のラッパー（`lib/ai/client.ts`）— `AI_PROVIDER` 環境変数でGemini/GPTを切り替え
+- **バリデーション**: Zod（DB/APIへ渡す前にすべての入力を検証）
+- **アニメーション**: Framer Motion
+- **ホスティング**: Vercel（無料プラン）
+- **メール送信**: Nodemailer（SMTP）
 
-All dependencies operate on **free tiers** — no paid infrastructure.
+すべての依存サービスは**無料プラン**で運用している（有料インフラなし）。
 
-## Development Commands
+## 開発コマンド
 
 ```bash
-npm run dev        # Start Next.js dev server (localhost:3000)
-npm run build      # Production build
-npm run start      # Start production server
-npm run lint       # Run ESLint
-npm run type-check # TypeScript type check (run after changes)
-npm run format     # Format with Prettier
-npm run format:check # Check formatting
+npm run dev           # Next.js開発サーバーを起動 (localhost:3000)
+npm run build         # 本番ビルド
+npm run start         # 本番サーバーを起動
+npm run lint          # ESLintを実行
+npm run type-check    # TypeScriptの型チェック（変更後は必ず実行）
+npm run format        # Prettierで整形
+npm run format:check  # フォーマットをチェック
+npm run test          # Vitestで単体テストを実行
+npm run test:watch    # Vitestをwatchモードで実行
+npm run test:coverage # カバレッジ計測付きでVitestを実行
+npm run test:e2e      # PlaywrightでE2Eテストを実行
+npm run test:e2e:ui   # PlaywrightをUIモードで実行
 ```
 
-**Before committing**, always run:
+**コミット前には必ず以下を実行する**:
 
 ```bash
 npm run type-check
 npm run lint
 npm run format:check
+npm run test
 ```
 
-## Core Architecture
+## コアアーキテクチャ
 
-### Authentication & Authorization
+### 認証・認可
 
-- **Server Components** (`createSupabaseReadonlyClient`): Read-only; no session mutation
-- **Route Handlers & Server Actions** (`createSupabaseServerActionClient`): Can mutate session cookies
-- **Auth guard**: Unauthenticated requests redirect to `/login`. User context obtained via `supabase.auth.getUser()`
-- **RLS enforcement**: All queries scoped to `user_id` at DB layer; Supabase RLS policies prevent cross-user data access
+- **Server Component**（`createSupabaseReadonlyClient`）: 読み取り専用。セッションを変更しない
+- **Route Handler / Server Action**（`createSupabaseServerActionClient`）: セッションCookieを変更できる
+- **認証ガード**: 未認証リクエストは `/login` へリダイレクトする。ユーザー情報は `supabase.auth.getUser()` で取得
+- **RLSの徹底**: すべてのクエリはDB層で `user_id` にスコープされる。SupabaseのRLSポリシーが他ユーザーのデータへのアクセスを防ぐ
 
-**Example**:
+**例**:
 
 ```typescript
-// Server Component (read-only)
+// Server Component（読み取り専用）
 const supabase = await createSupabaseReadonlyClient();
 const { data: userData } = await supabase.auth.getUser();
 
-// Route Handler or Server Action (can write auth)
+// Route Handler または Server Action（セッションの書き込み可）
 const supabase = await createSupabaseServerActionClient();
 ```
 
-### Data Fetching & State Management
+### データフェッチ・状態管理
 
-- **Server-side first**: Fetch data in Server Components where possible, pass as props to Client Components
-- **Parallel queries**: Use `Promise.all()` in Server Components to fetch related data concurrently (see `app/dashboard/page.tsx`)
-- **No external state management** (Redux, Zustand): Props and hooks only
-- **Client-side mutations**: Use `fetch()` to POST to Route Handlers; validate response and update UI
+- **サーバーサイドファースト**: 可能な限りServer Componentでデータを取得し、propsとしてClient Componentへ渡す
+- **並列クエリ**: 関連データの取得にはServer Component内で `Promise.all()` を使う（`app/dashboard/page.tsx` 参照）
+- **外部の状態管理ライブラリは使わない**（Redux, Zustandなど）: propsとhooksのみで完結させる
+- **クライアント側のミューテーション**: `fetch()` でRoute Handlerへ POST し、レスポンスを検証してUIを更新する
 
-### AI Integration
+### AI連携
 
-All AI calls route through `lib/ai/client.ts`:
+すべてのAI呼び出しは `lib/ai/client.ts` を経由する:
 
 ```typescript
 const client = createAiClient();
@@ -81,55 +87,56 @@ const result = await client.call(
 );
 ```
 
-**Features**:
+**特徴**:
 
-- Swappable providers: `AI_PROVIDER=gemini|gpt`
-- Prompt templates: Each `AiPromptKind` has locale-specific (Japanese) system prompts
-- Safe failure: If `AI_PROVIDER_API_KEY` is missing, returns a placeholder response
-- Rate limiting: 12 requests per 60 seconds per user (enforced in `/api/ai/route.ts`)
+- プロバイダーの切り替え: `AI_PROVIDER=gemini|gpt`
+- プロンプトテンプレート: `AiPromptKind` ごとにロケール別（日本語）のシステムプロンプトを持つ
+- 安全なフェイルオーバー: `AI_PROVIDER_API_KEY` が未設定の場合はプレースホルダー応答を返す
+- レート制限: ユーザーごとに60秒間で12リクエストまで（`/api/ai/route.ts` で強制）。永続化ストア（`api_rate_limits` テーブル、`lib/rate-limit.ts`）を使用しており、サーバーレス環境の複数インスタンス間でも一貫して機能する。コストの高い企業分析（agentic）エンドポイント `/api/ai/company/analyze` にも別枠のレート制限（10分間に5回）がある
 
-**Available prompt types**:
+**利用可能なプロンプト種別**:
 
-- `es_review`: Review ES content for structure/clarity/impact
-- `company_analysis`: Analyze company fit and desired traits
-- `aptitude_analysis`: Recommend industries/roles from self-assessment
-- `self_analysis`: Extract strengths and career axis
-- `interview_review`: Provide feedback on interview performance
+- `es_review`: ESの構成・明瞭性・訴求力をレビューする
+- `company_analysis`: 企業とのマッチ度・求める人物像を分析する
+- `aptitude_analysis`: 自己診断結果から業界・職種を推薦する
+- `self_analysis`: 強みとキャリアの軸を抽出する
+- `interview_review`: 面接パフォーマンスへのフィードバックを行う
 
-### Database Schema & RLS
+### データベーススキーマ・RLS
 
-**Core tables** (all have RLS enabled):
+**主要テーブル**（すべてRLS有効）:
 
-- `profiles`: User profile, XP, level, goals
-- `es_entries`: ES drafts/submissions with Markdown, tags, AI summary
-- `companies`: Company cards with stage/preference/AI summary
-- `calendar_events`: Unified deadlines/interviews/internship dates
-- `xp_logs`: Gamification history
-- `interview_logs`: Interview records + AI summaries
-- `aptitude_results`: One per user (unique index), stores AI diagnosis
-- `self_analysis_results`: One per user (unique index), stores AI summary
-- `webtest_questions` & `webtest_attempts`: Webtest practice bank
+- `profiles`: ユーザープロフィール、XP、レベル、目標
+- `es_entries`: Markdown・タグ・AIサマリー付きのES下書き/提出済みデータ
+- `companies`: 選考ステージ・志望度・AIサマリー付きの企業カード
+- `calendar_events`: 締切・面接・インターン日程を統合したカレンダー
+- `xp_logs`: ゲーミフィケーションの履歴
+- `interview_logs`: 面接記録＋AIサマリー
+- `aptitude_results`: ユーザー1人につき1件（ユニークインデックス）、AI診断結果を保存
+- `self_analysis_results`: ユーザー1人につき1件（ユニークインデックス）、AIサマリーを保存
+- `webtest_questions` / `webtest_attempts`: Webテスト練習用の問題バンク（ユーザーが自ら問題を作成する自己入力方式。共有/シード済みの問題集は無い）
+- `api_rate_limits`: AIエンドポイントのレート制限状態を永続化するテーブル（`lib/rate-limit.ts` が使用）
 
-**RLS pattern**: Every table enforces `auth.uid() = user_id` for SELECT/INSERT/UPDATE/DELETE. Querying bypasses RLS only via `createSupabaseAdminClient` (service role key).
+**RLSパターン**: すべてのテーブルがSELECT/INSERT/UPDATE/DELETEに対して `auth.uid() = user_id` を強制する。RLSを迂回するのは `createSupabaseAdminClient`（service roleキー）経由のクエリのみ（`/developer` ページや管理系スクリプトで限定的に使用）。
 
-**Example RLS policy**:
+**RLSポリシーの例**:
 
 ```sql
 CREATE POLICY "Enable read own es" ON es_entries
   FOR SELECT USING (auth.uid() = user_id);
 ```
 
-### Input Validation
+### 入力バリデーション
 
-**All inputs validated with Zod** before DB/API:
+**すべての入力をDB/APIへ渡す前にZodで検証する**:
 
-- `lib/validation/schemas/forms.ts`: Form input schemas
-- `lib/validation/schemas/api.ts`: API request body schemas
-- `lib/validation/schemas/ai.ts`: AI request schemas
-- `lib/validation/schemas/contact.ts`: Contact form schemas
-- `lib/validation/schemas/interviews.ts`: Interview schemas
+- `lib/validation/schemas/forms.ts`: フォーム入力スキーマ
+- `lib/validation/schemas/api.ts`: APIリクエストボディのスキーマ
+- `lib/validation/schemas/ai.ts`: AIリクエストのスキーマ
+- `lib/validation/schemas/contact.ts`: 問い合わせフォームのスキーマ
+- `lib/validation/schemas/interviews.ts`: 面接ログのスキーマ
 
-**Pattern**:
+**パターン**:
 
 ```typescript
 const schema = z.object({
@@ -137,128 +144,153 @@ const schema = z.object({
 });
 const parsed = schema.safeParse(formData);
 if (!parsed.success) return { error: "Invalid input" };
-// Safe to use parsed.data
+// parsed.data は安全に使用できる
 ```
 
-### API Routes
+### APIルート
 
-- `POST /api/ai`: Call AI with rate limiting + auth
-- `GET|POST|PUT /api/calendar-events`: Manage calendar events (CRUD)
-- `POST /api/contact`: Send contact form (SMTP)
-- `POST /api/interviews`: Create/update interview logs
-- `GET /api/developer/me`: Developer/test endpoint
+- `POST /api/ai`: レート制限＋認証付きでAIを呼び出す
+- `POST /api/ai/company/analyze`: 企業分析（agentic、Tavily検索連携、SSEストリーミング）。専用のレート制限あり
+- `GET|POST|PUT /api/calendar-events`: カレンダーイベントのCRUD
+- `POST /api/contact`: 問い合わせフォームの送信（SMTP）
+- `POST /api/interviews`: 面接ログの作成/更新
+- `GET /api/developer/me`: 開発者判定用エンドポイント
+- `POST /api/test-support/login`: **E2Eテスト専用**。`E2E_TEST_MODE` と共有シークレットの多重ガード付きで、本番以外では絶対に有効化しない（後述の「テスト」セクション参照）
 
-All Route Handlers:
+すべてのRoute Handlerは以下を行う:
 
-1. Validate user auth
-2. Validate request body with Zod
-3. Scope queries to `user_id`
-4. Return JSON or error
+1. ユーザー認証を検証する
+2. リクエストボディをZodで検証する
+3. クエリを `user_id` にスコープする
+4. JSONまたはエラーを返す
 
-### UI Patterns & Styling
+### UIパターン・スタイリング
 
-**Tailwind v4 conventions**:
+**Tailwind v4の規約**:
 
-- Use recommended classes (`bg-linear-to-r`, `text-balance`, `text-wrap`)
-- Avoid deprecated v3 syntax to prevent warnings
-- Theme: Light mode (`theme-light` class on `<html>`)
+- 推奨クラスを使う（`bg-linear-to-r`, `text-balance`, `text-wrap` など）
+- v3の非推奨構文は警告を避けるため使わない
+- テーマ: ライトモードは `<html>` に `theme-light` クラスを付与する方式（`app/globals.css` で属性セレクタによる上書きを実装。ハードコードされた色クラスに強く依存しており脆弱— Issue #116参照）
 
-**DQ-style UI** (Dragon Quest inspired):
+**DQ風UI**（ドラゴンクエスト風）:
 
-- `dq-window`, `dq-title`, `dq-item`: Quest log panels
-- `dq-button`, `dq-button-secondary`: Styled buttons
-- `dq-menu-item`: Menu items with hover state (left triangle `▶` moves right on hover)
-- Terminology: "クエスト", "ログ", "追加へ" (quest, log, add to)
+- `dq-window`, `dq-title`, `dq-item`: クエストログパネル
+- `dq-button`, `dq-button-secondary`: スタイル付きボタン
+- `dq-menu-item`: ホバー状態を持つメニュー項目（左向き三角 `▶` がホバーで右へ移動）
+- 用語: 「クエスト」「ログ」「追加へ」など
 
-**Component organization**:
+**コンポーネント構成**:
 
-- Page-level layout: `app/_components/layout.tsx` (`AppLayout`)
-- Feature-level: Co-locate components in `_components/` subdirs (e.g., `app/dashboard/_components/`)
-- Shared utilities: `lib/` (Zod schemas, Supabase clients, AI client, constants)
+- ページレベルのレイアウト: `app/_components/layout.tsx`（`AppLayout`）
+- 機能単位: `_components/` サブディレクトリにコンポーネントをコロケーションする（例: `app/dashboard/_components/`）
+- 共有ユーティリティ: `lib/`（Zodスキーマ、Supabaseクライアント、AIクライアント、定数）
 
-### Gamification (XP System)
+### ゲーミフィケーション（XPシステム）
 
-- Users earn XP for actions: ES creation, company addition, interview log, etc.
-- Level = `Math.floor(xp / 50) + 1`
-- XP logged in `xp_logs` table with `action` and optional `ref_id`
-- Dashboard displays current XP, level, and recent log entries
-- See `lib/xp/award-xp.ts` for awarding logic
+- ユーザーはアクション（ES作成、企業追加、面接ログ記録など）でXPを獲得する
+- レベル = `Math.floor(xp / 25) + 1`
+- XPは `action` と任意の `ref_id` とともに `xp_logs` テーブルに記録される
+- ダッシュボードに現在のXP・レベル・直近のログを表示する
+- 付与ロジックは `lib/xp/award-xp.ts` を参照（重複防止・日次上限・クールダウンあり）
 
-### Common Page Flows
+### よくあるページフロー
 
-**Dashboard (`/dashboard`)**:
+**ダッシュボード（`/dashboard`）**:
 
-- Fetches: ES entries, profile, calendar events, interviews, XP logs
-- Displays: Summary cards, calendar, goal/axis editor, recent activity
-- Protected: Redirects if not logged in
+- 取得データ: ESエントリー、プロフィール、カレンダーイベント、面接ログ、XPログ
+- 表示内容: サマリーカード、カレンダー、目標/軸エディタ、直近のアクティビティ
+- 保護ルート: 未ログインならリダイレクト
 
-**ES Management** (`/es`, `/es/new`, `/es/[id]`):
+**ES管理**（`/es`, `/es/new`, `/es/[id]`）:
 
-- Create/edit/delete with Markdown editor
-- Add questions and answers
-- AI review panel
-- Save triggers XP award
-- Delete also removes calendar event if present
+- Markdownエディタで作成/編集/削除
+- 質問と回答を追加
+- AI添削パネル
+- 保存でXP付与
+- 削除時、対応するカレンダーイベントがあれば併せて削除
 
-**Company Management** (`/companies`, `/companies/new`, `/companies/[id]`):
+**企業管理**（`/companies`, `/companies/new`, `/companies/[id]`）:
 
-- Track stage (未エントリー → 面接 → 内定 etc.)
-- Store mypage ID for tracking
-- AI company analysis panel
-- Preference/favorite flags
+- 選考ステージを追跡（未エントリー → 面接 → 内定 など）
+- マイページIDを保存して追跡
+- AI企業分析パネル
+- 志望度/お気に入りフラグ（`favorite`カラムは存在するがUI未実装 — Issue #114参照）
 
-**Login** (`/login`):
+**ログイン（`/login`）**:
 
-- Redirects to Supabase login (Google OAuth)
-- On success, Supabase redirects to `/auth/callback` → `/dashboard`
+- Supabaseログイン（Google OAuth）へリダイレクトする
+- 成功すると Supabase が `/auth/callback` → `/dashboard` へリダイレクトする
 
-### Development Rules (AGENTS.md)
+### 開発ルール（AGENTS.md）
 
-**Principles**:
+**原則**:
 
-- **YAGNI**: Only implement what's needed now; no speculative features
-- **KISS**: Prefer simple solutions over complex ones
-- **DRY**: Extract duplicated logic into shared utils/components
-- **Type safety**: Run `npm run type-check` after changes
-- **Validation**: Never trust user input; always validate with Zod
+- **YAGNI**: 今必要なものだけ実装する。投機的な機能追加はしない
+- **KISS**: 複雑な解決策よりシンプルな解決策を優先する
+- **DRY**: 重複したロジックは共有のutils/componentsへ抽出する
+- **型安全性**: 変更後は必ず `npm run type-check` を実行する
+- **バリデーション**: ユーザー入力を信用せず、常にZodで検証する
 
-**Implementation specifics**:
+**実装上の注意**:
 
-- Respect Server/Client Component boundaries (no mixing concerns)
-- Validate all form/API inputs before DB access
-- Use `createSupabaseReadonlyClient` in Server Components (no cookie mutation)
-- Use `createSupabaseServerActionClient` in Route Handlers (cookie mutation allowed)
-- AI calls must route through `lib/ai/client.ts`
-- AI keys not set → safe failure (no crashes)
-- Component max ~200 lines; split if larger
-- Directory structure: Group by feature/responsibility, not by type
+- Server/Client Componentの責務境界を尊重する（関心を混在させない）
+- すべてのフォーム/APIの入力をDBアクセス前に検証する
+- Server Componentでは `createSupabaseReadonlyClient` を使う（Cookieを変更しない）
+- Route Handlerでは `createSupabaseServerActionClient` を使う（Cookie変更可）
+- AI呼び出しは必ず `lib/ai/client.ts` を経由する
+- AIキー未設定時は安全に失敗する（クラッシュしない）
+- コンポーネントは最大200行程度。それを超えたら分割する
+- ディレクトリ構造: 種類別ではなく機能/責務別にグルーピングする
 
-**UI consistency**:
+**UIの一貫性**:
 
-- Use DQ-window/button classes as base
-- Left-triangle hover effect for menu items (no boxed buttons)
-- Quest/log terminology
+- DQ-window/buttonクラスをベースにする
+- メニュー項目は左向き三角のホバー効果を使う（ボックス状のボタンにしない）
+- クエスト/ログ用語を使う
 
-### Environment Variables
+### テスト
 
-**Required**:
+**単体テスト（Vitest）**:
+
+- テストファイルはテスト対象と同一ディレクトリにコロケーションし、`*.test.ts` サフィックスを使う
+- `test/helpers/supabase-mock.ts`: Supabaseクエリビルダーの手製フェイク（`from().select().eq().maybeSingle()` 等をチェーン可能）
+- `test/stubs/server-only.ts`: `server-only` パッケージ用の空スタブ（`vitest.config.ts` でエイリアス）
+- 詳細な設計は `docs/testing/unit-test-plan.md` を参照
+
+**E2Eテスト（Playwright）**:
+
+- テストは `e2e/` ディレクトリに配置する
+- 認証は「本番Supabaseに固定のテストユーザーA/Bを作成して流用」する方式。`POST /api/test-support/login` が `E2E_TEST_MODE=true` かつ `x-e2e-secret` ヘッダー一致という多重ガードの下でのみ、固定ユーザーのセッションを発行する
+- `e2e/global-setup.ts` がテストユーザーの作成〜ログイン〜`storageState` 保存までを行い、`e2e/global-teardown.ts` が全テスト終了後にテストユーザーの `es_entries` を一括削除する（本番Supabase流用に伴う安全策）
+- 本番Vercel環境変数には **`E2E_TEST_MODE` を絶対に設定しない**
+- 詳細な設計・セキュリティ上の注意点は `docs/testing/e2e-test-plan.md` を参照
+
+**CI（GitHub Actions）**:
+
+- `.github/workflows/checks.yml`: 静的チェック（`checks` = lint/type-check/format:checkを1ジョブに集約）+ `build`（本番ビルド確認）
+- `.github/workflows/test.yml`: `unit`（Vitest）+ `check-e2e-secrets`/`e2e`（Playwright。E2E用Secretsが未設定の間は自動スキップ）
+- devブランチには必須ステータスチェック（`checks`/`build`/`unit`）を要求するルールセットが設定されている
+
+### 環境変数
+
+**必須**:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
-NEXT_PUBLIC_SITE_URL=https://job-seeker-gray.vercel.app (or localhost:3000 locally)
+NEXT_PUBLIC_SITE_URL=https://job-seeker-gray.vercel.app (ローカルは localhost:3000)
 
 # AI
 AI_PROVIDER=gemini|gpt
 AI_PROVIDER_API_KEY=...
 
-# Optional AI customization
-AI_MODEL=gemini-1.5-flash-latest (for Gemini) or gpt-4o-mini (for GPT)
-AI_ENDPOINT=https://api.openai.com/v1/chat/completions (for custom OpenAI endpoint)
-AI_API_VERSION=v1beta (for Gemini)
+# AIの追加設定（任意）
+AI_MODEL=gemini-1.5-flash-latest (Geminiの場合) または gpt-4o-mini (GPTの場合)
+AI_ENDPOINT=https://api.openai.com/v1/chat/completions (カスタムOpenAIエンドポイントを使う場合)
+AI_API_VERSION=v1beta (Geminiの場合)
 
-# Contact form (SMTP)
+# 問い合わせフォーム（SMTP）
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=465
 SMTP_USER=your-mail@example.com
@@ -267,80 +299,92 @@ CONTACT_TO_EMAIL=contact-destination@example.com
 SMTP_SECURE=true
 ```
 
-### Supabase Auth Configuration
+**E2Eテスト用（任意。ローカルは `.env.test.local` に設定。CIはGitHub Secretsから注入）**:
 
-**Local development** (`http://localhost:3000`):
+```env
+E2E_TEST_MODE=true
+E2E_TEST_SECRET=...
+E2E_TEST_USER_EMAIL=...
+E2E_TEST_USER_PASSWORD=...
+E2E_TEST_USER2_EMAIL=...
+E2E_TEST_USER2_PASSWORD=...
+```
+
+### Supabase Auth設定
+
+**ローカル開発**（`http://localhost:3000`）:
 
 - Site URL: `http://localhost:3000`
 - Redirect URL: `http://localhost:3000/auth/callback`, `http://localhost:3000/dashboard`
 
-**Production** (`https://job-seeker-gray.vercel.app`):
+**本番**（`https://job-seeker-gray.vercel.app`）:
 
 - Site URL: `https://job-seeker-gray.vercel.app`
 - Redirect URL: `https://job-seeker-gray.vercel.app/auth/callback`, `https://job-seeker-gray.vercel.app/dashboard`
 
-Configure in Supabase Dashboard → Authentication → URL Configuration.
+Supabaseダッシュボード → Authentication → URL Configuration で設定する。
 
-### Page Structure
+### ページ構成
 
-**Layout hierarchy**:
+**レイアウト階層**:
 
-- `/` — Home (MVP intro, login/signup links)
-- `/login` — Google OAuth entry point
-- `/auth/callback` — OAuth callback handler, exchanges code for session
-- `/dashboard` — Main hub (read-only, protected)
-- `/es`, `/es/new`, `/es/[id]` — ES management
-- `/companies`, `/companies/new`, `/companies/[id]` — Company management
-- `/interviews`, `/interviews/new`, `/interviews/[id]` — Interview logs
-- `/self-analysis` — Self-analysis questionnaire + AI summary
-- `/aptitude` — Aptitude check + AI diagnosis
-- `/webtests`, `/webtests/new`, `/webtests/[id]` — Webtest practice
-- `/profile` — Edit user profile/goals
-- `/contact` — Feedback form (logged-in users)
+- `/` — ホーム（MVP紹介、ログイン/サインアップ導線）
+- `/login` — Google OAuthの入口
+- `/auth/callback` — OAuthコールバックハンドラ。codeをセッションに交換する
+- `/dashboard` — メインハブ（保護ルート）
+- `/es`, `/es/new`, `/es/[id]` — ES管理
+- `/companies`, `/companies/new`, `/companies/[id]` — 企業管理
+- `/interviews`, `/interviews/new`, `/interviews/[id]` — 面接ログ
+- `/self-analysis` — 自己分析アンケート＋AIサマリー
+- `/aptitude` — 適性チェック＋AI診断
+- `/webtests`, `/webtests/new`, `/webtests/[id]` — Webテスト練習
+- `/profile` — プロフィール/目標の編集
+- `/contact` — フィードバックフォーム（ログイン済みユーザー向け）
+- `/developer` — 開発者向け管理ページ（`isDeveloperUserId` でゲート。ナビゲーションリンクは無く、URL直打ちでのみアクセス）
 
-All protected pages: If `auth.getUser()` fails, redirect to `/login`.
+すべての保護ページ: `auth.getUser()` が失敗したら `/login` へリダイレクトする。
 
-### Type Definitions
+### 型定義
 
-- `lib/database.types.ts`: Auto-generated Supabase TypeScript types (from Supabase CLI or manual sync)
-- Database row types: e.g., `Database["public"]["Tables"]["es_entries"]["Row"]`
-- Use these to type-check queries and ensure DB changes propagate to TypeScript
+- `lib/database.types.ts`: Supabaseの型定義（Supabase CLIからの自動生成、または手動同期）
+- DBの行の型: 例 `Database["public"]["Tables"]["es_entries"]["Row"]`
+- クエリの型チェックと、DB変更のTypeScriptへの反映に使用する
 
-### Deployment
+### デプロイ
 
-- Hosted on **Vercel** (free Hobby tier)
-- Git push to main → auto-deploys
-- Environment variables set in Vercel dashboard
-- Preview deployments for branches
+- **Vercel**（無料のHobbyプラン）でホスティング
+- `dev` ブランチへのマージで自動デプロイ（GitHubのデフォルトブランチは `dev`。`master` は現在アクティブな開発フローでは使用していない — 扱いの決定はIssue #105参照）
+- 環境変数はVercelダッシュボードで設定する
+- ブランチごとにプレビューデプロイが作成される
 
-### Known Patterns & Pitfalls
+### 既知のパターン・落とし穴
 
-**Avoid**:
+**避けるべきこと**:
 
-- Writing auth logic in Server Components (use Route Handlers for session mutation)
-- Mixing Supabase clients (readonly in Server Components, action client in Route Handlers)
-- Skipping Zod validation on any user input
-- Hard-coding AI prompts outside `lib/ai/client.ts`
-- Querying without `user_id` scope (breaks RLS intent)
+- Server Component内で認証ロジックを書く（セッション変更にはRoute Handlerを使う）
+- Supabaseクライアントの混同（Server Componentではreadonly、Route Handlerではaction client）
+- ユーザー入力のZodバリデーションを省略する
+- AIプロンプトを `lib/ai/client.ts` の外にハードコードする
+- `user_id` スコープなしでクエリする（RLSの意図が崩れる）
 
-**Do**:
+**やるべきこと**:
 
-- Run `npm run type-check` after edits
-- Validate async/await in Route Handlers (await `supabase.auth.getUser()`)
-- Scope all DB queries to `user_id` via `.eq("user_id", userId)`
-- Test AI calls with missing keys to verify safe failure
-- Use `Promise.all()` for concurrent queries
-- Pass typed Supabase rows to components for type safety
+- 編集後は必ず `npm run type-check` を実行する
+- Route Handlerでのasync/awaitを正しく検証する（`supabase.auth.getUser()` を await する）
+- すべてのDBクエリを `.eq("user_id", userId)` で `user_id` にスコープする
+- AIキー未設定時の安全なフェイルオーバーをテストする
+- 並列クエリには `Promise.all()` を使う
+- 型付きのSupabase行をコンポーネントへ渡し、型安全性を保つ
 
 ## Cursor Rules
 
-See `AGENTS.md` for comprehensive Codex guidelines. Key excerpts:
+包括的なCodexガイドラインは `AGENTS.md` を参照。要点の抜粋:
 
-- Follow existing code structure and naming conventions
-- Respect App Router basics: Server/Client responsibilities
-- Auth queries must be `user_id`-scoped; unauth → redirect to `/login`
-- Zod validation for all inputs
-- AI calls through `lib/ai/` wrapper; safe failure on missing keys
-- Tailwind v4 recommended classes preferred; `bg-linear-to-*` etc.
-- DQ UI theme: `dq-window`, `dq-button`, menu items with triangle hover effect
-- Split components >200 lines; group by responsibility
+- 既存のコード構造・命名規則に従う
+- App Routerの基本（Server/Clientの責務）を尊重する
+- 認証クエリは `user_id` にスコープする。未認証は `/login` へリダイレクトする
+- すべての入力にZodバリデーションを行う
+- AI呼び出しは `lib/ai/` ラッパー経由。キー未設定時は安全に失敗する
+- Tailwind v4の推奨クラスを優先する（`bg-linear-to-*` など）
+- DQ UIテーマ: `dq-window`, `dq-button`、三角ホバー効果のメニュー項目
+- コンポーネントは200行を超えたら分割し、責務ごとにグルーピングする
