@@ -39,6 +39,38 @@
 
 ## 主要機能
 
+散らばりがちな就活タスクを、1つのダッシュボードに集約する構成です。
+
+```mermaid
+flowchart LR
+    subgraph Before["Before（分散管理）"]
+        W["Word (ES)"]
+        E["Excel (企業管理)"]
+        M["メモアプリ (面接/締切)"]
+    end
+    subgraph After["After（就活copilot）"]
+        D["ダッシュボード"]
+        ES["ES管理 + AI添削"]
+        Co["企業管理 + AI分析"]
+        Iv["面接ログ"]
+        Cal["カレンダー(締切/面接/インターン)"]
+        Sa["自己分析/適性チェック"]
+        Xp["XP・レベル(ゲーミフィケーション)"]
+    end
+
+    W -.-> D
+    E -.-> D
+    M -.-> D
+    D --> ES
+    D --> Co
+    D --> Iv
+    D --> Cal
+    D --> Sa
+    ES --> Xp
+    Co --> Xp
+    Iv --> Xp
+```
+
 - 認証: Supabase Auth（Google OAuth）。認証後は `/dashboard` へ。未ログイン時は各ページで `/login` にリダイレクト。
 - ダッシュボード: ES/企業カード/XP のサマリー、フォーカス、カレンダー表示。カレンダーでは ES 締切・面接・インターンなどの予定を追加/更新して保存（`/api/calendar-events`）し、ES 締切も自動表示。
 - ES 管理: 一覧・作成/編集・削除、Markdown 入力、タグ/ステータス、AI 添削パネル。

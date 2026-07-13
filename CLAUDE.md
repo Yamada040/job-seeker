@@ -50,12 +50,59 @@ npm run test
 
 ## コアアーキテクチャ
 
+```mermaid
+flowchart TB
+    subgraph Client["ブラウザ"]
+        UI["Client Components"]
+    end
+    subgraph Next["Next.js (App Router, Vercel)"]
+        SC["Server Components<br/>(読み取り専用)"]
+        SA["Server Actions / Route Handlers<br/>(書き込み可)"]
+        Proxy["proxy.ts (Middleware)<br/>認証ガード"]
+    end
+    subgraph External["外部サービス"]
+        Supabase["Supabase<br/>(Auth / Postgres+RLS)"]
+        AI["Gemini / GPT"]
+    end
+
+    UI -->|"fetch() POST"| SA
+    UI -.->|画面表示| SC
+    Proxy --> SC
+    Proxy --> SA
+    SC -->|readonly client| Supabase
+    SA -->|action client| Supabase
+    SA -->|createAiClient| AI
+```
+
+詳細な図解（認証フロー・AI連携フロー・XPフロー・CI）は [docs/architecture.md](./docs/architecture.md) を参照。
+
 ### 認証・認可
 
 - **Server Component**（`createSupabaseReadonlyClient`）: 読み取り専用。セッションを変更しない
 - **Route Handler / Server Action**（`createSupabaseServerActionClient`）: セッションCookieを変更できる
 - **認証ガード**: 未認証リクエストは `/login` へリダイレクトする。ユーザー情報は `supabase.auth.getUser()` で取得
 - **RLSの徹底**: すべてのクエリはDB層で `user_id` にスコープされる。SupabaseのRLSポリシーが他ユーザーのデータへのアクセスを防ぐ
+
+```mermaid
+sequenceDiagram
+    participant User as ユーザー
+    participant Google as Google OAuth
+    participant Supabase as Supabase Auth
+    participant Proxy as proxy.ts
+
+    User->>Supabase: signInWithOAuth() → Google
+    Google-->>Supabase: 認可コード
+    Supabase-->>User: セッションCookie発行、/dashboardへ
+
+    Note over Proxy: 以降の全リクエストで実行
+    User->>Proxy: 任意のページへアクセス
+    Proxy->>Supabase: auth.getUser()（Cookie検証）
+    alt 未ログイン かつ 保護ルート
+        Proxy-->>User: /login へリダイレクト
+    else ログイン済み かつ /login
+        Proxy-->>User: /dashboard へリダイレクト
+    end
+```
 
 **例**:
 
