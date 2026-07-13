@@ -107,6 +107,25 @@ flowchart TB
 - `computeLevel(xp) = Math.floor(xp / 25) + 1`
 - `redirect()` で終わるServer Actionは戻り値を返せないため、Cookie経由でフロントへXP変化を伝える一方通行の設計（`lib/xp/level-up-signal.ts`）
 
+## 代表的なデータフロー例: ES作成
+
+これまでの各フロー（Zodバリデーション・RLS・XP付与）が実際の機能でどう組み合わさるかの例として、ES新規作成（`/es/new` → `createEs` Server Action）の流れを示す。
+
+```mermaid
+flowchart TD
+    Form["/es/new のフォーム送信<br/>(company_name, title, questions_json 等)"]
+    Form --> Action["createEs(formData)<br/>app/es/actions.ts"]
+    Action --> AuthCheck{"認証済み?"}
+    AuthCheck -->|No| Redirect1["/login へリダイレクト"]
+    AuthCheck -->|Yes| Validate["esFormSchema.parse()<br/>lib/validation/schemas/forms.ts"]
+    Validate -->|不正| Throw["例外（error.tsx未整備のため<br/>Nextのクラッシュ画面 — Issue #109）"]
+    Validate -->|OK| Insert["es_entries へ insert<br/>(user_idスコープ、RLSで保護)"]
+    Insert --> Xp["awardXp(userId, 'es_submitted', {refId})<br/>lib/xp/award-xp.ts"]
+    Xp --> Revalidate["revalidatePath('/es')"]
+    Revalidate --> Redirect2["/es へリダイレクト"]
+    Redirect2 --> List["ES一覧に新しいカードが表示される"]
+```
+
 ## テスト・CI
 
 ```mermaid
@@ -124,25 +143,30 @@ flowchart LR
 
 ## ディレクトリ構成の要点
 
-```
-app/
-  <feature>/            # ルートセグメント（es, companies, interviews, ...）
-    _components/         # そのfeature専用のコンポーネント（コロケーション）
-    actions.ts            # Server Actions
-    page.tsx              # Server Component
-  api/<feature>/route.ts  # Route Handlers
-  _components/            # 全feature共有のコンポーネント（layout, ai-panel等）
-lib/
-  ai/                     # AIクライアント・設定・agentic company analysis
-  supabase/               # Supabaseクライアントファクトリ（readonly/action/admin）
-  validation/schemas/     # Zodスキーマ
-  xp/                     # XP計算・付与ロジック
-  rate-limit.ts           # 永続化レート制限
-e2e/                      # Playwright E2E
-docs/                     # このディレクトリ
-supabase/
-  schema.sql              # DBスキーマ正本
-  migrations/             # 差分（schema.sqlに追記済み）
+```mermaid
+flowchart TB
+    Root(("job-seeker/"))
+
+    Root --> App["app/"]
+    App --> Feature["&lt;feature&gt;/<br/>(es, companies, interviews, ...)"]
+    Feature --> FComp["_components/<br/>(feature専用、コロケーション)"]
+    Feature --> FAction["actions.ts (Server Actions)"]
+    Feature --> FPage["page.tsx (Server Component)"]
+    App --> Api["api/&lt;feature&gt;/route.ts<br/>(Route Handlers)"]
+    App --> Shared["_components/<br/>(layout, ai-panel等 全feature共有)"]
+
+    Root --> Lib["lib/"]
+    Lib --> LibAi["ai/ (クライアント・設定・agentic分析)"]
+    Lib --> LibSupabase["supabase/ (readonly/action/adminクライアント)"]
+    Lib --> LibValidation["validation/schemas/ (Zodスキーマ)"]
+    Lib --> LibXp["xp/ (XP計算・付与ロジック)"]
+    Lib --> LibRate["rate-limit.ts (永続化レート制限)"]
+
+    Root --> E2e["e2e/ (Playwright)"]
+    Root --> Docs["docs/ (このディレクトリ)"]
+    Root --> Supabase["supabase/"]
+    Supabase --> SchemaSql["schema.sql (DBスキーマ正本)"]
+    Supabase --> Migrations["migrations/ (差分、schema.sqlに追記済み)"]
 ```
 
 ## 既知の技術的負債（アーキテクチャ観点）
