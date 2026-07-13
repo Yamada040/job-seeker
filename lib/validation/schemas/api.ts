@@ -42,3 +42,8 @@ export const calendarEventSchema = z.object({
   type: z.string().optional().nullable(),
   time: z.string().optional().nullable(),
 });
+
+export const companyFavoriteSchema = z.object({
+  id: z.string().uuid(),
+  favorite: z.boolean(),
+});
