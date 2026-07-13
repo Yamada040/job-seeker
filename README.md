@@ -39,6 +39,38 @@
 
 ## 主要機能
 
+散らばりがちな就活タスクを、1つのダッシュボードに集約する構成です。
+
+```mermaid
+flowchart LR
+    subgraph Before["Before（分散管理）"]
+        W["Word (ES)"]
+        E["Excel (企業管理)"]
+        M["メモアプリ (面接/締切)"]
+    end
+    subgraph After["After（就活copilot）"]
+        D["ダッシュボード"]
+        ES["ES管理 + AI添削"]
+        Co["企業管理 + AI分析"]
+        Iv["面接ログ"]
+        Cal["カレンダー(締切/面接/インターン)"]
+        Sa["自己分析/適性チェック"]
+        Xp["XP・レベル(ゲーミフィケーション)"]
+    end
+
+    W -.-> D
+    E -.-> D
+    M -.-> D
+    D --> ES
+    D --> Co
+    D --> Iv
+    D --> Cal
+    D --> Sa
+    ES --> Xp
+    Co --> Xp
+    Iv --> Xp
+```
+
 - 認証: Supabase Auth（Google OAuth）。認証後は `/dashboard` へ。未ログイン時は各ページで `/login` にリダイレクト。
 - ダッシュボード: ES/企業カード/XP のサマリー、フォーカス、カレンダー表示。カレンダーでは ES 締切・面接・インターンなどの予定を追加/更新して保存（`/api/calendar-events`）し、ES 締切も自動表示。
 - ES 管理: 一覧・作成/編集・削除、Markdown 入力、タグ/ステータス、AI 添削パネル。
@@ -67,6 +99,14 @@
 | ホスティング   | **Vercel**                                  | Next.js との親和性が高く、Git 連携で CI/CD・プレビュー環境を即時に得られる。**無料枠（Hobby プラン）** でデプロイでき、インフラ管理も不要。                                                                               |
 
 > いずれも「**無料枠だけで完結させ運用コストをゼロにする**」「マネージド/サーバーレスで個人開発でも運用負荷を下げる」「ベンダーロックインを避ける」「型安全と入力検証でデータを守る」という方針に沿って選んでいます。Supabase・Vercel・AI（Gemini 無料枠）・SMTP（Gmail）とも無料の範囲で運用でき、**追加コストなしで公開・運用** できます。
+
+## ドキュメント
+
+- [docs/architecture.md](docs/architecture.md) — 全体構成・認証フロー・AI連携・XPフロー・CIの図解
+- [docs/database-schema.md](docs/database-schema.md) — DBスキーマの全テーブルリファレンス（ER図・未使用カラムの注記付き）
+- [docs/testing/unit-test-plan.md](docs/testing/unit-test-plan.md) — 単体テスト（Vitest）の設計
+- [docs/testing/e2e-test-plan.md](docs/testing/e2e-test-plan.md) — E2Eテスト（Playwright）の設計
+- [CLAUDE.md](CLAUDE.md) — AIエージェント（Claude Code）向けの開発ガイド。アーキテクチャ規約の要点はこちらにも集約
 
 ## セットアップ
 
@@ -112,13 +152,17 @@ Next.js 認証コールバック: `app/auth/callback/route.ts` で `exchangeCode
 
 ## DB スキーマ概要
 
-`supabase/schema.sql` に定義（すべて RLS 有効）
+`supabase/schema.sql` に定義（すべて RLS 有効）。全テーブルの詳細・ER図・未使用カラムの注記は [docs/database-schema.md](docs/database-schema.md) を参照。
 
 - `profiles`: ユーザープロフィール
 - `es_entries`: ES 本文/ステータス/締切など
 - `companies`: 企業カード
 - `xp_logs`: XP ログ
 - `calendar_events`: カレンダー予定（ES締切/面接/インターンなど）
+- `interview_logs`: 面接ログ
+- `aptitude_results` / `self_analysis_results`: 適性チェック/自己分析結果（ユーザー1人につき1件）
+- `webtest_questions` / `webtest_attempts`: Webテスト練習用の問題バンク
+- `api_rate_limits`: AIエンドポイントのレート制限状態
 
 カレンダー予定 API:
 
