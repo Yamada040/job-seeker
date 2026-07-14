@@ -318,6 +318,13 @@ if (!parsed.success) return { error: "Invalid input" };
 - `.github/workflows/test.yml`: `unit`（Vitest）+ `check-e2e-secrets`/`e2e`（Playwright。E2E用Secretsが未設定の間は自動スキップ）
 - devブランチには必須ステータスチェック（`checks`/`build`/`unit`）を要求するルールセットが設定されている
 
+### ブランチ運用
+
+- GitHubのデフォルトブランチは `dev`。通常の開発ブランチ・PRのbase・CI保護ルール・Vercelの本番デプロイは `dev` を基準にする。
+- `master` は現在の開発フローでは使用しない。古い履歴が残っているだけの非アクティブブランチとして扱い、新規PRのbaseや作業開始地点にしない。
+- リリース運用を `master` に戻す場合は、事前に運用方針をIssue/PRで明文化し、`dev` との差分を解消してから切り替える。
+- ローカル作業を始めるときは `git checkout dev && git pull --rebase origin dev` で最新の `dev` から作業ブランチを作成する。
+
 ### 環境変数
 
 **必須**:
@@ -400,7 +407,7 @@ Supabaseダッシュボード → Authentication → URL Configuration で設定
 ### デプロイ
 
 - **Vercel**（無料のHobbyプラン）でホスティング
-- `dev` ブランチへのマージで自動デプロイ（GitHubのデフォルトブランチは `dev`。`master` は現在アクティブな開発フローでは使用していない — 扱いの決定はIssue #105参照）
+- `dev` ブランチへのマージで自動デプロイ
 - 環境変数はVercelダッシュボードで設定する
 - ブランチごとにプレビューデプロイが作成される
 
