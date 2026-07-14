@@ -22,11 +22,15 @@ const STATUS_LABEL_MAP: Record<string, string> = {
   submitted: "提出済み",
 };
 
+function formatScore(score: number | null) {
+  return typeof score === "number" ? `${Math.round(score)}点` : "未採点";
+}
+
 export function EsListClient({ initialItems }: Props) {
   const [tab, setTab] = useState<(typeof TABS)[number]["value"]>("all");
   const [query, setQuery] = useState("");
 
-  const { filtered, counts } = useMemo(() => {
+  const { filtered, counts, scoreTrend } = useMemo(() => {
     const items = Array.isArray(initialItems) ? initialItems : [];
     const filtered = items.filter((item) => {
       const q = query.toLowerCase();
@@ -42,6 +46,14 @@ export function EsListClient({ initialItems }: Props) {
         draft: filtered.filter((i) => i.status === "draft").length,
         submitted: filtered.filter((i) => i.status === "submitted").length,
       },
+      scoreTrend: items
+        .filter((item) => typeof item.score === "number")
+        .sort((a, b) => {
+          const aTime = new Date(a.updated_at ?? a.created_at ?? 0).getTime();
+          const bTime = new Date(b.updated_at ?? b.created_at ?? 0).getTime();
+          return aTime - bTime;
+        })
+        .slice(-6),
     };
   }, [initialItems, query, tab]);
 
@@ -71,6 +83,37 @@ export function EsListClient({ initialItems }: Props) {
         />
       </div>
 
+      {scoreTrend.length ? (
+        <div className="rounded-xl border border-yellow-300/30 bg-yellow-500/10 px-4 py-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold text-yellow-200">ES添削スコア推移</p>
+              <p className="text-[11px] text-white/60">直近の採点済みESを更新順に表示</p>
+            </div>
+            <span className="rounded-full border border-yellow-300/40 bg-black/50 px-2 py-1 text-[11px] text-yellow-100">
+              最新 {formatScore(scoreTrend.at(-1)?.score ?? null)}
+            </span>
+          </div>
+          <div className="mt-3 flex h-24 items-end gap-2">
+            {scoreTrend.map((item) => {
+              const score = Math.round(item.score ?? 0);
+              return (
+                <div key={item.id} className="flex min-w-0 flex-1 flex-col items-center gap-1">
+                  <div className="flex h-16 w-full items-end rounded bg-black/40 px-1">
+                    <div
+                      className="w-full rounded-t bg-yellow-300"
+                      style={{ height: `${Math.max(8, Math.min(100, score))}%` }}
+                      title={`${item.title ?? "ES"}: ${score}点`}
+                    />
+                  </div>
+                  <span className="w-full truncate text-center text-[10px] text-white/60">{score}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
       <div className="grid gap-3 sm:grid-cols-2">
         {filtered.map((es) => (
           <Link
@@ -82,6 +125,15 @@ export function EsListClient({ initialItems }: Props) {
             <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-white/70">
               <span className="rounded-full border border-white/40 bg-black/60 px-2 py-1 text-white">
                 {STATUS_LABEL_MAP[es.status ?? ""] ?? "未設定"}
+              </span>
+              <span
+                className={`rounded-full border px-2 py-1 ${
+                  typeof es.score === "number"
+                    ? "border-yellow-300/50 bg-yellow-500/20 text-yellow-100"
+                    : "border-white/30 bg-black/40 text-white/50"
+                }`}
+              >
+                {formatScore(es.score)}
               </span>
               {es.tags?.length ? (
                 es.tags.map((tag) => (

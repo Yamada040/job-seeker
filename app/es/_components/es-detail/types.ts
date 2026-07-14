@@ -10,6 +10,7 @@ export type Entry = {
   title: string | null;
   status: string | null;
   content_md: string | null;
+  score: number | null;
   ai_summary: string | null;
   tags: string[] | null;
 };
