@@ -99,6 +99,7 @@ export default async function EsDetailPage({ params }: { params: Promise<{ id: s
           title: data.title,
           status: data.status,
           content_md: data.content_md,
+          score: data.score,
           tags: data.tags,
           ai_summary: data.ai_summary,
         }}

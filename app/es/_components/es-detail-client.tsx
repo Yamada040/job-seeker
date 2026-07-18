@@ -15,6 +15,10 @@ type Props = {
   handleDelete: (formData: FormData) => Promise<void>;
 };
 
+function formatScore(score: number | null) {
+  return typeof score === "number" ? `${Math.round(score)}点` : "未採点";
+}
+
 export function EsDetailClient({ entry, questions, combinedContent, handleUpdate, handleDelete }: Props) {
   const [editing, setEditing] = useState(entry.status !== "submitted");
 
@@ -30,6 +34,15 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
             }`}
           >
             {entry.status === "submitted" ? "提出済み" : "下書き"}
+          </span>
+          <span
+            className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+              typeof entry.score === "number"
+                ? "border-yellow-300/60 bg-yellow-500/20 text-yellow-100"
+                : "border-white/30 bg-black/40 text-white/50"
+            }`}
+          >
+            AIスコア: {formatScore(entry.score)}
           </span>
           {entry.status === "submitted" && !editing && (
             <span className="text-xs text-white/50">提出済みをプレビュー表示中</span>
@@ -173,6 +186,24 @@ export function EsDetailClient({ entry, questions, combinedContent, handleUpdate
                 <p className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">
                   {entry.title || "-"}
                 </p>
+              </div>
+              <div>
+                <p className="text-xs text-white/70">AI添削スコア</p>
+                <div className="rounded-md border border-[#3f3f46] bg-[#1a1a1a] px-3 py-2 text-white">
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg font-semibold text-yellow-100">{formatScore(entry.score)}</span>
+                    {typeof entry.score === "number" ? (
+                      <div className="h-2 flex-1 rounded-full bg-black/60">
+                        <div
+                          className="h-2 rounded-full bg-yellow-300"
+                          style={{ width: `${Math.max(0, Math.min(100, Math.round(entry.score)))}%` }}
+                        />
+                      </div>
+                    ) : (
+                      <span className="text-xs text-white/50">AI添削を保存すると表示されます</span>
+                    )}
+                  </div>
+                </div>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
