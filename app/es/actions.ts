@@ -1,45 +1,11 @@
 ﻿"use server";
 
-import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createSupabaseActionClient } from "@/lib/supabase/supabase-server";
-import { esFormSchema, esQuestionsSchema } from "@/lib/validation/schemas/forms";
+import { esFormSchema } from "@/lib/validation/schemas/forms";
 import { awardXp } from "@/lib/xp/award-xp";
-
-type Question = { id: string; prompt: string; answer_md: string };
-
-function parseQuestions(questionsJson: string | null): Question[] {
-  if (!questionsJson) return [];
-  try {
-    const questionsValue = JSON.parse(questionsJson);
-    const validated = esQuestionsSchema.parse(questionsValue);
-    return validated
-      .map((q) => ({
-        id: typeof q?.id === "string" ? q.id : randomUUID(),
-        prompt: typeof q?.prompt === "string" ? q.prompt : "",
-        answer_md: typeof q?.answer_md === "string" ? q.answer_md : "",
-      }))
-      .filter((q) => q.prompt.trim() || q.answer_md.trim());
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      throw new Error("questions_json must be valid JSON");
-    }
-    throw error;
-  }
-}
-
-function combineContent(questions: Question[], fallback: string) {
-  if (!questions.length) return fallback;
-  return questions
-    .map((q) => {
-      const prompt = q.prompt?.trim() ?? "";
-      const answer = q.answer_md?.trim() ?? "";
-      return [prompt, answer].filter(Boolean).join("\n");
-    })
-    .filter(Boolean)
-    .join("\n\n");
-}
+import { combineContent, parseQuestions } from "./actions-utils";
 
 export async function createEs(formData: FormData) {
   const supabase = await createSupabaseActionClient();
