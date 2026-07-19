@@ -11,7 +11,7 @@ export default async function CompaniesPage() {
 
   const { data, error } = await supabase
     .from("companies")
-    .select("id, name, industry, stage, preference, memo, updated_at")
+    .select("id, name, industry, stage, preference, memo, updated_at, favorite, mypage_url")
     .eq("user_id", userData.user!.id)
     .order("updated_at", { ascending: false });
 

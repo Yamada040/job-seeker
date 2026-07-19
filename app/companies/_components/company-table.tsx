@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, StarIcon as StarOutlineIcon } from "@heroicons/react/24/outline";
+import { StarIcon as StarSolidIcon } from "@heroicons/react/24/solid";
 import { ROUTES } from "@/lib/constants/routes";
 
 type Company = {
@@ -12,30 +13,52 @@ type Company = {
   stage?: string | null;
   preference?: number | null;
   memo?: string | null;
+  favorite?: boolean | null;
+  mypage_url?: string | null;
 };
 
 export function CompanyTable({ items }: { items: Company[] }) {
+  const [companies, setCompanies] = useState(items);
   const [industry, setIndustry] = useState<string>("");
   const [keyword, setKeyword] = useState("");
+  const [favoriteOnly, setFavoriteOnly] = useState(false);
 
   const industryOptions = useMemo(() => {
     const set = new Set<string>();
-    items.forEach((c) => {
+    companies.forEach((c) => {
       if (c.industry) set.add(c.industry);
     });
     return Array.from(set);
-  }, [items]);
+  }, [companies]);
 
   const filtered = useMemo(() => {
-    return items.filter((c) => {
-      const matchIndustry = industry ? c.industry === industry : true;
-      const kw = keyword.trim().toLowerCase();
-      const matchKeyword = kw
-        ? [c.name, c.stage, c.memo, c.industry].some((v) => (v || "").toLowerCase().includes(kw))
-        : true;
-      return matchIndustry && matchKeyword;
-    });
-  }, [industry, items, keyword]);
+    const kw = keyword.trim().toLowerCase();
+    return companies
+      .filter((c) => {
+        const matchIndustry = industry ? c.industry === industry : true;
+        const matchFavorite = favoriteOnly ? c.favorite === true : true;
+        const matchKeyword = kw
+          ? [c.name, c.stage, c.memo, c.industry].some((v) => (v || "").toLowerCase().includes(kw))
+          : true;
+        return matchIndustry && matchFavorite && matchKeyword;
+      })
+      .sort((a, b) => Number(b.favorite === true) - Number(a.favorite === true));
+  }, [companies, favoriteOnly, industry, keyword]);
+
+  const toggleFavorite = async (company: Company) => {
+    const nextFavorite = company.favorite !== true;
+    const res = await fetch("/api/companies/favorite", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: company.id, favorite: nextFavorite }),
+    }).catch(() => null);
+
+    if (!res?.ok) return;
+
+    setCompanies((current) =>
+      current.map((item) => (item.id === company.id ? { ...item, favorite: nextFavorite } : item)),
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -65,6 +88,15 @@ export function CompanyTable({ items }: { items: Company[] }) {
               ))}
             </select>
           </div>
+          <label className="dq-panel flex items-center gap-2 px-3 py-2 text-sm text-white">
+            <input
+              type="checkbox"
+              checked={favoriteOnly}
+              onChange={(e) => setFavoriteOnly(e.target.checked)}
+              className="h-4 w-4 accent-yellow-300"
+            />
+            <span>お気に入りのみ</span>
+          </label>
         </div>
       </div>
 
@@ -72,10 +104,11 @@ export function CompanyTable({ items }: { items: Company[] }) {
         <table className="w-full table-fixed divide-y divide-white/10 text-sm text-white">
           <thead className="bg-black/60">
             <tr>
-              <Th className="w-[35%]">企業名</Th>
-              <Th className="w-[30%]">業界</Th>
-              <Th className="w-[20%]">ステータス</Th>
-              <Th className="w-[15%]">志望度</Th>
+              <Th className="w-[10%]">★</Th>
+              <Th className="w-[32%]">企業名</Th>
+              <Th className="w-[28%]">業界</Th>
+              <Th className="w-[18%]">ステータス</Th>
+              <Th className="w-[12%]">志望度</Th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/10">
@@ -88,6 +121,20 @@ export function CompanyTable({ items }: { items: Company[] }) {
             ) : (
               filtered.map((c) => (
                 <tr key={c.id} className="hover:bg-white/5">
+                  <Td>
+                    <button
+                      type="button"
+                      onClick={() => void toggleFavorite(c)}
+                      aria-label={c.favorite === true ? "お気に入りを解除" : "お気に入りに追加"}
+                      className="rounded-full p-1 text-yellow-200 transition hover:bg-yellow-300/10"
+                    >
+                      {c.favorite === true ? (
+                        <StarSolidIcon className="h-5 w-5" />
+                      ) : (
+                        <StarOutlineIcon className="h-5 w-5" />
+                      )}
+                    </button>
+                  </Td>
                   <Td className="truncate">
                     <Link
                       href={ROUTES.COMPANY_DETAIL(c.id)}
@@ -96,6 +143,17 @@ export function CompanyTable({ items }: { items: Company[] }) {
                     >
                       {c.name}
                     </Link>
+                    {c.mypage_url?.trim() ? (
+                      <a
+                        href={c.mypage_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1 block truncate text-xs text-yellow-100/80 hover:text-yellow-100 hover:underline"
+                        title={c.mypage_url}
+                      >
+                        マイページを開く
+                      </a>
+                    ) : null}
                   </Td>
                   <Td className="truncate">
                     <span title={c.industry || "-"} className="block truncate">
